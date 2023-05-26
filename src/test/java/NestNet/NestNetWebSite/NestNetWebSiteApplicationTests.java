@@ -1,0 +1,13 @@
+package NestNet.NestNetWebSite;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class NestNetWebSiteApplicationTests {
+
+	@Test
+	void contextLoads() {
+	}
+
+}
