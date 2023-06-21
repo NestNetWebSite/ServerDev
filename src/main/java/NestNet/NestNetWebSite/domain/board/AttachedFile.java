@@ -1,10 +1,11 @@
 package NestNet.NestNetWebSite.domain.board;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 
 @Entity
-@Getter
+@Getter @Builder
 public class AttachedFile {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,8 +16,8 @@ public class AttachedFile {
     @JoinColumn(name = "board_id")
     private Board board;                                        // 게시판
 
-    private String fileName;                                    // 파일 이름
-
-    private String filePath;                                    // 파일 경로 (서버)
+    private String originalFileName;                                    // 파일 이름
+    private String saveFileName;
+    private String saveFilePath;                                    // 파일 경로 (서버)
 
 }
