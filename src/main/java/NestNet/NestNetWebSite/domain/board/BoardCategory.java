@@ -1,5 +1,5 @@
 package NestNet.NestNetWebSite.domain.board;
 
 public enum BoardCategory {
-    동아리소개, 학교생활, 활동, 자료실, 출석부, 정보, 공지사항
+    자유, 개발, 진로, 족보, 공식문서, 취업정보
 }

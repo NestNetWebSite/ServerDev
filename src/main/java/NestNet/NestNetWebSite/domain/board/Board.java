@@ -2,6 +2,7 @@ package NestNet.NestNetWebSite.domain.board;
 
 import NestNet.NestNetWebSite.domain.member.Member;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,8 +12,8 @@ import java.util.List;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(name = "Dtype")
-@Getter
+@DiscriminatorColumn(name = "dtype")
+@Getter @Builder
 public abstract class Board {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +22,7 @@ public abstract class Board {
 
     private String title;                                       // 제목
 
-    private String BodyContent;                                 // 본문
+    private String bodyContent;                                 // 본문
 
     @ManyToOne(fetch = FetchType.LAZY)  //단반향
     @JoinColumn(name = "member_id")
@@ -41,6 +42,18 @@ public abstract class Board {
 
     private LocalDateTime modifiedTime;                          // 글 수정한 시각
 
+    public Board() {}
+
+    public Board(String title, String bodyContent, Member member, int viewCount, int recommendationCount, BoardCategory boardCategory, LocalDateTime createdTime) {
+        this.title = title;
+        this.bodyContent = bodyContent;
+        this.member = member;
+        this.viewCount = viewCount;
+        this.recommendationCount = recommendationCount;
+        this.boardCategory = boardCategory;
+        this.createdTime = createdTime;
+    }
+
     //== setter ==//
 
     public void setTitle(String title) {
@@ -48,7 +61,7 @@ public abstract class Board {
     }
 
     public void setBodyContent(String bodyContent) {
-        BodyContent = bodyContent;
+        this.bodyContent = bodyContent;
     }
 
     public void setModifiedTime(LocalDateTime modifiedTime) {

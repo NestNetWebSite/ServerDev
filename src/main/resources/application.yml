@@ -10,6 +10,7 @@ spring:
       ddl-auto: update
     properties:
       hibernate:
+        default_batch_fetch_size: 100
         show_sql: true            # sout으로 sql 출력
         format_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect

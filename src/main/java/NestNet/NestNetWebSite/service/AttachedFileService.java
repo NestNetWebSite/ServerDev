@@ -25,16 +25,17 @@ public class AttachedFileService {
     private final BoardRepository boardRepository;
 
     @Transactional
-    public Long save(List<AttachedFileDto> attachedFileDtos, Long boardId){
-//        Board board = boardRepository.찾는 매서드
+    public void save(List<AttachedFileDto> attachedFileDtos, Long boardId){
+        Board board = boardRepository.findById(boardId);
         saveFiles(attachedFileDtos);
         for(AttachedFileDto fileDto : attachedFileDtos){
             AttachedFile attachedFile = fileDto.toEntity(board);
+            attachedFileRepository.save(attachedFile);
         }
 
     }
 
-    //파일 저장
+    //파일 저장 (물리적)
     public void saveFiles(List<AttachedFileDto> attachedFileDtos){
         for(AttachedFileDto fileDto : attachedFileDtos){
             MultipartFile multipartFile = fileDto.getFile();
