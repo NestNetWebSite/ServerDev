@@ -1,5 +1,6 @@
 package NestNet.NestNetWebSite.controller;
 
+import NestNet.NestNetWebSite.domain.board.BoardType;
 import NestNet.NestNetWebSite.dto.AttachedFileDto;
 import NestNet.NestNetWebSite.dto.ExamCollectionBoardDto;
 import NestNet.NestNetWebSite.dto.UnifiedBoardDto;
@@ -7,9 +8,7 @@ import NestNet.NestNetWebSite.service.AttachedFileService;
 import NestNet.NestNetWebSite.service.BoardService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -30,6 +29,11 @@ public class BoardController {
     public void savePost(@RequestBody @Valid UnifiedBoardDto boardDto, @RequestBody @Valid List<AttachedFileDto> attachedFileDtos){
         attachedFileService.saveFiles(attachedFileDtos);
         boardService.save(boardDto);
+    }
+
+    @GetMapping("/unified_board/{board_type}")
+    public void showPost(@PathVariable("board_type") BoardType board_type){
+        boardService.findAllFromUnifiedBoard(board_type, )
     }
 
 }

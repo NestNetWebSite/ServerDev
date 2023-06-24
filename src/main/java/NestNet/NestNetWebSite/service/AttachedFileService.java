@@ -24,6 +24,7 @@ public class AttachedFileService {
     private final AttachedFileRepository attachedFileRepository;
     private final BoardRepository boardRepository;
 
+    // Create
     @Transactional
     public void save(List<AttachedFileDto> attachedFileDtos, Long boardId){
         Board board = boardRepository.findById(boardId);
