@@ -28,17 +28,22 @@ public class MemberRepository {
     }
 
     // 로그인 아이디로 회원 단건 조회
-    public List<Member> findByLoginId(String LoginId){
-        return entityManager.createQuery("select m from Member m where m.loginId = :LoginId", Member.class)
-                .setParameter("LoginId", LoginId)
+    public List<Member> findByLoginId(String loginId){
+        List<Member> members = entityManager.createQuery("select m from Member m where m.loginId =: loginId", Member.class)
+                .setParameter("loginId", loginId)
                 .getResultList();
+
+        System.out.println(members);
+
+        return members;
 
     }
 
-    //회원 권한으로 회원 단건 조회
+    // 권한으로 회원 조회
     public List<Member> findByAuthority(MemberAuthority memberAuthority){
         return entityManager.createQuery("select m from Member m where m.memberAuthority =: memberAuthority", Member.class)
                 .setParameter("memberAuthority", memberAuthority)
                 .getResultList();
     }
+
 }

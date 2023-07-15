@@ -1,12 +1,18 @@
 package NestNet.NestNetWebSite.domain.member;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Member {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,7 +25,13 @@ public class Member {
 
     private String name;                            // 이름 (본명)
 
+    private boolean graduated;                      // 졸업 여부
+
+    private int graduateYear;                       // 졸업 년도
+
     private String studentId;                       // 학번
+
+    private int grade;                              // 학년
 
     private String emailAddress;                    // 이메일 주소
 
@@ -28,28 +40,28 @@ public class Member {
 
     private LocalDateTime joinDate;                 // 회원가입 날짜
 
-    //== setter ==//
-    public void setLoginId(String loginId) {
+    public Member(String loginId, String loginPassword, String name, String studentId, String emailAddress, MemberAuthority memberAuthority) {
         this.loginId = loginId;
-    }
-
-    public void setLoginPassword(String loginPassword) {
         this.loginPassword = loginPassword;
-    }
-
-    public void setName(String name) {
         this.name = name;
-    }
-
-    public void setStudentId(String studentId) {
         this.studentId = studentId;
-    }
-
-    public void setEmailAddress(String emailAddress) {
         this.emailAddress = emailAddress;
+        this.memberAuthority = memberAuthority;
+        this.joinDate = LocalDateTime.now();
     }
 
+    //== setter ==//
     public void setMemberAuthority(MemberAuthority memberAuthority) {
         this.memberAuthority = memberAuthority;
+    }
+
+    //== 비지니스 로직 ==//
+    /*
+    재학생 -> 졸업생으로 전환
+     */
+    public void changeMemberToGraduate(){
+        this.graduated = true;
+        this.graduateYear = LocalDateTime.now().getYear();
+        this.memberAuthority = MemberAuthority.GRADUATED_MEMBER;
     }
 }

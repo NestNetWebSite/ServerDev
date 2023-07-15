@@ -1,23 +1,20 @@
-package NestNet.NestNetWebSite.domain.board;
+package NestNet.NestNetWebSite.domain.post;
 
 import NestNet.NestNetWebSite.domain.member.Member;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "dtype")
-@Getter @Builder
-public abstract class Board {
+@Getter
+public abstract class Post {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "board_id")
+    @Column(name = "Post_id")
     private Long id;                                            // PK
 
     private String title;                                       // 제목
@@ -28,7 +25,7 @@ public abstract class Board {
     @JoinColumn(name = "member_id")
     private Member member;                                      // 글 쓴 멤버
 
-//    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
+//    @OneToMany(mappedBy = "Post", cascade = CascadeType.ALL)
 //    private List<Comment> comments = new ArrayList<>();          // 댓글
 
     private int viewCount;                                       // 조회 수
@@ -36,21 +33,21 @@ public abstract class Board {
     private int recommendationCount;                             // 추천 수
 
     @Enumerated(value = EnumType.STRING)
-    private BoardCategory boardCategory;                         // 게시판 분류
+    private PostCategory PostCategory;                         // 게시판 분류
 
     private LocalDateTime createdTime;                           // 글 쓴 시각
 
     private LocalDateTime modifiedTime;                          // 글 수정한 시각
 
-    public Board() {}
+    public Post() {}
 
-    public Board(String title, String bodyContent, Member member, int viewCount, int recommendationCount, BoardCategory boardCategory, LocalDateTime createdTime) {
+    public Post(String title, String bodyContent, Member member, int viewCount, int recommendationCount, PostCategory PostCategory, LocalDateTime createdTime) {
         this.title = title;
         this.bodyContent = bodyContent;
         this.member = member;
         this.viewCount = viewCount;
         this.recommendationCount = recommendationCount;
-        this.boardCategory = boardCategory;
+        this.PostCategory = PostCategory;
         this.createdTime = createdTime;
     }
 

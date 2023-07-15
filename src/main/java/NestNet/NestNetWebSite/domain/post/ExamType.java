@@ -1,4 +1,4 @@
-package NestNet.NestNetWebSite.domain.board;
+package NestNet.NestNetWebSite.domain.post;
 
 public enum ExamType {
     중간, 기말

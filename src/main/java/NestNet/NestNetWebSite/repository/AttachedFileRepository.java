@@ -1,7 +1,7 @@
 package NestNet.NestNetWebSite.repository;
 
-import NestNet.NestNetWebSite.domain.board.AttachedFile;
-import NestNet.NestNetWebSite.domain.board.Board;
+import NestNet.NestNetWebSite.domain.post.AttachedFile;
+import NestNet.NestNetWebSite.domain.post.Post;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -25,9 +25,9 @@ public class AttachedFileRepository {
     }
 
     // 게시물에 해당하는 파일 조회
-    public List<AttachedFile> findByBoard(Board board){
-        return entityManager.createQuery("select a from AttachedFile a where a.board =: board")
-                .setParameter("board", board)
+    public List<AttachedFile> findByPost(Post post){
+        return entityManager.createQuery("select a from AttachedFile a where a.Post =: post")
+                .setParameter("Post", post)
                 .getResultList();
     }
 }

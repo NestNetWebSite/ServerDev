@@ -1,8 +1,9 @@
-package NestNet.NestNetWebSite.dto;
+package NestNet.NestNetWebSite.dto.request;
 
-import NestNet.NestNetWebSite.domain.board.AttachedFile;
-import NestNet.NestNetWebSite.domain.board.Board;
+import NestNet.NestNetWebSite.domain.post.AttachedFile;
+import NestNet.NestNetWebSite.domain.post.Post;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -10,18 +11,19 @@ import java.text.Normalizer;
 import java.util.UUID;
 
 @Getter
-public class AttachedFileDto {
+@NoArgsConstructor
+public class AttachedFileRequestDto {
 
     private MultipartFile file;
-    private Long boardId;
+    private Long PostId;
     private String folderName;                  //폴더명. ex) 족보, 공식문서, 자유게시판, 개발게시판, 진로게시판...
     private String originalFileName;
     private String saveFileName;
     private String saveFilePath;
     private static String basePath = "C:" + File.separator + "nestnetFile" + File.separator;
 
-    public AttachedFileDto(Long boardId, MultipartFile file, String folderName) {
-        this.boardId = boardId;
+    public AttachedFileRequestDto(Long PostId, MultipartFile file, String folderName) {
+        this.PostId = PostId;
         this.file = file;
         this.folderName = folderName;
 
@@ -30,9 +32,9 @@ public class AttachedFileDto {
     }
 
     //== DTO ---> Entity ==//
-    public AttachedFile toEntity(Board board){      //연관관계 가 있는 엔티티는 id를 이용해 찾고 주입
+    public AttachedFile toEntity(Post post){      //연관관계 가 있는 엔티티는 id를 이용해 찾고 주입
         return AttachedFile.builder()
-                .board(board)
+                .post(post)
                 .originalFileName(this.originalFileName)
                 .saveFileName(this.saveFileName)
                 .saveFilePath(this.saveFilePath)

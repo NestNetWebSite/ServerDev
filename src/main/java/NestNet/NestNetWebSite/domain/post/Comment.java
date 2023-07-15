@@ -1,4 +1,4 @@
-package NestNet.NestNetWebSite.domain.board;
+package NestNet.NestNetWebSite.domain.post;
 
 import NestNet.NestNetWebSite.domain.member.Member;
 import jakarta.persistence.*;
@@ -13,8 +13,8 @@ public class Comment {
     private Long id;                        // PK
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_id")
-    private Board board;                    // 게시판
+    @JoinColumn(name = "Post_id")
+    private Post Post;                    // 게시판
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")

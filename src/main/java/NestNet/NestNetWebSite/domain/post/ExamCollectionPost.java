@@ -1,19 +1,16 @@
-package NestNet.NestNetWebSite.domain.board;
+package NestNet.NestNetWebSite.domain.post;
 
 import NestNet.NestNetWebSite.domain.member.Member;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @DiscriminatorValue("Exam")
 @Getter
-public class ExamCollectionBoard extends Board{
+public class ExamCollectionPost extends Post{
 
     private String subject;                                             // 과목
 
@@ -26,16 +23,16 @@ public class ExamCollectionBoard extends Board{
     @Enumerated(EnumType.STRING)
     private ExamType examType;                                          // 중간/기말 분류
 
-//    @OneToMany(mappedBy = "examCollectionBoard", cascade = CascadeType.ALL)
+//    @OneToMany(mappedBy = "examCollectionPost", cascade = CascadeType.ALL)
 //    private List<AttachedFile> attachedFileList = new ArrayList<>();    // 첨부파일
 
-    protected ExamCollectionBoard(){}
+    protected ExamCollectionPost(){}
 
     @Builder
-    public ExamCollectionBoard(String title, String bodyContent, Member member, int viewCount, int recommendationCount, BoardCategory boardCategory,
+    public ExamCollectionPost(String title, String bodyContent, Member member, int viewCount, int recommendationCount, PostCategory postCategory,
                                LocalDateTime createdTime, String subject, String professsor, int year, int semester, ExamType examType) {
 
-        super(title, bodyContent, member, viewCount, recommendationCount, boardCategory, createdTime);
+        super(title, bodyContent, member, viewCount, recommendationCount, postCategory, createdTime);
         this.subject = subject;
         this.professsor = professsor;
         this.year = year;
