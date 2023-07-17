@@ -59,9 +59,13 @@ public class SecurityConfig {
                 //로그인, 회원가입 api는 토큰이 없는 상태로 요청이 들어오기 때문에 permitAll()로 열어줌
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()       //html, css같은 정적 리소스에 대해 접근 허용
-                        .requestMatchers("/auth/signup", "/auth/login", "/manager/approve-signup").permitAll()
+                        .requestMatchers("/auth/signup", "auth/login").permitAll()          //로그인, 회원가입 접근 허용
+                        .requestMatchers("/manager/**").hasRole("MANAGER")                  //manager하위 리소스는 MANAGER 권한으로 허용
                         .anyRequest().authenticated()       //나머지 요청은 모두 권한 필요함.
+
                 )
+
+
 
                 // 세션을 사용하지 않기 때문에 STATELESS로 설정
                 .sessionManagement(sessionManagement ->
