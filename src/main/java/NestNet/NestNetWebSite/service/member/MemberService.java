@@ -12,6 +12,7 @@ import NestNet.NestNetWebSite.exception.DuplicateMemberException;
 import NestNet.NestNetWebSite.repository.MemberRepository;
 import NestNet.NestNetWebSite.repository.MemberSignUpManagementRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -32,6 +33,7 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final TokenProvider tokenProvider;
+    private final RedisTemplate<String, Object> redisTemplate;
 
 
     /*
@@ -67,31 +69,44 @@ public class MemberService {
     /*
     로그인
      */
+    @Transactional
     public JwtAccessTokenDto login(LoginRequestDto loginRequestDto){
-        Member member = memberRepository.findByLoginId(loginRequestDto.getLoginId()).get(0);
-
-//        System.out.println(member.getLoginId());
 
         //인증되기 전의 Authentication 객체
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginRequestDto.getLoginId(), loginRequestDto.getPassword());
 
-        System.out.println("인증되기 전 : " + authenticationToken);
-
         //인증
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-
-        System.out.println("인증 후 시큐리티 저장 전 : " + authentication);
 
         //스프링 시큐리티 컨텍스트에 인증 정보 저장
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        System.out.println("저장 후");
-
         String jwt = tokenProvider.createJwtToken(authentication);
 
-        System.out.println("jwt 토큰 : " + jwt);
+        redisTemplate.opsForValue().set(loginRequestDto.getLoginId(), jwt);         //redis에 저장 key : 아이디, value : jwt 토큰
 
         return new JwtAccessTokenDto(jwt);
     }
+
+    /*
+    로그아웃
+     */
+    @Transactional
+    public void logout(JwtAccessTokenDto accessTokenDto){
+
+        if(tokenProvider.validateToken(accessTokenDto.getToken())){
+            throw new IllegalArgumentException("로그아웃 : 유효하지 않은 토큰입니다. ");
+        }
+
+        // 토큰에서 Authentication 객체 뽑아냄
+        Authentication authentication = tokenProvider.getAuthentication(accessTokenDto.getToken());
+
+        //redis에 있는 jwt토큰 삭제
+        if(redisTemplate.opsForValue().get(authentication.getName()) != null){
+            redisTemplate.delete(authentication.getName());
+        }
+
+    }
+
 }

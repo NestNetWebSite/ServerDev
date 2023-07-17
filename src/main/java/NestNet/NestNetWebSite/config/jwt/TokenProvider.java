@@ -7,12 +7,14 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.security.Key;
 import java.util.Arrays;
@@ -32,6 +34,7 @@ public class TokenProvider implements InitializingBean {
     @Value("#{environment['jwt.token-validity-in-seconds']}")
     private long tokenValidityInMilliseconds;                   // 토큰 유효기간
     private Key key;
+    private RedisTemplate<String, Object> redisTemplate;
 
     /*
    빈이 생성되고 의존관계 주입까지 완료된 후, Key 변수에 값 할당
@@ -97,12 +100,19 @@ public class TokenProvider implements InitializingBean {
     }
 
     /*
+    토큰의 유효기간 가져오기
+     */
+
+
+    /*
    유효한 토큰인지 확인
     */
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-            return true;
+            if(StringUtils.hasText(checkInRedis(token))){
+                return true;
+            }
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             log.info("잘못된 JWT 서명입니다.");
         } catch (ExpiredJwtException e) {
@@ -113,5 +123,13 @@ public class TokenProvider implements InitializingBean {
             log.info("JWT 토큰이 잘못되었습니다.");
         }
         return false;
+    }
+
+    /*
+    redis에서 access 토큰의 logout 여부 확인
+     */
+    private String checkInRedis(String token){
+
+        return (String) redisTemplate.opsForValue().get(token);
     }
 }
