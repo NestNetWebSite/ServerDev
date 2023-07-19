@@ -4,6 +4,7 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,20 +22,23 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Component
 @Slf4j
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class TokenProvider implements InitializingBean {
 
     private static final String AUTHORITIES_KEY = "auth";
     @Value("#{environment['jwt.secret']}")
     private String secret;                                      // 시크릿 키
-    @Value("#{environment['jwt.token-validity-in-seconds']}")
-    private long tokenValidityInMilliseconds;                   // 토큰 유효기간
+    @Value("#{environment['jwt.access-exp-time']}")
+    private long accessTokenExpTime;                            // access 토큰 유효 기간
+    @Value("#{environment['jwt.refresh-exp-time']}")
+    private long refreshTokenExpTime;                           // refresh 토큰 유효 기간
     private Key key;
-    private RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
 
     /*
    빈이 생성되고 의존관계 주입까지 완료된 후, Key 변수에 값 할당
@@ -48,32 +52,56 @@ public class TokenProvider implements InitializingBean {
     /*
     로그인한 사용자의 Authentication를 이용하여 access 토큰 발급
      */
-    public String createJwtToken(Authentication authentication){
+    public String createAccessToken(Authentication authentication){
 
-        long now = (new Date()).getTime();     //현재 시간
-        Date validity = new Date(now + this.tokenValidityInMilliseconds);    //현재시간 + 토큰 유효 시간 == 만료날짜
+        Date now = new Date();
+        Date validity = new Date(now.getTime() + this.accessTokenExpTime);    //현재시간 + 토큰 유효 시간 == 만료날짜
 
         String authority = null;
-        if (authentication.getAuthorities().size() > 0){        //권한이 있을 경우
+        if (authentication.getAuthorities().size() > 0){            //권한이 있을 경우
             authority = authentication.getAuthorities().iterator().next().getAuthority();
         }
 
         return Jwts.builder()
-                .setSubject(authentication.getName())
-                .setExpiration(validity)
+                .setSubject(authentication.getName())           //로그인 아이디
                 .claim(AUTHORITIES_KEY, authority)
+                .setIssuedAt(now)                               //생성날짜
+                .setExpiration(validity)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
     }
 
     /*
-    remember-me 토큰 발급
+    로그인한 사용자의 Authentication를 이용하여 refresh 토큰 발급
      */
-//    public String createRememberMeToken(Object principal){
-//        String randomVal = UUID.randomUUID().toString();
-//
-//        return randomVal + principal.toString();
-//    }
+    public String createRefreshToken(Authentication authentication){
+
+        Date now = new Date();
+        Date validity = new Date(now.getTime() + this.refreshTokenExpTime);    //현재시간 + 토큰 유효 시간 == 만료날짜
+
+        String authority = null;
+        if (authentication.getAuthorities().size() > 0){            //권한이 있을 경우
+            authority = authentication.getAuthorities().iterator().next().getAuthority();
+        }
+
+        String refreshToken = Jwts.builder()
+                .setSubject(authentication.getName())
+                .claim(AUTHORITIES_KEY, authority)
+                .setIssuedAt(now)                               //생성날짜
+                .setExpiration(validity)
+                .signWith(key, SignatureAlgorithm.HS512)
+                .compact();
+
+        // redis에 저장
+        redisTemplate.opsForValue().set(
+                authentication.getName(),           // 로그인 아이디
+                refreshToken,
+                refreshTokenExpTime,
+                TimeUnit.MILLISECONDS
+        );
+
+        return refreshToken;
+    }
 
     /*
     jwt access 토큰을 이용하여 Authentication 객체 리턴
@@ -99,20 +127,15 @@ public class TokenProvider implements InitializingBean {
         return new UsernamePasswordAuthenticationToken(principal, accessToken, authority);
     }
 
-    /*
-    토큰의 유효기간 가져오기
-     */
-
 
     /*
    유효한 토큰인지 확인
     */
     public boolean validateToken(String token) {
+
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-            if(StringUtils.hasText(checkInRedis(token))){
-                return true;
-            }
+            return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             log.info("잘못된 JWT 서명입니다.");
         } catch (ExpiredJwtException e) {
@@ -125,11 +148,4 @@ public class TokenProvider implements InitializingBean {
         return false;
     }
 
-    /*
-    redis에서 access 토큰의 logout 여부 확인
-     */
-    private String checkInRedis(String token){
-
-        return (String) redisTemplate.opsForValue().get(token);
-    }
 }

@@ -18,13 +18,11 @@ import org.springframework.data.redis.support.collections.RedisProperties;
 @EnableRedisRepositories        //레디스 리포지토리 활성화
 public class RedisConfig {
 
-    @Value("#{environment['cache.redis.host']}")
+    @Value("#{environment['spring.data.redis.host']}")
     private String host;
 
-    @Value("#{environment['cache.redis.port']}")
+    @Value("#{environment['spring.data.redis.port']}")
     private int port;
-
-    private final RedisProperties redisProperties;
 
     /*
     레디스 연결
@@ -35,18 +33,18 @@ public class RedisConfig {
     }
 
     /*
-    레디스 템플릿을 이용한 데이터 저장, 조회 . 데이터를 직렬화하여 바이트 형태로 전송해야 한다.
+    redis template을 이용해 데이터 접근한다. RedisTemplate로 레디스 서버에 명령을 수행한다.
      */
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(){
+    public RedisTemplate<String, String> redisTemplate() {
 
-        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();        //레디스에 데이터 저장,조회 담당
-        redisTemplate.setKeySerializer(new StringRedisSerializer());                //key 직렬화
-        redisTemplate.setValueSerializer(new StringRedisSerializer());              //value 직렬화
+        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();        // redisTemplate를 받아와서 set, get, delete를 사용
+
+        redisTemplate.setKeySerializer(new StringRedisSerializer());        // 데이터 직렬화
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
 
         redisTemplate.setConnectionFactory(redisConnectionFactory());
 
         return redisTemplate;
     }
-
 }

@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,16 +33,29 @@ public class CustomJwtFilter extends GenericFilterBean {
 
         log.info("requestURI: " + requestURI);
 
-        //jwt 문자열이 null이 아니고 유효한 토큰이면 스프링 시큐리티 컨텍스트에 Authentication 객체 저장
-        if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
-            Authentication authentication = tokenProvider.getAuthentication(jwt);      //토큰에서 Authentication 정보 뽑아서 UsernamePasswordAuthenticationToken 객체 리턴
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);       //스프링 시큐리티에 Authetication 저장
-
-            log.debug("Security Context에 '{}' 인증 정보를 저장했습니다, uri: {}", authentication.getName(), requestURI);
-        } else {
+        try{
+            if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)){
+                Authentication authentication = tokenProvider.getAuthentication(jwt);      //토큰에서 Authentication 정보 뽑아서 UsernamePasswordAuthenticationToken 객체 리턴
+                SecurityContextHolder.getContext().setAuthentication(authentication);       //스프링 시큐리티에 Authetication 저장
+                log.debug("Security Context에 '{}' 인증 정보를 저장했습니다, uri: {}", authentication.getName(), requestURI);
+            }
+        } catch (RedisConnectionFailureException e){
+            SecurityContextHolder.clearContext();
+            log.info("레디스 연결에 문제가 생겼습니다.");
+        } catch (Exception e){
             log.debug("유효한 JWT 토큰이 없습니다, uri: {}", requestURI);
         }
+
+        //jwt 문자열이 null이 아니고 유효한 토큰이면 스프링 시큐리티 컨텍스트에 Authentication 객체 저장
+//        if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
+//            Authentication authentication = tokenProvider.getAuthentication(jwt);      //토큰에서 Authentication 정보 뽑아서 UsernamePasswordAuthenticationToken 객체 리턴
+//
+//            SecurityContextHolder.getContext().setAuthentication(authentication);       //스프링 시큐리티에 Authetication 저장
+//
+//            log.debug("Security Context에 '{}' 인증 정보를 저장했습니다, uri: {}", authentication.getName(), requestURI);
+//        } else {
+//            log.debug("유효한 JWT 토큰이 없습니다, uri: {}", requestURI);
+//        }
 
         chain.doFilter(request, response);
     }

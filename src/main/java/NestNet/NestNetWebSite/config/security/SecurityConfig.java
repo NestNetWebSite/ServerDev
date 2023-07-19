@@ -1,5 +1,6 @@
 package NestNet.NestNetWebSite.config.security;
 
+import NestNet.NestNetWebSite.config.auth.CustomAuthorizationFilter;
 import NestNet.NestNetWebSite.config.jwt.CustomJwtFilter;
 import NestNet.NestNetWebSite.config.jwt.TokenProvider;
 import NestNet.NestNetWebSite.config.jwt.errorHandler.JwtAccessDeniedHandler;
@@ -8,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -34,6 +37,13 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration authenticationConfiguration
+    ) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
     /*
     스프링 시큐리티 구성을 정의하는 필터체인 구성
      */
@@ -42,6 +52,9 @@ public class SecurityConfig {
         http
                 //API 통신을 하는 애플리케이션의 경우 csrf 공격을 받을 가능성이 없기 때문에 @EnableWebSecurity의 csrf 보호 기능을 해제
                 .csrf(csrf -> csrf.disable())
+
+                //jwt를 사용하기 때문에 세션 사용하지 않음
+                .sessionManagement((sessionManagement) -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 //UsernamePasswordAuthenticationFilter 앞에 corsFilter 추가
                 .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
@@ -65,13 +78,6 @@ public class SecurityConfig {
 
                 )
 
-
-
-                // 세션을 사용하지 않기 때문에 STATELESS로 설정
-                .sessionManagement(sessionManagement ->
-                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-
                 //브라우저 자동 로그인
 //                .rememberMe(rememberMe -> rememberMe
 //                        .key("uniqueKey")                       // 토큰을 암호화하는 데 사용될 키
@@ -86,9 +92,6 @@ public class SecurityConfig {
 
                         )
                 );
-
-                // JwtSecurityConfig 클래스를 이용하여 JWT 관련 설정 적용   -> addfilter로 바꿈
-//                .apply(new JwtSecurityConfig(tokenProvider));
 
         return http.build();
     }

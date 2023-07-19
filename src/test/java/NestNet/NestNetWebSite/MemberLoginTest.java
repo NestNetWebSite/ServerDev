@@ -25,7 +25,7 @@ public class MemberLoginTest {
         LoginRequestDto dto = new LoginRequestDto("kksshh0612", "kksshh1735");
 
         //when
-        System.out.println(memberService.login(dto).getToken());
+
 
         //then
     }
