@@ -44,8 +44,9 @@ public class ManagerService {
     @Transactional
     public ApiResult<?> approveSignUp(MemberSignUpManagementRequestDto dto){
 
-        Member member = memberRepository.findByLoginId(dto.getLoginId()).get(0);
+        Member member = memberRepository.findByLoginId(dto.getLoginId());
         member.setMemberAuthority(dto.getMemberAuthority());         //권한 설정
+        memberSignUpManagementRepository.findByMember(member).setComplete(true);
 
         System.out.println("여기여기여기여긱여기");
 

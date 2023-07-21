@@ -1,6 +1,7 @@
 package NestNet.NestNetWebSite.config.auth;
 
 import NestNet.NestNetWebSite.config.jwt.TokenProvider;
+import NestNet.NestNetWebSite.exception.CustomException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,37 +32,38 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {       //ht
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
+        System.out.println("CustomAuthorizationFilter ");
+
         String servletPath = request.getServletPath();
-        String authorizationHeader = request.getHeader(AUTHORIZATION_HEADER);
         String requestURI = request.getRequestURI();
 
-        //로그인 or 리프레시 요청이면 토큰을 검사하지 않음
-        if(servletPath.equals("auth/login") || servletPath.equals("auth/refresh")){
-            filterChain.doFilter(request, response);
-        }
-        else if(authorizationHeader == null ||!authorizationHeader.startsWith("Bearer ")){  //토큰 값이 없거나 정상적이지 않을 때
-            log.info("CustomAuthorizationFilter: JWT 토큰이 존재하지 않거나 정상적이지 않습니다.");
-
-            //=========추후 예외처리 관련하여 리펙토링 예정=========//
-
+        //회원가입 or 로그인 or 리프레시 요청이면 토큰을 검사하지 않음
+        if(servletPath.equals("/auth/signup") || servletPath.equals("/auth/login") || servletPath.equals("/auth/refresh")){
+            log.info(servletPath + " : 토큰을 검사하지 않음");
         }
         else{
+            System.out.println("CustomAuthorizationFilter 여기 들어오나?");
             try{
-                String accessToken = authorizationHeader.substring(("Bearer ").length());       //access토큰 꺼내옴
+                String accessToken = tokenProvider.resolveToken(request);
+
+                System.out.println("여기 토큰 : " + accessToken);
 
                 // access 토큰 검증
-
                 if(StringUtils.hasText(accessToken) && tokenProvider.validateToken(accessToken)){
                     Authentication authentication = tokenProvider.getAuthentication(accessToken);
-                    SecurityContextHolder.getContext().setAuthentication(authentication);       //스프링 시큐리티에 Authetication 저장
+                    System.out.println("여기 authentication : " + authentication);
+                    //토큰을 통해 생성한 Authentication 객체 스프링 시큐리티 컨텍스트에 저장
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
                     log.debug("Security Context에 '{}' 인증 정보를 저장했습니다, uri: {}", authentication.getName(), requestURI);
                 }
-                filterChain.doFilter(request, response);        //인증 처리 후 다음 필터 수행
 
-            } catch (Exception e) {      //만료됐을때 처리. refresh 토큰으로부터 access토큰 발행받도록
-
+            } catch (CustomException e) {      //만료됐을때 처리. refresh 토큰으로부터 access토큰 발행받도록
+                SecurityContextHolder.clearContext();
+                System.out.println("만료");
+//                response.sendError(e.getHttpStatus().value(), e.getMessage());
+                return;
             }
         }
-
+        filterChain.doFilter(request, response);        //다음 필터 실행
     }
 }

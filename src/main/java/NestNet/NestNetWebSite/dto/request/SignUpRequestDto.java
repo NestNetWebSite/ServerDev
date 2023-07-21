@@ -27,10 +27,6 @@ public class SignUpRequestDto {
         this.memberAuthority = memberAuthority;
     }
 
-    public void setLoginPassword(String loginPassword) {
-        this.loginPassword = loginPassword;
-    }
-
     public Member toEntity(){
         return Member.builder()
                 .loginId(this.loginId)

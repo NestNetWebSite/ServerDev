@@ -1,20 +1,24 @@
 package NestNet.NestNetWebSite.config.security;
 
 import NestNet.NestNetWebSite.config.auth.CustomAuthorizationFilter;
-import NestNet.NestNetWebSite.config.jwt.CustomJwtFilter;
 import NestNet.NestNetWebSite.config.jwt.TokenProvider;
 import NestNet.NestNetWebSite.config.jwt.errorHandler.JwtAccessDeniedHandler;
 import NestNet.NestNetWebSite.config.jwt.errorHandler.JwtAuthenticationEntryPoint;
+import NestNet.NestNetWebSite.repository.MemberRepository;
+import NestNet.NestNetWebSite.service.member.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -31,18 +35,43 @@ public class SecurityConfig {
     private final CorsFilter corsFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private final MemberRepository memberRepository;
 
+    /*
+    비밀번호 암호화를 담당할 인코더 설정
+     */
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
 
+    /*
+    loadUserByUsername 을 사용하여 UserDetails 객체를 가져올 수 있도록 하는 설정
+    UserDetails는 시큐리티 컨텍스트에 사용자 정보를 담는 인터페이스
+     */
     @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration authenticationConfiguration
-    ) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+    public UserDetailsService userDetailsService(){
+        return new CustomUserDetailsService(memberRepository);
     }
+
+    /*
+    커스텀 필터 등록
+     */
+    @Bean
+    public CustomAuthorizationFilter customAuthorizationFilter(){
+        return new CustomAuthorizationFilter(tokenProvider);
+    }
+
+
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider(){
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService());
+        provider.setPasswordEncoder(passwordEncoder());
+
+        return provider;
+    }
+
 
     /*
     스프링 시큐리티 구성을 정의하는 필터체인 구성
@@ -57,10 +86,12 @@ public class SecurityConfig {
                 .sessionManagement((sessionManagement) -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 //UsernamePasswordAuthenticationFilter 앞에 corsFilter 추가
-                .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
+//                .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
+
 
                 //jwt 커스텀 필터 추가
-                .addFilterBefore(new CustomJwtFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class)
+//                .addFilterBefore(new CustomJwtFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class)
+//                .addFilterBefore(customAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
 
                 //각 예외 인터페이스를 커스텀한 두 예외 등록. 401, 403 에러
                 .exceptionHandling(exceptionHandling -> exceptionHandling
@@ -74,6 +105,7 @@ public class SecurityConfig {
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()       //html, css같은 정적 리소스에 대해 접근 허용
                         .requestMatchers("/auth/signup", "auth/login").permitAll()          //로그인, 회원가입 접근 허용
                         .requestMatchers("/manager/**").hasRole("MANAGER")                  //manager하위 리소스는 MANAGER 권한으로 허용
+                        .requestMatchers("/auth/president").hasAuthority("PRESIDENT")                  //manager하위 리소스는 MANAGER 권한으로 허용
                         .anyRequest().authenticated()       //나머지 요청은 모두 권한 필요함.
 
                 )
@@ -92,6 +124,10 @@ public class SecurityConfig {
 
                         )
                 );
+
+        http
+                .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(customAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

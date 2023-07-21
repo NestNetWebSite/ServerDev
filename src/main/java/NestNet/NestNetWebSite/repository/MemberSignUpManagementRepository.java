@@ -20,7 +20,9 @@ public class MemberSignUpManagementRepository {
 
     // 회원가입 요청 모두 조회
     public List<MemberSignUpManagement> findAll(){
-        List<MemberSignUpManagement> resultList = entityManager.createQuery("select mr from  MemberSignUpManagement mr")
+        List<MemberSignUpManagement> resultList = entityManager.createQuery(
+                "select mr from  MemberSignUpManagement mr where mr.isComplete = false",
+                        MemberSignUpManagement.class)
                 .getResultList();
 
         return resultList;
@@ -34,7 +36,9 @@ public class MemberSignUpManagementRepository {
     // 회원가입 요청 Member로 조회
     public MemberSignUpManagement findByMember(Member member){
 
-        return entityManager.createQuery("select mr from MemberSignUpManagement mr where mr.member =: member", MemberSignUpManagement.class)
+        return entityManager.createQuery(
+                        "select mr from MemberSignUpManagement mr where mr.member =: member and mr.isComplete = false ",
+                        MemberSignUpManagement.class)
                 .setParameter("member", member)
                 .getResultList().get(0);
     }

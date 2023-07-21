@@ -9,10 +9,14 @@ import NestNet.NestNetWebSite.dto.request.LoginRequestDto;
 import NestNet.NestNetWebSite.dto.request.SignUpRequestDto;
 import NestNet.NestNetWebSite.dto.response.JwtAccessTokenDto;
 import NestNet.NestNetWebSite.dto.response.TokenDto;
+import NestNet.NestNetWebSite.exception.CustomException;
 import NestNet.NestNetWebSite.exception.DuplicateMemberException;
 import NestNet.NestNetWebSite.repository.MemberRepository;
 import NestNet.NestNetWebSite.repository.MemberSignUpManagementRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -24,11 +28,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Slf4j
 public class MemberService {
 
     private final MemberRepository memberRepository;
     private final MemberSignUpManagementRepository memberSignUpManagementRepository;
     private final PasswordEncoder passwordEncoder;
+//    private final AuthenticationManager authenticationManager;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final TokenProvider tokenProvider;
 
@@ -39,26 +45,25 @@ public class MemberService {
     @Transactional
     public ApiResult<?> sendSignUpRequest(SignUpRequestDto signUpRequestDto){
 
-        if(!memberRepository.findByLoginId(signUpRequestDto.getLoginId()).isEmpty()){
-            throw new DuplicateMemberException("이미 가입된 유저입니다.");
+        // 아이디 중복 확인
+        if(memberRepository.findByLoginId(signUpRequestDto.getLoginId()) != null){
+            return ApiResult.error(409, "이미 가입된 유저 아이디입니다.");
+//            throw new DuplicateMemberException("이미 가입된 유저입니다.");
         }
 
         MemberAuthority enrollAuthority = signUpRequestDto.getMemberAuthority();        //사용자가 신청한 권한 (PRESIDENT, VICE_PRESIDENT, MANAGER, GENERAL_MEMBER, GRADUATED_MEMBER)
 
-        System.out.println(enrollAuthority);
-
         signUpRequestDto.setMemberAuthority(MemberAuthority.WAITING_FOR_APPROVAL);                          //권한을 승인대기중으로 변경
-        signUpRequestDto.setLoginPassword(passwordEncoder.encode(signUpRequestDto.getLoginPassword()));     //비밀번호 인코딩해서 저장
 
         Member joinMember = signUpRequestDto.toEntity();
-        MemberSignUpManagement signUpRequest = new MemberSignUpManagement(joinMember, enrollAuthority);
+        joinMember.encodePassword(passwordEncoder);         //비밀번호 인코딩해서 저장
 
-        System.out.println("MemberService 저장 전");
+        MemberSignUpManagement signUpRequest = new MemberSignUpManagement(joinMember, enrollAuthority);
 
         memberRepository.save(joinMember);
         memberSignUpManagementRepository.save(signUpRequest);
 
-        System.out.println("MemberService 저장 후 ");
+        log.info("MemberService.class / sendSignUpRequest");
 
         return ApiResult.success("회원가입 신청이 성공적으로 처리되었습니다.");
     }
@@ -66,24 +71,27 @@ public class MemberService {
     /*
     로그인
      */
-    @Transactional
     public TokenDto login(LoginRequestDto loginRequestDto){
 
-        //인증되기 전의 Authentication 객체
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(loginRequestDto.getLoginId(), loginRequestDto.getPassword());
+        try{
+            //인증되기 전의 Authentication 객체
+            UsernamePasswordAuthenticationToken authenticationToken =
+                    new UsernamePasswordAuthenticationToken(loginRequestDto.getLoginId(), loginRequestDto.getPassword());
 
-        //인증
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+            //인증 후의 객체
+            //authenticationManager가 UserDetailsService의 loadByUsername매서드를 호출한 후 인증 수행
+            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
-        //스프링 시큐리티 컨텍스트에 인증 정보 저장
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+            log.info("MemberService / login 매서드 : 인증 후의 Authentication 객체 " + authentication);
 
-        //엑세스, 리프레쉬 토큰 Dto
-        TokenDto tokenDto = new TokenDto(tokenProvider.createAccessToken(authentication),tokenProvider.createRefreshToken(authentication));
+            TokenDto tokenDto = new TokenDto(tokenProvider.createAccessToken(authentication), tokenProvider.createRefreshToken(authentication));
+
+            return tokenDto;
+        } catch (CustomException e){
+            throw new CustomException("로그인 아이디 / 비밀번호 불일치", HttpStatus.BAD_REQUEST);
+        }
 
 
-        return tokenDto;
     }
 
     /*

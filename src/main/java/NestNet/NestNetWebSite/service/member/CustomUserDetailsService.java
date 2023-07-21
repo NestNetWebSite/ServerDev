@@ -3,6 +3,7 @@ package NestNet.NestNetWebSite.service.member;
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -17,6 +18,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
@@ -25,10 +27,12 @@ public class CustomUserDetailsService implements UserDetailsService {
     사용자 아이디를 통해 UserDetails 객체를 반환
      */
     @Override
-    @Transactional
     public UserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
 
-        Member member = memberRepository.findByLoginId(loginId).get(0);
+        Member member = memberRepository.findByLoginId(loginId);
+
+        log.info("CustomUserDetailsService / loadUserByUsername 매서드 : " + member.getLoginId() + " 유저 찾음");
+
         if (member == null) {
             throw new UsernameNotFoundException(loginId + " : 해당 유저를 데이터베이스에서 찾을 수 없습니다.");
         } else {

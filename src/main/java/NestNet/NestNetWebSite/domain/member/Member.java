@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 
@@ -57,6 +58,21 @@ public class Member {
 
     //== 비지니스 로직 ==//
     /*
+    비밀번호 암호화
+     */
+    public Member encodePassword(PasswordEncoder passwordEncoder){
+        this.loginPassword = passwordEncoder.encode(this.loginPassword);
+        return this;
+    }
+
+    /*
+    비밀번호가 맞는지 확인
+     */
+    public boolean checkPassword(String rawPassword, PasswordEncoder passwordEncoder){
+        return passwordEncoder.matches(rawPassword, this.getLoginPassword());
+    }
+
+    /*
     재학생 -> 졸업생으로 전환
      */
     public void changeMemberToGraduate(){
@@ -64,4 +80,5 @@ public class Member {
         this.graduateYear = LocalDateTime.now().getYear();
         this.memberAuthority = MemberAuthority.GRADUATED_MEMBER;
     }
+
 }

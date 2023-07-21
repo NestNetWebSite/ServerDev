@@ -18,10 +18,12 @@ public class ApiResult<T> {
     }
 
     public static <T> ApiResult<T> success(T response) {
+
         return new ApiResult<>(true, response, null);
     }
 
     public static <T> ApiResult<?> error(int status, String message) {
+
         return new ApiResult<>(false, null, new ApiError(status, message));
     }
 
