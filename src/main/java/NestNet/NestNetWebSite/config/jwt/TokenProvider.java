@@ -156,13 +156,11 @@ public class TokenProvider implements InitializingBean {
     }
 
     /*
-    HTTP 헤더에서 Bearer 토큰은 가져옴
+    HTTP 헤더에서 access 토큰 가져옴
      */
     public String resolveToken(HttpServletRequest request){
 
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
-
-        System.out.println("resolve : " + bearerToken);
 
         //"Bearer " 부분 슬라이싱. 바로 뒤부터 토큰임
 //        if(bearerToken != null && bearerToken.startsWith("Bearer ")){
@@ -173,6 +171,23 @@ public class TokenProvider implements InitializingBean {
         }
 
         return null;
+    }
+
+    /*
+    HTTP 요청의 쿠키에서 refresh 토큰 가져옴
+     */
+    public String getRefreshToken(HttpServletRequest request){
+
+        String refreshToken = null;
+
+        Cookie[] cookies = request.getCookies();
+        for(Cookie cookie : cookies){
+            if(cookie.getName().equals("refresh-token")){
+                refreshToken = cookie.getValue();
+            }
+        }
+
+        return refreshToken;
     }
 
 }

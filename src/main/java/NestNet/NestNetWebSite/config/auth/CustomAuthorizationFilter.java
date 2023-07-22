@@ -59,8 +59,14 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {       //ht
 
             } catch (CustomException e) {      //만료됐을때 처리. refresh 토큰으로부터 access토큰 발행받도록
                 SecurityContextHolder.clearContext();
-                System.out.println("만료");
-//                response.sendError(e.getHttpStatus().value(), e.getMessage());
+                log.debug("access 토큰 만료");
+
+                String refreshToken = tokenProvider.getRefreshToken(request);       //쿠키에서 리프레쉬 토큰 가져옴
+
+                /*
+                레디스랑 비교하는 로직 들어가야 함.
+                 */
+
                 return;
             }
         }
