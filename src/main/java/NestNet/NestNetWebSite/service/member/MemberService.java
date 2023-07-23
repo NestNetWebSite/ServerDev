@@ -6,6 +6,7 @@ import NestNet.NestNetWebSite.domain.manager.MemberSignUpManagement;
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.member.MemberAuthority;
 import NestNet.NestNetWebSite.dto.request.LoginRequestDto;
+import NestNet.NestNetWebSite.dto.request.RefreshtokenRequestDto;
 import NestNet.NestNetWebSite.dto.request.SignUpRequestDto;
 import NestNet.NestNetWebSite.dto.response.JwtAccessTokenDto;
 import NestNet.NestNetWebSite.dto.response.TokenDto;
@@ -13,6 +14,7 @@ import NestNet.NestNetWebSite.exception.CustomException;
 import NestNet.NestNetWebSite.exception.DuplicateMemberException;
 import NestNet.NestNetWebSite.repository.MemberRepository;
 import NestNet.NestNetWebSite.repository.MemberSignUpManagementRepository;
+import NestNet.NestNetWebSite.service.token.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -25,6 +27,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -34,10 +38,8 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final MemberSignUpManagementRepository memberSignUpManagementRepository;
     private final PasswordEncoder passwordEncoder;
-//    private final AuthenticationManager authenticationManager;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final TokenProvider tokenProvider;
-
 
     /*
     관리자에게 회원가입 요청을 보냄
@@ -71,6 +73,7 @@ public class MemberService {
     /*
     로그인
      */
+    @Transactional
     public TokenDto login(LoginRequestDto loginRequestDto){
 
         try{
@@ -90,23 +93,21 @@ public class MemberService {
         } catch (CustomException e){
             throw new CustomException("로그인 아이디 / 비밀번호 불일치", HttpStatus.BAD_REQUEST);
         }
-
-
     }
 
     /*
     로그아웃
      */
-    @Transactional
-    public void logout(JwtAccessTokenDto accessTokenDto){
-
-        if(tokenProvider.validateToken(accessTokenDto.getToken())){
-            throw new IllegalArgumentException("로그아웃 : 유효하지 않은 토큰입니다. ");
-        }
-
-        // 토큰에서 Authentication 객체 뽑아냄
-        Authentication authentication = tokenProvider.getAuthentication(accessTokenDto.getToken());
-
-    }
+//    @Transactional
+//    public void logout(JwtAccessTokenDto accessTokenDto){
+//
+//        if(tokenProvider.validateToken(accessTokenDto.getToken())){
+//            throw new IllegalArgumentException("로그아웃 : 유효하지 않은 토큰입니다. ");
+//        }
+//
+//        // 토큰에서 Authentication 객체 뽑아냄
+//        Authentication authentication = tokenProvider.getAuthentication(accessTokenDto.getToken());
+//
+//    }
 
 }

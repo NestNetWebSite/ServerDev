@@ -29,7 +29,7 @@ jwt:
   # HS512 알고리즘을 사용할 것이기 때문에 512bit, 즉 64byte 이상의 secret key를 사용
   # cbnu-club-nestnet-website-seongho-kim-kangmin-kim-wonil-heo-jwt-secret-key-who-is-the-best  base64로 인코딩
   secret: Y2JudS1jbHViLW5lc3RuZXQtd2Vic2l0ZS1zZW9uZ2hvLWtpbS1rYW5nbWluLWtpbS13b25pbC1oZW8tand0LXNlY3JldC1rZXktd2hvLWlzLXRoZS1iZXN0
-  access-exp-time: 7200000    # 2시간
+  access-exp-time: 30000    # 2시간 7200000
   refresh-exp-time: 1209600000    # 14일
 
 

@@ -2,6 +2,7 @@ package NestNet.NestNetWebSite.config.auth;
 
 import NestNet.NestNetWebSite.config.jwt.TokenProvider;
 import NestNet.NestNetWebSite.exception.CustomException;
+import NestNet.NestNetWebSite.service.token.RefreshTokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -45,27 +46,29 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {       //ht
             System.out.println("CustomAuthorizationFilter 여기 들어오나?");
             try{
                 String accessToken = tokenProvider.resolveToken(request);
+                String refreshToken = tokenProvider.getRefreshToken(request);
 
                 System.out.println("여기 토큰 : " + accessToken);
 
                 // access 토큰 검증
-                if(StringUtils.hasText(accessToken) && tokenProvider.validateToken(accessToken)){
+                if(StringUtils.hasText(accessToken) && tokenProvider.validateAccessToken(accessToken, request, response)){
                     Authentication authentication = tokenProvider.getAuthentication(accessToken);
                     System.out.println("여기 authentication : " + authentication);
                     //토큰을 통해 생성한 Authentication 객체 스프링 시큐리티 컨텍스트에 저장
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                     log.debug("Security Context에 '{}' 인증 정보를 저장했습니다, uri: {}", authentication.getName(), requestURI);
                 }
+//                else if(tokenProvider.validateRefreshToken(refreshToken, accessToken)){
+//
+//                }
 
             } catch (CustomException e) {      //만료됐을때 처리. refresh 토큰으로부터 access토큰 발행받도록
                 SecurityContextHolder.clearContext();
                 log.debug("access 토큰 만료");
 
-                String refreshToken = tokenProvider.getRefreshToken(request);       //쿠키에서 리프레쉬 토큰 가져옴
+//                String refreshToken = tokenProvider.getRefreshToken(request);       //쿠키에서 리프레쉬 토큰 가져옴
 
-                /*
-                레디스랑 비교하는 로직 들어가야 함.
-                 */
+
 
                 return;
             }
