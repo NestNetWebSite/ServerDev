@@ -4,6 +4,7 @@ import NestNet.NestNetWebSite.config.auth.CustomAuthorizationFilter;
 import NestNet.NestNetWebSite.config.jwt.TokenProvider;
 import NestNet.NestNetWebSite.config.jwt.errorHandler.JwtAccessDeniedHandler;
 import NestNet.NestNetWebSite.config.jwt.errorHandler.JwtAuthenticationEntryPoint;
+import NestNet.NestNetWebSite.config.redis.RedisUtil;
 import NestNet.NestNetWebSite.repository.MemberRepository;
 import NestNet.NestNetWebSite.service.member.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,7 @@ public class SecurityConfig {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final MemberRepository memberRepository;
+    private final RedisUtil redisUtil;
 
     /*
     비밀번호 암호화를 담당할 인코더 설정
@@ -59,7 +61,7 @@ public class SecurityConfig {
      */
     @Bean
     public CustomAuthorizationFilter customAuthorizationFilter(){
-        return new CustomAuthorizationFilter(tokenProvider);
+        return new CustomAuthorizationFilter(tokenProvider, redisUtil);
     }
 
 

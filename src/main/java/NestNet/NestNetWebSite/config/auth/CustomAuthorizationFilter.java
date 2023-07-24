@@ -1,6 +1,7 @@
 package NestNet.NestNetWebSite.config.auth;
 
 import NestNet.NestNetWebSite.config.jwt.TokenProvider;
+import NestNet.NestNetWebSite.config.redis.RedisUtil;
 import NestNet.NestNetWebSite.exception.CustomException;
 import NestNet.NestNetWebSite.service.token.RefreshTokenService;
 import jakarta.servlet.FilterChain;
@@ -11,8 +12,10 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,27 +31,34 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {       //ht
 
     public static final String AUTHORIZATION_HEADER = "Authorization";
     private final TokenProvider tokenProvider;
+    private final RedisUtil redisUtil;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-
-        System.out.println("CustomAuthorizationFilter ");
 
         String servletPath = request.getServletPath();
         String requestURI = request.getRequestURI();
 
         //회원가입 or 로그인 or 리프레시 요청이면 토큰을 검사하지 않음
         if(servletPath.equals("/auth/signup") || servletPath.equals("/auth/login") || servletPath.equals("/auth/refresh")){
-            log.info(servletPath + " : 토큰을 검사하지 않음");
+            log.info("CustomAuthorizationFilter / doFilterInternal :" + servletPath +  ": 엑세스 토큰을 검사하지 않음");
         }
         else{
-            System.out.println("CustomAuthorizationFilter 여기 들어오나?");
+            log.info("CustomAuthorizationFilter / doFilterInternal :" + servletPath +  ": 엑세스 토큰을 검사");
             try{
                 String accessToken = tokenProvider.resolveToken(request);
+
+                // 블랙리스트에 있으면 401에러
+                if(redisUtil.hasKey(accessToken)){
+                    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                    response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                    return;
+                }
+
                 String refreshToken = tokenProvider.getRefreshToken(request);
 
-                System.out.println("여기 토큰 : " + accessToken);
+                System.out.println("CustomAuthorizatoinFilter / doFilterInternel 엑세스 토큰 : " + accessToken);
 
                 // access 토큰 검증
                 if(StringUtils.hasText(accessToken) && tokenProvider.validateAccessToken(accessToken, request, response)){

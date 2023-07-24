@@ -69,8 +69,9 @@ public class TokenProvider implements InitializingBean {
      */
     public String createAccessToken(Authentication authentication){
 
-        Date now = new Date();
-        Date validity = new Date(now.getTime() + this.accessTokenExpTime);    //현재시간 + 토큰 유효 시간 == 만료날짜
+        Date validity = new Date(System.currentTimeMillis() + accessTokenExpTime);    //현재시간 + 토큰 유효 시간 == 만료날짜
+
+        System.out.println("그러면 엑세스토큰 만드는 여기서는 몇시? " + validity);
 
         //권한 가져옴
         String authority = null;
@@ -82,7 +83,6 @@ public class TokenProvider implements InitializingBean {
         return Jwts.builder()
                 .setSubject(authentication.getName())           //로그인 아이디
                 .claim(AUTHORITIES_KEY, authority)              //권한한
-               .setIssuedAt(now)                               //생성날짜
                 .setExpiration(validity)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
@@ -93,8 +93,7 @@ public class TokenProvider implements InitializingBean {
      */
     public String createRefreshToken(Authentication authentication){
 
-        Date now = new Date();
-        Date validity = new Date(now.getTime() + this.refreshTokenExpTime);    //현재시간 + 토큰 유효 시간 == 만료날짜
+        Date validity = new Date(System.currentTimeMillis() + this.refreshTokenExpTime);    //현재시간 + 토큰 유효 시간 == 만료날짜
 
         //권한 가져옴
         String authority = null;
@@ -106,21 +105,25 @@ public class TokenProvider implements InitializingBean {
         String refreshToken = Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim(AUTHORITIES_KEY, authority)
-                .setIssuedAt(now)                               //생성날짜
                 .setExpiration(validity)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
 
-
-        // redis에 저장
-//        redisTemplate.opsForValue().set(
-//                authentication.getName(),           // 로그인 아이디
-//                refreshToken,
-//                refreshTokenExpTime,
-//                TimeUnit.MILLISECONDS
-//        );
-
         return refreshToken;
+    }
+
+    public Claims getTokenClaims(String accessToken){
+
+        System.out.println("여기는 들어오냐? ??????????");
+
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key)                 //서버의 시크릿 키로 서명 검증
+                .build()
+                .parseClaimsJws(accessToken)
+                .getBody();
+
+        System.out.println("여기는??");
+        return claims;
     }
 
     /*
@@ -129,11 +132,7 @@ public class TokenProvider implements InitializingBean {
     public Authentication getAuthentication(String accessToken){
 
         //토큰의 body의 클레임 정보 ex){sub=admin, auth=admin, exp=1688709600}
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(key)                 //서버의 시크릿 키로 서명 검증
-                .build()
-                .parseClaimsJws(accessToken)
-                .getBody();
+        Claims claims = getTokenClaims(accessToken);
 
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(claims.getSubject());
 
