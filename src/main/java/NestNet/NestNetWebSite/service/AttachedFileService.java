@@ -1,6 +1,6 @@
 package NestNet.NestNetWebSite.service;
 
-import NestNet.NestNetWebSite.domain.post.AttachedFile;
+import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.dto.request.AttachedFileRequestDto;
 import NestNet.NestNetWebSite.dto.response.AttachedFileDto;

@@ -1,6 +1,6 @@
 package NestNet.NestNetWebSite.dto.response;
 
-import NestNet.NestNetWebSite.domain.post.ExamType;
+import NestNet.NestNetWebSite.domain.post.exam.ExamType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

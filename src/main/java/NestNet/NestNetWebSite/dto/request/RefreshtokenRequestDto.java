@@ -18,11 +18,6 @@ public class RefreshtokenRequestDto {
 
     //== DTO ---> Entity ==//
     public RefreshToken toEntity(){
-
-        return RefreshToken.builder()
-                .accessToken(this.accessToken)
-                .refreshToken(this.refreshToken)
-                .expTime(this.expTime)
-                .build();
+        return new RefreshToken(this.accessToken, this.refreshToken, this.expTime);
     }
 }

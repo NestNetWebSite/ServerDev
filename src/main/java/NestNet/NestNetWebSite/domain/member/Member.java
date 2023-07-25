@@ -9,6 +9,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 
+/**
+ * 회원 정보를 담고 있는 엔티티
+ */
 @Entity
 @Getter
 @NoArgsConstructor
@@ -37,19 +40,9 @@ public class Member {
     private String emailAddress;                    // 이메일 주소
 
     @Enumerated(EnumType.STRING)
-    private MemberAuthority memberAuthority;        // 권한 (회장, 부회장, 임원, 재학생, 졸업생, 관리자)
+    private MemberAuthority memberAuthority;        // 권한 (PRESIDENT, VICE_PRESIDENT, MANAGER, GENERAL_MEMBER, GRADUATED_MEMBER, WAITING_FOR_APPROVAL)
 
     private LocalDateTime joinDate;                 // 회원가입 날짜
-
-    public Member(String loginId, String loginPassword, String name, String studentId, String emailAddress, MemberAuthority memberAuthority) {
-        this.loginId = loginId;
-        this.loginPassword = loginPassword;
-        this.name = name;
-        this.studentId = studentId;
-        this.emailAddress = emailAddress;
-        this.memberAuthority = memberAuthority;
-        this.joinDate = LocalDateTime.now();
-    }
 
     //== setter ==//
     public void setMemberAuthority(MemberAuthority memberAuthority) {
@@ -63,13 +56,6 @@ public class Member {
     public Member encodePassword(PasswordEncoder passwordEncoder){
         this.loginPassword = passwordEncoder.encode(this.loginPassword);
         return this;
-    }
-
-    /*
-    비밀번호가 맞는지 확인
-     */
-    public boolean checkPassword(String rawPassword, PasswordEncoder passwordEncoder){
-        return passwordEncoder.matches(rawPassword, this.getLoginPassword());
     }
 
     /*

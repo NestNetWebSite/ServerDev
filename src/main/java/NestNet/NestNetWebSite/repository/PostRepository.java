@@ -1,8 +1,8 @@
 package NestNet.NestNetWebSite.repository;
 
-import NestNet.NestNetWebSite.domain.post.ExamCollectionPost;
+import NestNet.NestNetWebSite.domain.post.exam.ExamCollectionPost;
 import NestNet.NestNetWebSite.domain.post.Post;
-import NestNet.NestNetWebSite.domain.post.UnifiedPost;
+import NestNet.NestNetWebSite.domain.post.unified.UnifiedPost;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

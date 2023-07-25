@@ -2,6 +2,8 @@ package NestNet.NestNetWebSite.dto.request;
 
 import NestNet.NestNetWebSite.domain.post.*;
 import NestNet.NestNetWebSite.domain.member.Member;
+import NestNet.NestNetWebSite.domain.post.unified.UnifiedPost;
+import NestNet.NestNetWebSite.domain.post.unified.UnifiedPostType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +19,7 @@ public class UnifiedPostRequestDto {
     private String title;
     private String bodyContent;
     private PostCategory postCategory;
-    private PostType postType;                    // 게시판 소분류 (자유, 개발, 진로)
+    private UnifiedPostType unifiedPostType;                    // 게시판 소분류 (자유, 개발, 진로)
 
 
     //== DTO ---> Entity ==//
@@ -31,7 +33,7 @@ public class UnifiedPostRequestDto {
                 .recommendationCount(0)
                 .postCategory(this.postCategory)
                 .createdTime(LocalDateTime.now())
-                .postType(this.postType)
+                .unifiedPostType(this.unifiedPostType)
                 .build();
     }
 }

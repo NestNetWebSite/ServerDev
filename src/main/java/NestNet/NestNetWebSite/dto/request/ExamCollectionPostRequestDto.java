@@ -2,8 +2,8 @@ package NestNet.NestNetWebSite.dto.request;
 
 import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.domain.post.PostCategory;
-import NestNet.NestNetWebSite.domain.post.ExamCollectionPost;
-import NestNet.NestNetWebSite.domain.post.ExamType;
+import NestNet.NestNetWebSite.domain.post.exam.ExamCollectionPost;
+import NestNet.NestNetWebSite.domain.post.exam.ExamType;
 import NestNet.NestNetWebSite.domain.member.Member;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

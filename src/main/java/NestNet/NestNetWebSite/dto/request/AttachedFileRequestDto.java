@@ -1,6 +1,6 @@
 package NestNet.NestNetWebSite.dto.request;
 
-import NestNet.NestNetWebSite.domain.post.AttachedFile;
+import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.post.Post;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,12 +33,9 @@ public class AttachedFileRequestDto {
 
     //== DTO ---> Entity ==//
     public AttachedFile toEntity(Post post){      //연관관계 가 있는 엔티티는 id를 이용해 찾고 주입
-        return AttachedFile.builder()
-                .post(post)
-                .originalFileName(this.originalFileName)
-                .saveFileName(this.saveFileName)
-                .saveFilePath(this.saveFilePath)
-                .build();
+
+        AttachedFile attachedFile = new AttachedFile(post, this.originalFileName, this.saveFileName, this.saveFilePath);
+        return attachedFile;
     }
 
     //파일 이름 중복 방지를 위한 파일명 생성

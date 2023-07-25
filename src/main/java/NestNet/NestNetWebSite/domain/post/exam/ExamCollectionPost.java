@@ -1,35 +1,39 @@
-package NestNet.NestNetWebSite.domain.post;
+package NestNet.NestNetWebSite.domain.post.exam;
 
 import NestNet.NestNetWebSite.domain.member.Member;
+import NestNet.NestNetWebSite.domain.post.Post;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+/**
+ * 족보(기출) 게시물 엔티티
+ */
 @Entity
-@DiscriminatorValue("Exam")
 @Getter
-public class ExamCollectionPost extends Post{
+@DiscriminatorValue("Exam")
+@NoArgsConstructor
+public class ExamCollectionPost extends Post {
 
     private String subject;                                             // 과목
 
     private String professsor;                                          // 교수
 
-    private int year;                                                // 출제 년도
+    private int year;                                                   // 출제 년도
 
-    private int semester;                                            // 출제 학기
+    private int semester;                                               // 출제 학기
 
     @Enumerated(EnumType.STRING)
-    private ExamType examType;                                          // 중간/기말 분류
+    private ExamType examType;                                          // 중간/기말  MID / FINAL
 
-//    @OneToMany(mappedBy = "examCollectionPost", cascade = CascadeType.ALL)
-//    private List<AttachedFile> attachedFileList = new ArrayList<>();    // 첨부파일
-
-    protected ExamCollectionPost(){}
-
+    /*
+    생성자
+     */
     @Builder
-    public ExamCollectionPost(String title, String bodyContent, Member member, int viewCount, int recommendationCount, PostCategory postCategory,
+    public ExamCollectionPost(String title, String bodyContent, Member member, int viewCount, int recommendationCount, NestNet.NestNetWebSite.domain.post.PostCategory postCategory,
                                LocalDateTime createdTime, String subject, String professsor, int year, int semester, ExamType examType) {
 
         super(title, bodyContent, member, viewCount, recommendationCount, postCategory, createdTime);
@@ -40,7 +44,17 @@ public class ExamCollectionPost extends Post{
         this.examType = examType;
     }
 
-    //== setter ==//
+    //== 비지니스 로직 ==//
+    /*
+    게시글 수정
+     */
+    @Override
+    public void modifyPost(String title, String bodyContent) {
+        super.setTitle(title);
+        super.setBodyContent(bodyContent);
+        super.setModifiedTime(LocalDateTime.now());
+    }
+
     public void setSubject(String subject) {
         this.subject = subject;
     }

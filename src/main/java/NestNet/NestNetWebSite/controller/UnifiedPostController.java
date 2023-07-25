@@ -1,6 +1,6 @@
 package NestNet.NestNetWebSite.controller;
 
-import NestNet.NestNetWebSite.domain.post.PostType;
+import NestNet.NestNetWebSite.domain.post.unified.UnifiedPostType;
 import NestNet.NestNetWebSite.dto.request.AttachedFileRequestDto;
 import NestNet.NestNetWebSite.dto.request.UnifiedPostRequestDto;
 import NestNet.NestNetWebSite.service.AttachedFileService;
@@ -22,11 +22,11 @@ public class UnifiedPostController {
     통합 게시판 목록 get 요청 처리
      */
     @GetMapping("/unified-post/{post_type}")
-    public void showPost(@PathVariable("post_type") PostType postType,
+    public void showPost(@PathVariable("post_type") UnifiedPostType unifiedPostType,
                          @RequestParam(value = "offset", defaultValue = "0") int offset,
                          @RequestParam(value = "limit", defaultValue = "10") int limit){
 
-        PostService.findAllFromUnifiedPost(postType, offset, limit);
+        PostService.findAllFromUnifiedPost(unifiedPostType, offset, limit);
     }
 
     /*

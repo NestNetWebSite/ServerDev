@@ -2,6 +2,9 @@ package NestNet.NestNetWebSite.service;
 
 import NestNet.NestNetWebSite.domain.post.*;
 import NestNet.NestNetWebSite.domain.member.Member;
+import NestNet.NestNetWebSite.domain.post.exam.ExamCollectionPost;
+import NestNet.NestNetWebSite.domain.post.unified.UnifiedPost;
+import NestNet.NestNetWebSite.domain.post.unified.UnifiedPostType;
 import NestNet.NestNetWebSite.dto.request.ExamCollectionPostRequestDto;
 import NestNet.NestNetWebSite.dto.request.UnifiedPostRequestDto;
 import NestNet.NestNetWebSite.dto.response.ExamCollectionPostDto;
@@ -74,15 +77,15 @@ public class PostService {
 
 
     // Read ---> 통합 게시판 조회
-    public List<UnifiedPostDto> findAllFromUnifiedPost(PostType postType, int offset, int limit) {
+    public List<UnifiedPostDto> findAllFromUnifiedPost(UnifiedPostType unifiedPostType, int offset, int limit) {
 
         List<UnifiedPost> postList = new ArrayList<>();
 
-        if (postType.equals("자유")) {
+        if (unifiedPostType.equals("자유")) {
             postList = postRepository.findUnifiedFreePost(offset, limit);
-        } else if (postType.equals("개발")) {
+        } else if (unifiedPostType.equals("개발")) {
             postList = postRepository.findUnifiedDevPost(offset, limit);
-        } else if (postType.equals("진로")) {
+        } else if (unifiedPostType.equals("진로")) {
             postList = postRepository.findUnifiedCareerPost(offset, limit);
         }
 
@@ -90,7 +93,7 @@ public class PostService {
 
         for (UnifiedPost Post : postList) {
             PostDtos.add(new UnifiedPostDto(Post.getMember().getId(), Post.getTitle(), Post.getBodyContent(),
-                    Post.getPostCategory(), Post.getPostType()));
+                    Post.getPostCategory(), Post.getUnifiedPostType()));
         }
 
         return PostDtos;

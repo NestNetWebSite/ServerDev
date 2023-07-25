@@ -1,6 +1,6 @@
 package NestNet.NestNetWebSite.repository;
 
-import NestNet.NestNetWebSite.domain.post.AttachedFile;
+import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.post.Post;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
