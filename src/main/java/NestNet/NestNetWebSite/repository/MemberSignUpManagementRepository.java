@@ -14,6 +14,7 @@ public class MemberSignUpManagementRepository {
 
     private final EntityManager entityManager;
 
+    // 저장
     public void save(MemberSignUpManagement memberSignUpManagement){
         entityManager.persist(memberSignUpManagement);
     }

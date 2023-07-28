@@ -23,7 +23,7 @@ public class UnifiedPostRequestDto {
 
 
     //== DTO ---> Entity ==//
-    public Post toEntity(Member member){
+    public UnifiedPost toEntity(Member member){
 
         return UnifiedPost.builder()
                 .title(this.title)

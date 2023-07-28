@@ -68,7 +68,7 @@ public class RefreshTokenService {
 
         RefreshToken findRefreshToken = refreshTokenRepository.findByAccessToken(oldAccessToken);
 
-        findRefreshToken.setAccessToken(newAccessToken);        //더티 체킹에 의해 DB 반영
+        findRefreshToken.changeAccessToken(newAccessToken);        //더티 체킹에 의해 DB 반영
 
     }
 }

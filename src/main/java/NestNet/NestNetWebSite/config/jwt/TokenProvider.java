@@ -191,9 +191,9 @@ public class TokenProvider implements InitializingBean {
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
 
         //"Bearer " 부분 슬라이싱. 바로 뒤부터 토큰임
-//        if(bearerToken != null && bearerToken.startsWith("Bearer ")){
-//            return bearerToken.substring(7);
-//        }
+        if(bearerToken != null && bearerToken.startsWith("Bearer ")){
+            return bearerToken.substring(7);
+        }
         if(bearerToken != null){
             return  bearerToken;
         }

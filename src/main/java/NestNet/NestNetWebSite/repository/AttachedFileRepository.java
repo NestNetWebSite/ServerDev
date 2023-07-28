@@ -15,9 +15,14 @@ public class AttachedFileRepository {
     private final EntityManager entityManager;
 
     // 저장
-    public void save(AttachedFile attachedFile){
-        entityManager.persist(attachedFile);
+    public void saveAll(List<AttachedFile> attachedFiles){
+        for(AttachedFile file : attachedFiles){
+            entityManager.persist(file);
+        }
+
     }
+
+    //=========================================조회=========================================//
 
     // id(PK)로 단건 조회
     public AttachedFile findById(Long id){
@@ -26,8 +31,10 @@ public class AttachedFileRepository {
 
     // 게시물에 해당하는 파일 조회
     public List<AttachedFile> findByPost(Post post){
-        return entityManager.createQuery("select a from AttachedFile a where a.Post =: post")
-                .setParameter("Post", post)
+        return entityManager.createQuery("select a from AttachedFile a where a.post =: post")
+                .setParameter("post", post)
                 .getResultList();
     }
+
+    //====================================================================================//
 }

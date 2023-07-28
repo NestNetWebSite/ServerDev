@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ExamCollectionPostRequestDto {
 
-    private Long memberId;
     private String title;
     private String bodyContent;
     private PostCategory postCategory;
@@ -28,7 +27,7 @@ public class ExamCollectionPostRequestDto {
 
 
     //== DTO ---> Entity ==//
-    public Post toEntity(Member member){
+    public ExamCollectionPost toEntity(Member member){
 
         return ExamCollectionPost.builder()
                 .title(this.title)

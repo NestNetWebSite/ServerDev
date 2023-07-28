@@ -1,10 +1,10 @@
-package NestNet.NestNetWebSite.controller;
+package NestNet.NestNetWebSite.controller.post;
 
 import NestNet.NestNetWebSite.domain.post.unified.UnifiedPostType;
 import NestNet.NestNetWebSite.dto.request.AttachedFileRequestDto;
 import NestNet.NestNetWebSite.dto.request.UnifiedPostRequestDto;
 import NestNet.NestNetWebSite.service.AttachedFileService;
-import NestNet.NestNetWebSite.service.PostService;
+import NestNet.NestNetWebSite.service.post.UnifiedPostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +16,7 @@ import java.util.List;
 public class UnifiedPostController {
 
     private final AttachedFileService attachedFileService;
-    private final PostService PostService;
+    private final UnifiedPostService UnifiedPostService;
 
     /*
     통합 게시판 목록 get 요청 처리
@@ -26,19 +26,19 @@ public class UnifiedPostController {
                          @RequestParam(value = "offset", defaultValue = "0") int offset,
                          @RequestParam(value = "limit", defaultValue = "10") int limit){
 
-        PostService.findAllFromUnifiedPost(unifiedPostType, offset, limit);
+        UnifiedPostService.findAllFromUnifiedPost(unifiedPostType, offset, limit);
     }
 
     /*
     통합 게시판 (자유, 개발, 진로) post 요청 처리
      */
-    @PostMapping("/unified-post/post")
-    public void savePost(@RequestBody @Valid UnifiedPostRequestDto unifiedPostRequestDto,
-                         @RequestBody @Valid List<AttachedFileRequestDto> attachedFileRequestDtos){
-
-        attachedFileService.saveFiles(attachedFileRequestDtos);
-        PostService.save(unifiedPostRequestDto);
-    }
+//    @PostMapping("/unified-post/post")
+//    public void savePost(@RequestBody @Valid UnifiedPostRequestDto unifiedPostRequestDto,
+//                         @RequestBody @Valid List<AttachedFileRequestDto> attachedFileRequestDtos){
+//
+//        attachedFileService.saveFiles(attachedFileRequestDtos);
+//        UnifiedPostService.save(unifiedPostRequestDto);
+//    }
 
 
 

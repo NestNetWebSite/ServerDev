@@ -1,5 +1,6 @@
 package NestNet.NestNetWebSite.domain.post;
 
+import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.member.Member;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 게시물 추상클래스 (모든 게시물의 부모)
@@ -17,7 +20,7 @@ import java.time.LocalDateTime;
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "dtype")
 @NoArgsConstructor
-public abstract class Post {
+public abstract class Post implements Postable{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Post_id")
@@ -43,10 +46,12 @@ public abstract class Post {
 
     private LocalDateTime modifiedTime;                             // 글 수정한 시각
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AttachedFile> attachedFileList = new ArrayList<>();
+
     /*
     생성자
      */
-    @Builder
     public Post(String title, String bodyContent, Member member, int viewCount, int recommendationCount, PostCategory postCategory, LocalDateTime createdTime) {
         this.title = title;
         this.bodyContent = bodyContent;
@@ -55,6 +60,12 @@ public abstract class Post {
         this.recommendationCount = recommendationCount;
         PostCategory = postCategory;
         this.createdTime = createdTime;
+    }
+
+    //== 연관관계 편의 매서드 ==//
+    public void addAttachedFiles(AttachedFile attachedFile){
+        this.attachedFileList.add(attachedFile);
+        attachedFile.setPost(this);
     }
 
     //== 비지니스 로직 ==//

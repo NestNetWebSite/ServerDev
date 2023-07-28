@@ -29,12 +29,14 @@ public class MemberRepository {
 
     // 로그인 아이디로 회원 단건 조회
     public Member findByLoginId(String loginId){
+
         List<Member> members = entityManager.createQuery("select m from Member m where m.loginId =: loginId", Member.class)
                 .setParameter("loginId", loginId)
                 .getResultList();
 
-        System.out.println(members);
-
+        if(members.isEmpty()){
+            return null;
+        }
         return members.get(0);
 
     }
