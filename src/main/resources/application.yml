@@ -26,11 +26,11 @@ spring:
   servlet:
     multipart:
       enabled: true
-#      location: C:/nestnetFile/
+      location: C:/nestnetFile/
 
-#part:
-#  upload:
-#    path: C:/nestnetFile/
+part:
+  upload:
+    path: C:/nestnetFile/
 
 jwt:
   header: Authorization

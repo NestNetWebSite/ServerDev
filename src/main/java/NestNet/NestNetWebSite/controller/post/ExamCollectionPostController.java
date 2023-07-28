@@ -52,6 +52,10 @@ public class ExamCollectionPostController {
 
         System.out.println(userDetails.getUsername());
         System.out.println(examCollectionPostRequestDto.getSubject());
+        System.out.println(examCollectionPostRequestDto.getProfessor());
+        for(MultipartFile file : files){
+            System.out.println(file);
+        }
 
         examCollectionPostService.savePost(examCollectionPostRequestDto, files, userDetails.getUsername());
 

@@ -1,15 +1,10 @@
 package NestNet.NestNetWebSite.controller.post;
 
 import NestNet.NestNetWebSite.domain.post.unified.UnifiedPostType;
-import NestNet.NestNetWebSite.dto.request.AttachedFileRequestDto;
-import NestNet.NestNetWebSite.dto.request.UnifiedPostRequestDto;
-import NestNet.NestNetWebSite.service.AttachedFileService;
+import NestNet.NestNetWebSite.service.attachedfile.AttachedFileService;
 import NestNet.NestNetWebSite.service.post.UnifiedPostService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor

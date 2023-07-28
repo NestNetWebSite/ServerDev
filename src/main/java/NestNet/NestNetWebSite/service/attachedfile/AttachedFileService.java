@@ -1,4 +1,4 @@
-package NestNet.NestNetWebSite.service;
+package NestNet.NestNetWebSite.service.attachedfile;
 
 import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.post.Post;
@@ -18,14 +18,15 @@ import java.util.List;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class AttachedFileService {
+public class AttachedFileService {      // 시스템에 실제 파일을 저장하는 로직만 존재
 
-    private final AttachedFileRepository attachedFileRepository;
+    /*
+    지정된 폴더에 파일 저장
+     */
+    public void saveFile(List<MultipartFile> files){
 
-    // 첨부파일은 게시판에 종속적인데, 굳이 서비스 레이어가 있을 필요가 있을까??
+    }
 
-//    @Transactional
-//    public void save()
 
 
 }

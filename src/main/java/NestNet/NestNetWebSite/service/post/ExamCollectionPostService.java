@@ -39,11 +39,11 @@ public class ExamCollectionPostService {
         List<AttachedFile> attachedFileList = new ArrayList<>();
         for(MultipartFile file : files){
             AttachedFile attachedFile = new AttachedFile(post, file);
-            attachedFileList.add(attachedFile);
+            attachedFileList.add(new AttachedFile(post, file));
             post.addAttachedFiles(attachedFile);
         }
 
         examCollectionPostRepository.save(post);
-        attachedFileRepository.saveAll(attachedFileList);
+        attachedFileRepository.saveAll(attachedFileList, files);
     }
 }

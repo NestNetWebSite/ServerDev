@@ -20,7 +20,7 @@ public class ExamCollectionPostRequestDto {
     private String bodyContent;
     private PostCategory postCategory;
     private String subject;
-    private String professsor;
+    private String professor;
     private int year;
     private int semester;
     private ExamType examType;
@@ -38,7 +38,7 @@ public class ExamCollectionPostRequestDto {
                 .postCategory(this.postCategory)
                 .createdTime(LocalDateTime.now())
                 .subject(this.subject)
-                .professsor(this.professsor)
+                .professor(this.professor)
                 .year(this.year)
                 .semester(this.semester)
                 .examType(this.examType)

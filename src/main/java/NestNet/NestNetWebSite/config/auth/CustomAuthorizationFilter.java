@@ -58,27 +58,18 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {       //ht
 
                 String refreshToken = tokenProvider.getRefreshToken(request);
 
-                System.out.println("CustomAuthorizatoinFilter / doFilterInternel 엑세스 토큰 : " + accessToken);
-
                 // access 토큰 검증
                 if(StringUtils.hasText(accessToken) && tokenProvider.validateAccessToken(accessToken, request, response)){
                     Authentication authentication = tokenProvider.getAuthentication(accessToken);
-                    System.out.println("여기 authentication : " + authentication);
+
                     //토큰을 통해 생성한 Authentication 객체 스프링 시큐리티 컨텍스트에 저장
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                     log.debug("Security Context에 '{}' 인증 정보를 저장했습니다, uri: {}", authentication.getName(), requestURI);
                 }
-//                else if(tokenProvider.validateRefreshToken(refreshToken, accessToken)){
-//
-//                }
 
             } catch (CustomException e) {      //만료됐을때 처리. refresh 토큰으로부터 access토큰 발행받도록
                 SecurityContextHolder.clearContext();
                 log.debug("access 토큰 만료");
-
-//                String refreshToken = tokenProvider.getRefreshToken(request);       //쿠키에서 리프레쉬 토큰 가져옴
-
-
 
                 return;
             }

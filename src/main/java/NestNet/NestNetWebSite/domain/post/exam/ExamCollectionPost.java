@@ -20,7 +20,7 @@ public class ExamCollectionPost extends Post {
 
     private String subject;                                             // 과목
 
-    private String professsor;                                          // 교수
+    private String professor;                                          // 교수
 
     private int year;                                                   // 출제 년도
 
@@ -34,11 +34,11 @@ public class ExamCollectionPost extends Post {
      */
     @Builder
     public ExamCollectionPost(String title, String bodyContent, Member member, int viewCount, int recommendationCount, NestNet.NestNetWebSite.domain.post.PostCategory postCategory,
-                               LocalDateTime createdTime, String subject, String professsor, int year, int semester, ExamType examType) {
+                               LocalDateTime createdTime, String subject, String professor, int year, int semester, ExamType examType) {
 
         super(title, bodyContent, member, viewCount, recommendationCount, postCategory, createdTime);
         this.subject = subject;
-        this.professsor = professsor;
+        this.professor = professor;
         this.year = year;
         this.semester = semester;
         this.examType = examType;
@@ -59,8 +59,8 @@ public class ExamCollectionPost extends Post {
         this.subject = subject;
     }
 
-    public void setProfesssor(String professsor) {
-        this.professsor = professsor;
+    public void setProfessor(String professor) {
+        this.professor = professor;
     }
 
     public void setYear(int year) {

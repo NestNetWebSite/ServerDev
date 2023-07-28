@@ -70,9 +70,6 @@ public class TokenProvider implements InitializingBean {
     public String createAccessToken(Authentication authentication){
 
         Date validity = new Date(System.currentTimeMillis() + accessTokenExpTime);    //현재시간 + 토큰 유효 시간 == 만료날짜
-
-        System.out.println("그러면 엑세스토큰 만드는 여기서는 몇시? " + validity);
-
         //권한 가져옴
         String authority = null;
         if (authentication.getAuthorities().size() > 0){            //권한이 있을 경우
@@ -112,9 +109,10 @@ public class TokenProvider implements InitializingBean {
         return refreshToken;
     }
 
+    /*
+    토큰의 정보를 가져옴
+     */
     public Claims getTokenClaims(String accessToken){
-
-        System.out.println("여기는 들어오냐? ??????????");
 
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)                 //서버의 시크릿 키로 서명 검증
@@ -122,7 +120,6 @@ public class TokenProvider implements InitializingBean {
                 .parseClaimsJws(accessToken)
                 .getBody();
 
-        System.out.println("여기는??");
         return claims;
     }
 
@@ -164,11 +161,7 @@ public class TokenProvider implements InitializingBean {
 
                 Authentication authentication = getAuthentication(refreshToken);
 
-                System.out.println("새로 생성한 Authentication 객체 : " + authentication);
-
                 String newAccessToken = createAccessToken(authentication);
-
-                System.out.println("새로 생성한 엑세스 토큰 " + newAccessToken);
 
                 refreshTokenService.updateRefreshToken(accessToken, newAccessToken);
 
@@ -217,9 +210,6 @@ public class TokenProvider implements InitializingBean {
                 }
             }
         }
-
-        System.out.println("요청에서 받은 리프레쉬 토큰 : " + refreshToken);
-
         return refreshToken;
     }
 
@@ -241,14 +231,10 @@ public class TokenProvider implements InitializingBean {
             return false;
         }
 
-        System.out.println("디비:" + dbRefreshToken.getRefreshToken());
-        System.out.println("요청:" + requestRefreshToken);
-
         // http 요청의 리프레쉬 토큰과 데이터베이스 리프레쉬 토큰이 일치하면 ( + 만료되지 않았으면 )
         if(requestRefreshToken.equals(dbRefreshToken.getRefreshToken())){
             return true;
         }
-
         return false;
     }
 
