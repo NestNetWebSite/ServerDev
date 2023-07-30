@@ -1,4 +1,4 @@
-package NestNet.NestNetWebSite.repository;
+package NestNet.NestNetWebSite.repository.post;
 
 import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.post.Post;

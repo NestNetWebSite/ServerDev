@@ -5,16 +5,13 @@ import NestNet.NestNetWebSite.config.jwt.TokenProvider;
 import NestNet.NestNetWebSite.config.jwt.errorHandler.JwtAccessDeniedHandler;
 import NestNet.NestNetWebSite.config.jwt.errorHandler.JwtAuthenticationEntryPoint;
 import NestNet.NestNetWebSite.config.redis.RedisUtil;
-import NestNet.NestNetWebSite.repository.MemberRepository;
+import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import NestNet.NestNetWebSite.service.member.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -109,6 +106,7 @@ public class SecurityConfig {
                         .requestMatchers("/manager/**").hasAuthority("MANAGER")                  //manager하위 리소스는 MANAGER 권한으로 허용
                         .requestMatchers("/auth/president").hasAuthority("PRESIDENT")                  //manager하위 리소스는 MANAGER 권한으로 허용
                         .requestMatchers("/post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "GRADUATED_MEMBER")
+                        .requestMatchers("/exam-collection-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "GRADUATED_MEMBER")
                         .anyRequest().authenticated()       //나머지 요청은 모두 권한 필요함.
 
                 )

@@ -2,15 +2,14 @@ package NestNet.NestNetWebSite.repository;
 
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.member.MemberAuthority;
-import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.domain.post.exam.ExamCollectionPost;
 import NestNet.NestNetWebSite.domain.post.exam.ExamType;
-import org.apache.catalina.users.SparseUserDatabase;
+import NestNet.NestNetWebSite.repository.member.MemberRepository;
+import NestNet.NestNetWebSite.repository.post.ExamCollectionPostRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -19,8 +18,10 @@ import java.util.List;
 @Transactional
 public class ExamCollectionPostRepositoryTest {
 
-    @Autowired MemberRepository memberRepository;
-    @Autowired ExamCollectionPostRepository examCollectionPostRepository;
+    @Autowired
+    MemberRepository memberRepository;
+    @Autowired
+    ExamCollectionPostRepository examCollectionPostRepository;
 
     @Test
     public void 필터에_따른_조회(){

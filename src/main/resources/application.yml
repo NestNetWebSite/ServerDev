@@ -26,11 +26,30 @@ spring:
   servlet:
     multipart:
       enabled: true
-      location: C:/nestnetFile/
 
-part:
-  upload:
-    path: C:/nestnetFile/
+#springdoc:
+#  packages-to-scan: NestNet-WebSite.NestNet.NestNetWebSite
+#  default-consumes-media-type: application/json;charset=UTF-8
+#  default-produces-media-type: application/json;charset=UTF-8
+#  swagger-ui:
+#    path: localhost:8000/demo-ui.html           # Swagger UI 경로 => localhost:8000/demo-ui.html
+#    tags-sorter: alpha            # alpha: 알파벳 순 태그 정렬, method: HTTP Method 순 정렬
+#    operations-sorter: alpha      # alpha: 알파벳 순 태그 정렬, method: HTTP Method 순 정렬
+#    api-docs:
+#      path: /api-docs/json
+#      groups:
+#        enabled: true
+#    cache:
+#      disabled: true
+
+springdoc:
+  swagger-ui:
+    path: /api-docs.html
+  api-docs:
+    path: /api-docs
+  show-actuator: true
+  default-produces-media-type: application/json
+
 
 jwt:
   header: Authorization

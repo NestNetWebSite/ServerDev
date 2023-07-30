@@ -3,7 +3,7 @@ package NestNet.NestNetWebSite.service.token;
 import NestNet.NestNetWebSite.domain.token.RefreshToken;
 import NestNet.NestNetWebSite.dto.request.RefreshtokenRequestDto;
 import NestNet.NestNetWebSite.dto.response.RefreshTokenDto;
-import NestNet.NestNetWebSite.repository.RefreshTokenRepository;
+import NestNet.NestNetWebSite.repository.token.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

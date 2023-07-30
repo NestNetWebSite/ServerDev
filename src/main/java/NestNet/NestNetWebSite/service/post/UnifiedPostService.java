@@ -1,18 +1,13 @@
 package NestNet.NestNetWebSite.service.post;
 
-import NestNet.NestNetWebSite.domain.post.*;
 import NestNet.NestNetWebSite.domain.member.Member;
-import NestNet.NestNetWebSite.domain.post.exam.ExamCollectionPost;
 import NestNet.NestNetWebSite.domain.post.unified.UnifiedPost;
 import NestNet.NestNetWebSite.domain.post.unified.UnifiedPostType;
-import NestNet.NestNetWebSite.dto.request.ExamCollectionPostRequestDto;
 import NestNet.NestNetWebSite.dto.request.UnifiedPostRequestDto;
-import NestNet.NestNetWebSite.dto.response.ExamCollectionPostDto;
-import NestNet.NestNetWebSite.dto.response.ExamCollectionPostListDto;
 import NestNet.NestNetWebSite.dto.response.UnifiedPostDto;
-import NestNet.NestNetWebSite.repository.AttachedFileRepository;
-import NestNet.NestNetWebSite.repository.UnifiedPostRepository;
-import NestNet.NestNetWebSite.repository.MemberRepository;
+import NestNet.NestNetWebSite.repository.post.AttachedFileRepository;
+import NestNet.NestNetWebSite.repository.post.UnifiedPostRepository;
+import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

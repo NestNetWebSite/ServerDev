@@ -1,4 +1,4 @@
-package NestNet.NestNetWebSite.repository;
+package NestNet.NestNetWebSite.repository.post;
 
 import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.domain.post.exam.ExamCollectionPost;
@@ -28,17 +28,17 @@ public class ExamCollectionPostRepository {
     }
 
     // 족보 게시물 조건에 따른 조회
-    public List<ExamCollectionPost> findAllExamCollectionPostByFilter(String subject, String professsor, Integer year, Integer semester, ExamType examType){
+    public List<ExamCollectionPost> findAllExamCollectionPostByFilter(String subject, String professor, Integer year, Integer semester, ExamType examType){
 
         List<ExamCollectionPost> resultList = entityManager.createQuery(
                 "select p from ExamCollectionPost p where" +
                         "(:subject is null or p.subject =: subject )" + " and " +
-                        "(:professsor is null or p.professsor =: professsor )" + " and " +
+                        "(:professor is null or p.professor =: professor )" + " and " +
                         "(:year is null or p.year =: year )" + " and " +
                         "(:semester is null or p.semester =: semester )" + " and " +
                         "(:examType is null or p.examType =: examType )", ExamCollectionPost.class)
                 .setParameter("subject", subject)
-                .setParameter("professsor", professsor)
+                .setParameter("professor", professor)
                 .setParameter("year", year)
                 .setParameter("semester", semester)
                 .setParameter("examType", examType)

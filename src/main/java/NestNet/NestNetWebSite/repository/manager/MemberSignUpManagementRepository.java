@@ -1,4 +1,4 @@
-package NestNet.NestNetWebSite.repository;
+package NestNet.NestNetWebSite.repository.manager;
 
 import NestNet.NestNetWebSite.domain.manager.MemberSignUpManagement;
 import NestNet.NestNetWebSite.domain.member.Member;

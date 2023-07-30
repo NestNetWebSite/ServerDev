@@ -1,4 +1,4 @@
-package NestNet.NestNetWebSite.repository;
+package NestNet.NestNetWebSite.repository.member;
 
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.member.MemberAuthority;

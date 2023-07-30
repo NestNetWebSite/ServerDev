@@ -1,24 +1,25 @@
 package NestNet.NestNetWebSite.repository;
 
-import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.member.Member;
-import NestNet.NestNetWebSite.domain.member.MemberAuthority;
 import NestNet.NestNetWebSite.domain.post.exam.ExamCollectionPost;
 import NestNet.NestNetWebSite.domain.post.exam.ExamType;
-import org.junit.jupiter.api.Test;
+import NestNet.NestNetWebSite.repository.member.MemberRepository;
+import NestNet.NestNetWebSite.repository.post.AttachedFileRepository;
+import NestNet.NestNetWebSite.repository.post.ExamCollectionPostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @SpringBootTest
 @Transactional
 public class AttachedFileRepositoryTest {
 
-    @Autowired AttachedFileRepository attachedFileRepository;
-    @Autowired ExamCollectionPostRepository examCollectionPostRepository;
-    @Autowired MemberRepository memberRepository;
+    @Autowired
+    AttachedFileRepository attachedFileRepository;
+    @Autowired
+    ExamCollectionPostRepository examCollectionPostRepository;
+    @Autowired
+    MemberRepository memberRepository;
 
 //    @Test
 //    public void 첨부파일_저장_테스트(){

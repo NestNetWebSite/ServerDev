@@ -8,30 +8,24 @@ import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.member.MemberAuthority;
 import NestNet.NestNetWebSite.domain.token.RefreshToken;
 import NestNet.NestNetWebSite.dto.request.LoginRequestDto;
-import NestNet.NestNetWebSite.dto.request.RefreshtokenRequestDto;
 import NestNet.NestNetWebSite.dto.request.SignUpRequestDto;
 import NestNet.NestNetWebSite.dto.response.JwtAccessTokenDto;
 import NestNet.NestNetWebSite.dto.response.TokenDto;
 import NestNet.NestNetWebSite.exception.CustomException;
-import NestNet.NestNetWebSite.exception.DuplicateMemberException;
-import NestNet.NestNetWebSite.repository.MemberRepository;
-import NestNet.NestNetWebSite.repository.MemberSignUpManagementRepository;
-import NestNet.NestNetWebSite.repository.RefreshTokenRepository;
-import NestNet.NestNetWebSite.service.token.RefreshTokenService;
+import NestNet.NestNetWebSite.repository.member.MemberRepository;
+import NestNet.NestNetWebSite.repository.manager.MemberSignUpManagementRepository;
+import NestNet.NestNetWebSite.repository.token.RefreshTokenRepository;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 
 @Service

@@ -1,4 +1,4 @@
-package NestNet.NestNetWebSite.repository;
+package NestNet.NestNetWebSite.repository.token;
 
 import NestNet.NestNetWebSite.domain.token.RefreshToken;
 import jakarta.persistence.EntityManager;
