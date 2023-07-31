@@ -26,5 +26,4 @@ public class ExamCollectionPostDto {
     private int semester;
     private ExamType examType;
     private String userName;
-    private List<AttachedFile> attachedFileList;
 }

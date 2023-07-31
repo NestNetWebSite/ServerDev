@@ -75,11 +75,9 @@ public class ExamCollectionPostService {
     /*
     족보 게시물 단건 상세 조회
      */
-    public ExamCollectionPostDto findPostById(Long id, String memberLoginId){
+    public ExamCollectionPostDto findPostById(Long id){
 
         ExamCollectionPost post = examCollectionPostRepository.findById(id);
-        Member member = memberRepository.findByLoginId(memberLoginId);
-        List<AttachedFile> files = attachedFileRepository.findByPost(post);
 
         return ExamCollectionPostDto.builder()
                 .id(post.getId())
@@ -90,8 +88,7 @@ public class ExamCollectionPostService {
                 .year(post.getYear())
                 .semester(post.getSemester())
                 .examType(post.getExamType())
-                .userName(member.getName())
-                .attachedFileList(files.stream().toList())
+                .userName(post.getMember().getName())
                 .build();
     }
 }

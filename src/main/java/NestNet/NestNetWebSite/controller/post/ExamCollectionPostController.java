@@ -1,11 +1,14 @@
 package NestNet.NestNetWebSite.controller.post;
 
+import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.post.exam.ExamCollectionPost;
 import NestNet.NestNetWebSite.domain.post.exam.ExamType;
 import NestNet.NestNetWebSite.dto.request.ExamCollectionPostRequestDto;
+import NestNet.NestNetWebSite.dto.response.AttachedFileDto;
 import NestNet.NestNetWebSite.dto.response.CommentDto;
 import NestNet.NestNetWebSite.dto.response.ExamCollectionPostDto;
 import NestNet.NestNetWebSite.dto.response.ExamCollectionPostListDto;
+import NestNet.NestNetWebSite.service.attachedfile.AttachedFileService;
 import NestNet.NestNetWebSite.service.comment.CommentService;
 import NestNet.NestNetWebSite.service.post.ExamCollectionPostService;
 import NestNet.NestNetWebSite.service.post.UnifiedPostService;
@@ -29,6 +32,7 @@ import java.util.Map;
 public class ExamCollectionPostController {
 
     private final ExamCollectionPostService examCollectionPostService;
+    private final AttachedFileService attachedFileService;
     private final CommentService commentService;
 
     /*
@@ -69,15 +73,21 @@ public class ExamCollectionPostController {
     족보 게시판 게시물 단건 조회
      */
     @GetMapping("exam-collection-post/{post_id}")
-    public ResponseEntity<Map<String, Object>> showPost(@PathVariable("post_id") Long postId, @AuthenticationPrincipal UserDetails userDetails){
+    public ResponseEntity<Map<String, Object>> showPost(@PathVariable("post_id") Long postId){
 
         Map<String, Object> result = new HashMap<>();
 
-        ExamCollectionPostDto postDto = examCollectionPostService.findPostById(postId, userDetails.getUsername());
+        ExamCollectionPostDto postDto = examCollectionPostService.findPostById(postId);
+        List<AttachedFileDto> fileDtoList = attachedFileService.findAllFilesByPost(postId);
         List<CommentDto> commentDtoList = commentService.findCommentByPost(postId);
 
+        System.out.println(postDto.getSubject());
+        System.out.println(commentDtoList.get(0).getContent());
+
         result.put("post-data", postDto);
+        result.put("file-data", fileDtoList);
         result.put("comment-data", commentDtoList);
+
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
