@@ -81,9 +81,6 @@ public class ExamCollectionPostController {
         List<AttachedFileDto> fileDtoList = attachedFileService.findAllFilesByPost(postId);
         List<CommentDto> commentDtoList = commentService.findCommentByPost(postId);
 
-        System.out.println(postDto.getSubject());
-        System.out.println(commentDtoList.get(0).getContent());
-
         result.put("post-data", postDto);
         result.put("file-data", fileDtoList);
         result.put("comment-data", commentDtoList);

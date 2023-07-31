@@ -23,10 +23,10 @@ public class Comment {
     private Long id;                                                // PK
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "Post_id")
+    @JoinColumn(name = "post_id")
     private Post post;                                              // 댓글이 포함된 게시물
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;                                          // 댓글 작성한 회원
 

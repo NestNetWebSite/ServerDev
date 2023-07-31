@@ -1,7 +1,5 @@
 package NestNet.NestNetWebSite.repository.post;
 
-import NestNet.NestNetWebSite.domain.post.Postable;
-import NestNet.NestNetWebSite.domain.post.exam.ExamCollectionPost;
 import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.domain.post.unified.UnifiedPost;
 import jakarta.persistence.EntityManager;

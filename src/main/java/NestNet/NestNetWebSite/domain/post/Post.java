@@ -3,8 +3,6 @@ package NestNet.NestNetWebSite.domain.post;
 import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.member.Member;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -20,10 +18,10 @@ import java.util.List;
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "dtype")
 @NoArgsConstructor
-public abstract class Post implements Postable{
+public abstract class Post {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "Post_id")
+    @Column(name = "post_id")
     private Long id;                                                // PK
 
     private String title;                                           // 제목
