@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class MemberSignUpManagementRequestDto {
 
     private String loginId;

@@ -10,6 +10,7 @@ import NestNet.NestNetWebSite.dto.response.ExamCollectionPostDto;
 import NestNet.NestNetWebSite.dto.response.ExamCollectionPostListDto;
 import NestNet.NestNetWebSite.service.attachedfile.AttachedFileService;
 import NestNet.NestNetWebSite.service.comment.CommentService;
+import NestNet.NestNetWebSite.service.like.PostLikeService;
 import NestNet.NestNetWebSite.service.post.ExamCollectionPostService;
 import NestNet.NestNetWebSite.service.post.UnifiedPostService;
 import NestNet.NestNetWebSite.service.member.MemberService;
@@ -34,6 +35,7 @@ public class ExamCollectionPostController {
     private final ExamCollectionPostService examCollectionPostService;
     private final AttachedFileService attachedFileService;
     private final CommentService commentService;
+    private final PostLikeService postLikeService;
 
     /*
     족보 게시판 게시물 저장
@@ -73,20 +75,42 @@ public class ExamCollectionPostController {
     족보 게시판 게시물 단건 조회
      */
     @GetMapping("exam-collection-post/{post_id}")
-    public ResponseEntity<Map<String, Object>> showPost(@PathVariable("post_id") Long postId){
+    public ResponseEntity<Map<String, Object>> showPost(@PathVariable("post_id") Long postId,
+                                                        @AuthenticationPrincipal UserDetails userDetails){
 
         Map<String, Object> result = new HashMap<>();
 
         ExamCollectionPostDto postDto = examCollectionPostService.findPostById(postId);
         List<AttachedFileDto> fileDtoList = attachedFileService.findAllFilesByPost(postId);
         List<CommentDto> commentDtoList = commentService.findCommentByPost(postId);
+        Long likeCount = postLikeService.findLikeCountByPost(postId);
+        boolean isMemberLiked = postLikeService.isMemberLikedByPost(postId, userDetails.getUsername());
 
         result.put("post-data", postDto);
         result.put("file-data", fileDtoList);
         result.put("comment-data", commentDtoList);
-
+        result.put("like-count", likeCount);
+        result.put("is-member-liked", isMemberLiked);
 
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    /*
+    좋아요 누름
+     */
+    @GetMapping("/exam-collection-post/{post_id}/like")
+    public void like(@PathVariable("post_id") Long postId, @AuthenticationPrincipal UserDetails userDetails){
+
+        postLikeService.saveLike(postId, userDetails.getUsername());
+    }
+
+    /*
+    좋아요 취소
+     */
+    @GetMapping("/exam-collection-post/{post_id}/cancel_like")
+    public void dislike(@PathVariable("post_id") Long postId, @AuthenticationPrincipal UserDetails userDetails){
+
+        postLikeService.cancelLike(postId, userDetails.getUsername());
     }
 
 }

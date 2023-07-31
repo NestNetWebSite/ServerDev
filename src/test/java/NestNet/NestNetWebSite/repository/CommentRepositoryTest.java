@@ -25,7 +25,7 @@ public class CommentRepositoryTest {
     CommentRepository commentRepository;
 
     @Test
-    public void 댓글_작성_조회(){
+    public void 댓글_작성_조회(){     //한 사용자가 한 게시물에 두개 이상 댓글 다는 행위에 대한 테스트
         //given
         Post post = new ExamCollectionPost();
         Member member = new Member();
