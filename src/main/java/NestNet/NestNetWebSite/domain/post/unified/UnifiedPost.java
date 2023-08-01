@@ -28,7 +28,7 @@ public class UnifiedPost extends Post {
     생성자
      */
     @Builder
-    public UnifiedPost(String title, String bodyContent, Member member, int viewCount, int recommendationCount, NestNet.NestNetWebSite.domain.post.PostCategory postCategory,
+    public UnifiedPost(String title, String bodyContent, Member member, Long viewCount, int recommendationCount, NestNet.NestNetWebSite.domain.post.PostCategory postCategory,
                         LocalDateTime createdTime, UnifiedPostType unifiedPostType){
 
         super(title, bodyContent, member, viewCount, recommendationCount, postCategory, createdTime);

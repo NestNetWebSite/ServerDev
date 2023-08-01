@@ -38,7 +38,7 @@ public class PostLikeRepositoryTest {
         entityManager.persist(member2);
         postLikeRepository.save(postLike);
         postLikeRepository.save(postLike2);
-        postLikeRepository.delete(postLike2);
+        postLikeRepository.delete(post, member2);
 
         //then
         Assertions.assertEquals(1L, postLikeRepository.likeCount(post));

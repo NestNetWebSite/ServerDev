@@ -33,7 +33,7 @@ public class ExamCollectionPost extends Post {
     생성자
      */
     @Builder
-    public ExamCollectionPost(String title, String bodyContent, Member member, int viewCount, int recommendationCount, NestNet.NestNetWebSite.domain.post.PostCategory postCategory,
+    public ExamCollectionPost(String title, String bodyContent, Member member, Long viewCount, int recommendationCount, NestNet.NestNetWebSite.domain.post.PostCategory postCategory,
                                LocalDateTime createdTime, String subject, String professor, int year, int semester, ExamType examType) {
 
         super(title, bodyContent, member, viewCount, recommendationCount, postCategory, createdTime);

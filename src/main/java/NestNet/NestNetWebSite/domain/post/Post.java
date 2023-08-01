@@ -33,7 +33,7 @@ public abstract class Post {
     @JoinColumn(name = "member_id")
     private Member member;                                          // 작성 멤버
 
-    private int viewCount;                                          // 조회 수
+    private Long viewCount;                                          // 조회 수
 
     private int recommendationCount;                                // 추천 수
 
@@ -50,7 +50,7 @@ public abstract class Post {
     /*
     생성자
      */
-    public Post(String title, String bodyContent, Member member, int viewCount, int recommendationCount, PostCategory postCategory, LocalDateTime createdTime) {
+    public Post(String title, String bodyContent, Member member, Long viewCount, int recommendationCount, PostCategory postCategory, LocalDateTime createdTime) {
         this.title = title;
         this.bodyContent = bodyContent;
         this.member = member;
@@ -71,6 +71,13 @@ public abstract class Post {
     게시글 수정
      */
     public abstract void modifyPost(String title, String bodyContent);
+
+    /*
+    조회수 count
+     */
+    public void addViewCount(){
+        this.viewCount++;
+    }
 
     //== setter ==//
     public void setTitle(String title) {

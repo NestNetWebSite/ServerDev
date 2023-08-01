@@ -75,14 +75,17 @@ public class ExamCollectionPostService {
     /*
     족보 게시물 단건 상세 조회
      */
+    @Transactional
     public ExamCollectionPostDto findPostById(Long id){
 
         ExamCollectionPost post = examCollectionPostRepository.findById(id);
+        examCollectionPostRepository.addViewCount(post);
 
         return ExamCollectionPostDto.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .bodyContent(post.getBodyContent())
+                .viewCount(post.getViewCount())
                 .subject(post.getSubject())
                 .professor(post.getProfessor())
                 .year(post.getYear())

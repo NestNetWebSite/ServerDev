@@ -20,6 +20,11 @@ public class ExamCollectionPostRepository {
         entityManager.persist(post);
     }
 
+    // 조회수 update
+    public void addViewCount(Post post){
+        post.addViewCount();        //변경 감지에 의해 update
+    }
+
     //=========================================조회=========================================//
 
     // Id(PK)로 단건 조회
@@ -56,7 +61,7 @@ public class ExamCollectionPostRepository {
         return resultList;
     }
 
-    // 족보 게시물 개수 제한에 따른 조회
+    // 족보 게시물 개수 제한에 따른 리스트 조회
     public List<ExamCollectionPost> findExamCollectionPostLimit(int offset, int limit){
 
         List<ExamCollectionPost> resultList = entityManager.createQuery("select p from ExamCollectionPost p", ExamCollectionPost.class)

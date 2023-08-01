@@ -29,7 +29,7 @@ public class UnifiedPostRequestDto {
                 .title(this.title)
                 .bodyContent(this.bodyContent)
                 .member(member)
-                .viewCount(0)
+                .viewCount(0L)
                 .recommendationCount(0)
                 .postCategory(this.postCategory)
                 .createdTime(LocalDateTime.now())
