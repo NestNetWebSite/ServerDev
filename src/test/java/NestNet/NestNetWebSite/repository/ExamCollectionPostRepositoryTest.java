@@ -24,6 +24,27 @@ public class ExamCollectionPostRepositoryTest {
     ExamCollectionPostRepository examCollectionPostRepository;
 
     @Test
+    public void 게시물_삭제(){
+        //given
+        Member member = createMember();
+        ExamCollectionPost examCollectionPost = createPost(member);
+
+        //when
+        memberRepository.save(member);
+        List<ExamCollectionPost> resultListPrev = examCollectionPostRepository.findAllExamCollectionPost();
+        examCollectionPostRepository.save(examCollectionPost);
+        List<ExamCollectionPost> resultListAfter = examCollectionPostRepository.findAllExamCollectionPost();
+        examCollectionPostRepository.deletePost(examCollectionPost.getId());
+        List<ExamCollectionPost> resultListAfterDelete = examCollectionPostRepository.findAllExamCollectionPost();
+
+        //then
+        Assertions.assertEquals(resultListPrev.size() + 1, resultListAfter.size());
+        Assertions.assertEquals(resultListAfter.size() - 1, resultListAfterDelete.size());
+        Assertions.assertEquals(resultListPrev.size(), resultListAfterDelete.size());
+
+    }
+
+    @Test
     public void 필터에_따른_조회(){
         //given
         Member member = createMember();

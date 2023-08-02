@@ -74,7 +74,10 @@ public class ExamCollectionPostRepository {
     //=====================================================================================//
 
     // 족보 게시물 삭제
-    public void deletePost(ExamCollectionPost examCollectionPost){
-        entityManager.remove(examCollectionPost);
+    public void deletePost(Long postId){
+
+        Post post = entityManager.find(Post.class, postId);
+
+        entityManager.remove(post);
     }
 }

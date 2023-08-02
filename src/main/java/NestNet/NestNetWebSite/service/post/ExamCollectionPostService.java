@@ -94,4 +94,11 @@ public class ExamCollectionPostService {
                 .userName(post.getMember().getName())
                 .build();
     }
+
+    /*
+    족보 게시물 삭제
+     */
+    public void deletePost(Long id){
+        examCollectionPostRepository.deletePost(id);
+    }
 }
