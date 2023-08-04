@@ -32,7 +32,7 @@ public class ExamCollectionPostRepository {
         return entityManager.find(ExamCollectionPost.class, id);
     }
 
-    // 족보 게시물 조건에 따른 조회
+    // 족보 게시물 조건에 따른 리스트 조회
     public List<ExamCollectionPost> findAllExamCollectionPostByFilter(String subject, String professor, Integer year, Integer semester, ExamType examType){
 
         List<ExamCollectionPost> resultList = entityManager.createQuery(

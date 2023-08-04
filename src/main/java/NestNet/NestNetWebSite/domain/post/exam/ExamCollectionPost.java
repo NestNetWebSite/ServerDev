@@ -2,6 +2,7 @@ package NestNet.NestNetWebSite.domain.post.exam;
 
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.post.Post;
+import NestNet.NestNetWebSite.domain.post.PostCategory;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,10 +34,10 @@ public class ExamCollectionPost extends Post {
     생성자
      */
     @Builder
-    public ExamCollectionPost(String title, String bodyContent, Member member, Long viewCount, int recommendationCount, NestNet.NestNetWebSite.domain.post.PostCategory postCategory,
+    public ExamCollectionPost(String title, String bodyContent, Member member, Long viewCount, int recommendationCount,
                                LocalDateTime createdTime, String subject, String professor, int year, int semester, ExamType examType) {
 
-        super(title, bodyContent, member, viewCount, recommendationCount, postCategory, createdTime);
+        super(title, bodyContent, member, viewCount, recommendationCount, PostCategory.EXAM, createdTime);
         this.subject = subject;
         this.professor = professor;
         this.year = year;

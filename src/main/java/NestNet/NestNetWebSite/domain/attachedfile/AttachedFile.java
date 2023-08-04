@@ -65,7 +65,9 @@ public class AttachedFile {
     파일 저장 경로 생성
      */
     public void createSavePath(){
-        String path = basePath + this.post.getPostCategory();      //파일 저장 경로 ( ex) C:/nestnetFile/dev)
+
+        String path = basePath + this.post.getPostCategory();      //파일 저장 경로 ( ex) C:/nestnetFile/EXAM)
+
         File folder = new File(path);               //해당 경로에 폴더 생성
 
         if(!folder.exists()){       //해당 폴더가 존재하지 않을 경우 생성
@@ -75,6 +77,20 @@ public class AttachedFile {
                 e.printStackTrace();
             }
         }
+        //사진 게시판의 경우 게시글마다 폴더를 생성 ex) C:/nestnetFile/PHOTO/230520_23년도 1학기 체육대회
+        if(this.post.getPostCategory().equals(PostCategory.PHOTO)) {
+            path += File.separator + this.post.getCreatedTime().getYear() + this.post.getCreatedTime().getMonth() +
+                    this.post.getCreatedTime().getDayOfMonth() + "_" + this.post.getTitle();
+
+            File innerFolder = new File(path);               //해당 경로에 폴더 생성
+
+            try {
+                innerFolder.mkdir();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+
         this.saveFilePath = path;
     }
 }

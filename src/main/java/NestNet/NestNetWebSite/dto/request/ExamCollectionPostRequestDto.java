@@ -35,7 +35,6 @@ public class ExamCollectionPostRequestDto {
                 .member(member)
                 .viewCount(0L)
                 .recommendationCount(0)
-                .postCategory(this.postCategory)
                 .createdTime(LocalDateTime.now())
                 .subject(this.subject)
                 .professor(this.professor)

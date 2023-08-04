@@ -107,6 +107,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/president").hasAuthority("PRESIDENT")                  //manager하위 리소스는 MANAGER 권한으로 허용
                         .requestMatchers("/post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "GRADUATED_MEMBER")
                         .requestMatchers("/exam-collection-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "GRADUATED_MEMBER")
+                        .requestMatchers("/photo-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "GRADUATED_MEMBER")
                         .anyRequest().authenticated()       //나머지 요청은 모두 권한 필요함.
 
                 )
