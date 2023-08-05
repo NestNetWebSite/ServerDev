@@ -3,20 +3,27 @@ package NestNet.NestNetWebSite.repository.post;
 import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.domain.post.exam.ExamCollectionPost;
 import NestNet.NestNetWebSite.domain.post.photo.PhotoPost;
+import NestNet.NestNetWebSite.domain.post.photo.ThumbNail;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 public class PhotoPostRepository {
 
     private final EntityManager entityManager;
 
     // 저장
     public void save(Post post){
+
         entityManager.persist(post);
     }
 

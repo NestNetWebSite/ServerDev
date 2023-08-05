@@ -41,18 +41,10 @@ public class ExamCollectionPostController {
     족보 게시판 게시물 저장
      */
     @PostMapping("/exam-collection-post/post")
-    public void savePost(@RequestPart("data") @Valid ExamCollectionPostRequestDto examCollectionPostRequestDto, @RequestPart("attachedFile") List<MultipartFile> files,
+    public void savePost(@RequestPart("data") @Valid ExamCollectionPostRequestDto examCollectionPostRequestDto, @RequestPart("file") List<MultipartFile> files,
                          @AuthenticationPrincipal UserDetails userDetails){
 
-        System.out.println(userDetails.getUsername());
-        System.out.println(examCollectionPostRequestDto.getSubject());
-        System.out.println(examCollectionPostRequestDto.getProfessor());
-        for(MultipartFile file : files){
-            System.out.println(file);
-        }
-
         examCollectionPostService.savePost(examCollectionPostRequestDto, files, userDetails.getUsername());
-
     }
 
     /*

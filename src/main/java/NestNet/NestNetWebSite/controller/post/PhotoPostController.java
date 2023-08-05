@@ -24,7 +24,7 @@ public class PhotoPostController {
     사진 게시판 게시물 저장
      */
     @PostMapping("/photo-post/post")
-    public void savePost(@RequestPart("data") @Valid PhotoPostRequestDto photoPostRequestDto, @RequestPart("attachedFile") List<MultipartFile> files,
+    public void savePost(@RequestPart("data") @Valid PhotoPostRequestDto photoPostRequestDto, @RequestPart("photo-file") List<MultipartFile> files,
                          @AuthenticationPrincipal UserDetails userDetails){
 
         photoPostService.savePost(photoPostRequestDto, files, userDetails.getUsername());
