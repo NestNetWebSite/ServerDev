@@ -72,7 +72,7 @@ public class ExamCollectionPostController {
 
         Map<String, Object> result = new HashMap<>();
 
-        ExamCollectionPostDto postDto = examCollectionPostService.findPostById(postId);
+        ExamCollectionPostDto postDto = examCollectionPostService.findPostById(postId, userDetails.getUsername());
         List<AttachedFileDto> fileDtoList = attachedFileService.findAllFilesByPost(postId);
         List<CommentDto> commentDtoList = commentService.findCommentByPost(postId);
         Long likeCount = postLikeService.findLikeCountByPost(postId);

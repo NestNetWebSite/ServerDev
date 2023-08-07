@@ -76,10 +76,10 @@ public class ExamCollectionPostService {
     족보 게시물 단건 상세 조회
      */
     @Transactional
-    public ExamCollectionPostDto findPostById(Long id){
+    public ExamCollectionPostDto findPostById(Long id, String memberLoginId){
 
         ExamCollectionPost post = examCollectionPostRepository.findById(id);
-        examCollectionPostRepository.addViewCount(post);
+        examCollectionPostRepository.addViewCount(post, memberLoginId);
 
         return ExamCollectionPostDto.builder()
                 .id(post.getId())

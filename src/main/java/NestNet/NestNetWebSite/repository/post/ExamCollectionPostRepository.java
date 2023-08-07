@@ -1,5 +1,6 @@
 package NestNet.NestNetWebSite.repository.post;
 
+import NestNet.NestNetWebSite.config.redis.RedisUtil;
 import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.domain.post.exam.ExamCollectionPost;
 import NestNet.NestNetWebSite.domain.post.exam.ExamType;
@@ -8,12 +9,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Repository
 @RequiredArgsConstructor
 public class ExamCollectionPostRepository {
 
     private final EntityManager entityManager;
+    private final RedisUtil redisUtil;
 
     // 저장
     public void save(Post post){
@@ -21,8 +24,15 @@ public class ExamCollectionPostRepository {
     }
 
     // 조회수 update
-    public void addViewCount(Post post){
-        post.addViewCount();        //변경 감지에 의해 update
+    public void addViewCount(Post post, String memberLoginId){
+
+        String viewRecordKey = memberLoginId + post.getId().toString();     //사용자아이디 + 게시물 id
+
+        //24시간 내에 조회하지 않았으면 레디스에 없음 -> 조회수 + 1
+        if(!redisUtil.hasKey(viewRecordKey)){
+            post.addViewCount();        //변경 감지에 의해 update
+            redisUtil.setData(viewRecordKey, "v", 24, TimeUnit.HOURS);      //24시간 유지
+        }
     }
 
     //=========================================조회=========================================//

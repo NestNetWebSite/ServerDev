@@ -64,7 +64,7 @@ public class PhotoPostController {
 
         Map<String, Object> result = new HashMap<>();
 
-        PhotoPostDto photoPostDto = photoPostService.findById(postId);
+        PhotoPostDto photoPostDto = photoPostService.findPostById(postId, userDetails.getUsername());
         List<AttachedFileDto> fileDtoList = attachedFileService.findAllFilesByPost(postId);
         List<CommentDto> commentDtoList = commentService.findCommentByPost(postId);
         Long likeCount = postLikeService.findLikeCountByPost(postId);

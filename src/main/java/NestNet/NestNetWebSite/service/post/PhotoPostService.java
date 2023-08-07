@@ -59,11 +59,12 @@ public class PhotoPostService {
     /*
     사진 게시물 단건 조회
      */
-    public PhotoPostDto findById(Long id){
+    public PhotoPostDto findPostById(Long id, String memberLoginId){
 
-        PhotoPost findPost = photoPostRepository.findById(id);
+        PhotoPost post = photoPostRepository.findById(id);
+        photoPostRepository.addViewCount(post, memberLoginId);
 
-        return new PhotoPostDto(findPost.getId(), findPost.getTitle(),
-                findPost.getBodyContent(), findPost.getViewCount(), findPost.getMember().getName());
+        return new PhotoPostDto(post.getId(), post.getTitle(),
+                post.getBodyContent(), post.getViewCount(), post.getMember().getName());
     }
 }
