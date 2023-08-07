@@ -101,12 +101,15 @@ public class SecurityConfig {
                 //http 요청에 대한 접근 권한을 설정한다.
                 //로그인, 회원가입 api는 토큰이 없는 상태로 요청이 들어오기 때문에 permitAll()로 열어줌
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
-                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()       //html, css같은 정적 리소스에 대해 접근 허용
-                        .requestMatchers("/auth/signup", "auth/login").permitAll()          //로그인, 회원가입 접근 허용
+                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()        //html, css같은 정적 리소스에 대해 접근 허용
+                        .requestMatchers("/auth/signup", "auth/login").permitAll()                      //로그인, 회원가입 접근 허용
+                        // 관리자 패이지는 관리자만 접근 가능
                         .requestMatchers("/manager/**").hasAuthority("MANAGER")                  //manager하위 리소스는 MANAGER 권한으로 허용
-                        .requestMatchers("/auth/president").hasAuthority("PRESIDENT")                  //manager하위 리소스는 MANAGER 권한으로 허용
+                        // 통합 게시판은 모든 회원 접근 가능
                         .requestMatchers("/post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "GRADUATED_MEMBER")
-                        .requestMatchers("/exam-collection-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "GRADUATED_MEMBER")
+                        // 족보 게시판은 졸업생을 제외한 모든 회원 접근 가능
+                        .requestMatchers("/exam-collection-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER")
+                        // 사진 게시판은 모든 회원 접근 가능
                         .requestMatchers("/photo-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "GRADUATED_MEMBER")
                         .anyRequest().authenticated()       //나머지 요청은 모두 권한 필요함.
 
