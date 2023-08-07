@@ -5,6 +5,7 @@ import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.post.photo.PhotoPost;
 import NestNet.NestNetWebSite.domain.post.photo.ThumbNail;
 import NestNet.NestNetWebSite.dto.request.PhotoPostRequestDto;
+import NestNet.NestNetWebSite.dto.response.PhotoPostDto;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import NestNet.NestNetWebSite.repository.post.AttachedFileRepository;
 import NestNet.NestNetWebSite.repository.post.PhotoPostRepository;
@@ -53,5 +54,16 @@ public class PhotoPostService {
         photoPostRepository.save(post);
         thumbNailRepository.save(new ThumbNail(post, thumbNailFile), thumbNailFile);
         attachedFileRepository.saveAll(attachedFileList, files);
+    }
+
+    /*
+    사진 게시물 단건 조회
+     */
+    public PhotoPostDto findById(Long id){
+
+        PhotoPost findPost = photoPostRepository.findById(id);
+
+        return new PhotoPostDto(findPost.getId(), findPost.getTitle(),
+                findPost.getBodyContent(), findPost.getViewCount(), findPost.getMember().getName());
     }
 }

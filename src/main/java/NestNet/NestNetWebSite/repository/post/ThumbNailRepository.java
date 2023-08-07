@@ -42,7 +42,7 @@ public class ThumbNailRepository {
     }
 
     // 사진 게시판 썸네일 모두 조회 (페이징)
-    public List<ThumbNail> findAllPhotoPostByPaging(int offset, int limit){
+    public List<ThumbNail> findAllPhotoThumbNailByPaging(int offset, int limit){
 
         return entityManager.createQuery("select t from ThumbNail t", ThumbNail.class)
                 .setFirstResult(offset)

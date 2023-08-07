@@ -2,23 +2,37 @@ package NestNet.NestNetWebSite.controller.post;
 
 import NestNet.NestNetWebSite.dto.request.ExamCollectionPostRequestDto;
 import NestNet.NestNetWebSite.dto.request.PhotoPostRequestDto;
+import NestNet.NestNetWebSite.dto.response.AttachedFileDto;
+import NestNet.NestNetWebSite.dto.response.CommentDto;
+import NestNet.NestNetWebSite.dto.response.PhotoPostDto;
+import NestNet.NestNetWebSite.dto.response.ThumbNailDto;
+import NestNet.NestNetWebSite.service.attachedfile.AttachedFileService;
+import NestNet.NestNetWebSite.service.comment.CommentService;
+import NestNet.NestNetWebSite.service.like.PostLikeService;
 import NestNet.NestNetWebSite.service.post.PhotoPostService;
+import NestNet.NestNetWebSite.service.post.ThumbNailService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
 public class PhotoPostController {
 
     private final PhotoPostService photoPostService;
+    private final ThumbNailService thumbNailService;
+    private final AttachedFileService attachedFileService;
+    private final CommentService commentService;
+    private final PostLikeService postLikeService;
 
     /*
     사진 게시판 게시물 저장
@@ -30,5 +44,38 @@ public class PhotoPostController {
         photoPostService.savePost(photoPostRequestDto, files, userDetails.getUsername());
     }
 
+    /*
+    사진 게시판 목록(썸네일) 조회
+     */
+    @GetMapping("/photo-post")
+    public ResponseEntity<List<ThumbNailDto>> showThumbNail(@RequestParam("offset") int offset, @RequestParam("limit") int limit){
 
+        List<ThumbNailDto> thumbNailDtoList = thumbNailService.findAllThumbNail(offset, limit);
+
+        return new ResponseEntity<>(thumbNailDtoList, HttpStatus.OK);
+    }
+
+    /*
+    사진 게시물 조회
+     */
+    @GetMapping("/photo-post/{post_id}")
+    public ResponseEntity<Map<String, Object>> showPost(@PathVariable("post_id") Long postId,
+                                                        @AuthenticationPrincipal UserDetails userDetails){
+
+        Map<String, Object> result = new HashMap<>();
+
+        PhotoPostDto photoPostDto = photoPostService.findById(postId);
+        List<AttachedFileDto> fileDtoList = attachedFileService.findAllFilesByPost(postId);
+        List<CommentDto> commentDtoList = commentService.findCommentByPost(postId);
+        Long likeCount = postLikeService.findLikeCountByPost(postId);
+        boolean isMemberLiked = postLikeService.isMemberLikedByPost(postId, userDetails.getUsername());
+
+        result.put("post-data", photoPostDto);
+        result.put("file-data", fileDtoList);
+        result.put("comment-data", commentDtoList);
+        result.put("like-count", likeCount);
+        result.put("is-member-liked", isMemberLiked);
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
 }
