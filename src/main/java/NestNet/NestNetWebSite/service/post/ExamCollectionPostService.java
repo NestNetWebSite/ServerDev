@@ -7,7 +7,7 @@ import NestNet.NestNetWebSite.domain.post.exam.ExamType;
 import NestNet.NestNetWebSite.dto.request.ExamCollectionPostRequestDto;
 import NestNet.NestNetWebSite.dto.response.ExamCollectionPostDto;
 import NestNet.NestNetWebSite.dto.response.ExamCollectionPostListDto;
-import NestNet.NestNetWebSite.repository.post.AttachedFileRepository;
+import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import NestNet.NestNetWebSite.repository.post.ExamCollectionPostRepository;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +40,7 @@ public class ExamCollectionPostService {
         List<AttachedFile> attachedFileList = new ArrayList<>();
         for(MultipartFile file : files){
             AttachedFile attachedFile = new AttachedFile(post, file);
-            attachedFileList.add(new AttachedFile(post, file));
+            attachedFileList.add(attachedFile);
             post.addAttachedFiles(attachedFile);
         }
 

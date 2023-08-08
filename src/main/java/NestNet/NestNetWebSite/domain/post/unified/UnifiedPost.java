@@ -2,6 +2,7 @@ package NestNet.NestNetWebSite.domain.post.unified;
 
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.post.Post;
+import NestNet.NestNetWebSite.domain.post.PostCategory;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -28,10 +29,10 @@ public class UnifiedPost extends Post {
     생성자
      */
     @Builder
-    public UnifiedPost(String title, String bodyContent, Member member, Long viewCount, int recommendationCount, NestNet.NestNetWebSite.domain.post.PostCategory postCategory,
-                        LocalDateTime createdTime, UnifiedPostType unifiedPostType){
+    public UnifiedPost(String title, String bodyContent, Member member, Long viewCount, int likeCount,
+                       LocalDateTime createdTime, UnifiedPostType unifiedPostType){
 
-        super(title, bodyContent, member, viewCount, recommendationCount, postCategory, createdTime);
+        super(title, bodyContent, member, viewCount, likeCount, PostCategory.UNIFIED, createdTime);
         this.unifiedPostType = unifiedPostType;
     }
 

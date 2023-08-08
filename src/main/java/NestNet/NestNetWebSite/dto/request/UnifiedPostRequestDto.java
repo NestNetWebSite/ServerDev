@@ -15,12 +15,16 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class UnifiedPostRequestDto {
 
-    private Long memberId;
     private String title;
     private String bodyContent;
-    private PostCategory postCategory;
     private UnifiedPostType unifiedPostType;                    // 게시판 소분류 (자유, 개발, 진로)
-
+/*
+{
+    "title" : "도커 이미지가 뭔가요"
+    "bodyContent" : "testtesttesttest"
+    "unifiedPostType" : "DEV"
+}
+ */
 
     //== DTO ---> Entity ==//
     public UnifiedPost toEntity(Member member){
@@ -30,8 +34,7 @@ public class UnifiedPostRequestDto {
                 .bodyContent(this.bodyContent)
                 .member(member)
                 .viewCount(0L)
-                .recommendationCount(0)
-                .postCategory(this.postCategory)
+                .likeCount(0)
                 .createdTime(LocalDateTime.now())
                 .unifiedPostType(this.unifiedPostType)
                 .build();

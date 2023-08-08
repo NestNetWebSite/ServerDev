@@ -40,11 +40,11 @@ public class PostLikeService {
     /*
     게시물 좋아요 수 조회
      */
-    public Long findLikeCountByPost(Long postId){
-
-        Post post = findPost(postId);
-        return postLikeRepository.likeCount(post);
-    }
+//    public Long findLikeCountByPost(Long postId){
+//
+//        Post post = findPost(postId);
+//        return postLikeRepository.likeCount(post);
+//    }
 
     /*
     로그인한 회원의 좋아요 여부 조회

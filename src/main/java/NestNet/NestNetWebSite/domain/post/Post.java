@@ -35,7 +35,7 @@ public abstract class Post {
 
     private Long viewCount;                                          // 조회 수
 
-    private int recommendationCount;                                // 추천 수
+    private int likeCount;                                // 추천 수
 
     @Enumerated(value = EnumType.STRING)
     private PostCategory PostCategory;                              // 게시판 분류
@@ -50,12 +50,12 @@ public abstract class Post {
     /*
     생성자
      */
-    public Post(String title, String bodyContent, Member member, Long viewCount, int recommendationCount, PostCategory postCategory, LocalDateTime createdTime) {
+    public Post(String title, String bodyContent, Member member, Long viewCount, int likeCount, PostCategory postCategory, LocalDateTime createdTime) {
         this.title = title;
         this.bodyContent = bodyContent;
         this.member = member;
         this.viewCount = viewCount;
-        this.recommendationCount = recommendationCount;
+        this.likeCount = likeCount;
         PostCategory = postCategory;
         this.createdTime = createdTime;
     }

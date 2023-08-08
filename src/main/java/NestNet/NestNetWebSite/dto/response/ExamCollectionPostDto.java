@@ -21,6 +21,7 @@ public class ExamCollectionPostDto {
     private String title;
     private String bodyContent;
     private Long viewCount;
+    private int likeCount;
     private String subject;
     private String professor;
     private int year;

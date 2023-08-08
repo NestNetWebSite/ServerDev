@@ -75,13 +75,11 @@ public class ExamCollectionPostController {
         ExamCollectionPostDto postDto = examCollectionPostService.findPostById(postId, userDetails.getUsername());
         List<AttachedFileDto> fileDtoList = attachedFileService.findAllFilesByPost(postId);
         List<CommentDto> commentDtoList = commentService.findCommentByPost(postId);
-        Long likeCount = postLikeService.findLikeCountByPost(postId);
         boolean isMemberLiked = postLikeService.isMemberLikedByPost(postId, userDetails.getUsername());
 
         result.put("post-data", postDto);
         result.put("file-data", fileDtoList);
         result.put("comment-data", commentDtoList);
-        result.put("like-count", likeCount);
         result.put("is-member-liked", isMemberLiked);
 
         return new ResponseEntity<>(result, HttpStatus.OK);

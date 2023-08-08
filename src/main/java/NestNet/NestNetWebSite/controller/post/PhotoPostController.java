@@ -67,15 +67,31 @@ public class PhotoPostController {
         PhotoPostDto photoPostDto = photoPostService.findPostById(postId, userDetails.getUsername());
         List<AttachedFileDto> fileDtoList = attachedFileService.findAllFilesByPost(postId);
         List<CommentDto> commentDtoList = commentService.findCommentByPost(postId);
-        Long likeCount = postLikeService.findLikeCountByPost(postId);
         boolean isMemberLiked = postLikeService.isMemberLikedByPost(postId, userDetails.getUsername());
 
         result.put("post-data", photoPostDto);
         result.put("file-data", fileDtoList);
         result.put("comment-data", commentDtoList);
-        result.put("like-count", likeCount);
         result.put("is-member-liked", isMemberLiked);
 
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    /*
+    좋아요 누름
+     */
+    @GetMapping("/photo-post/{post_id}/like")
+    public void like(@PathVariable("post_id") Long postId, @AuthenticationPrincipal UserDetails userDetails){
+
+        postLikeService.saveLike(postId, userDetails.getUsername());
+    }
+
+    /*
+    좋아요 취소
+     */
+    @GetMapping("/photo-post/{post_id}/cancel_like")
+    public void dislike(@PathVariable("post_id") Long postId, @AuthenticationPrincipal UserDetails userDetails){
+
+        postLikeService.cancelLike(postId, userDetails.getUsername());
     }
 }

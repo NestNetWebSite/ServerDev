@@ -3,12 +3,11 @@ package NestNet.NestNetWebSite.service.attachedfile;
 import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.dto.response.AttachedFileDto;
-import NestNet.NestNetWebSite.repository.post.AttachedFileRepository;
+import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;

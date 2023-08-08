@@ -1,16 +1,19 @@
 package NestNet.NestNetWebSite.service.post;
 
+import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.post.unified.UnifiedPost;
 import NestNet.NestNetWebSite.domain.post.unified.UnifiedPostType;
 import NestNet.NestNetWebSite.dto.request.UnifiedPostRequestDto;
 import NestNet.NestNetWebSite.dto.response.UnifiedPostDto;
-import NestNet.NestNetWebSite.repository.post.AttachedFileRepository;
+import NestNet.NestNetWebSite.dto.response.UnifiedPostListDto;
+import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import NestNet.NestNetWebSite.repository.post.UnifiedPostRepository;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,63 +27,60 @@ public class UnifiedPostService {
     private final MemberRepository memberRepository;
     private final AttachedFileRepository attachedFileRepository;
 
-    // Create
+    /*
+    통합 게시판 게시물 저장
+     */
     @Transactional
-    public void save(UnifiedPostRequestDto postDto) {
+    public void savePost(UnifiedPostRequestDto unifiedPostRequestDto, List<MultipartFile> files, String memberLoginId) {
 
-        Member findMember = memberRepository.findById(postDto.getMemberId());
-        UnifiedPost post = postDto.toEntity(findMember);
+        Member member = memberRepository.findByLoginId(memberLoginId);
+
+        UnifiedPost post = unifiedPostRequestDto.toEntity(member);
+
+        List<AttachedFile> attachedFileList = new ArrayList<>();
+        for(MultipartFile file : files){
+            AttachedFile attachedFile = new AttachedFile(post, file);
+            attachedFileList.add(attachedFile);
+            post.addAttachedFiles(attachedFile);
+        }
 
         unifiedPostRepository.save(post);
+        attachedFileRepository.saveAll(attachedFileList, files);
     }
 
-//    // Read ---> 족보 게시판 목록 조회
-//    public List<ExamCollectionPostListDto> findListFromExamCollectionPost(int offset, int limit){
-//
-//        List<UnifiedPost> postList = new ArrayList<>();
-//
-//        postList = unifiedPostRepository.findAllUnifiedPost(offset, limit);
-//
-//        List<ExamCollectionPostListDto> postListDtos = new ArrayList<>();
-//
-//        for(ExamCollectionPost Post : postList){
-//            postListDtos.add(new ExamCollectionPostListDto(Post.getId(), Post.getSubject(),
-//                    Post.getProfesssor(), Post.getYear(), Post.getSemester(), Post.getExamType()));
-//        }
-//
-//        return postListDtos;
-//    }
+    /*
+    통합 게시판 목록 조회
+     */
+    public List<UnifiedPostListDto> findPostList(UnifiedPostType unifiedPostType, int offset, int limit){
 
-//    // Read ---> 족보 게시판 단건 조회
-//    public ExamCollectionPostDto findPostFromExamCollectionPost(Long postId){
-//
-//        ExamCollectionPost post = unifiedPostRepository.findExamCollectionPost(postId);
-//
-//        return new ExamCollectionPostDto(postId, post.getTitle(), post.getBodyContent(), post.getSubject(),
-//                post.getProfesssor(), post.getYear(), post.getSemester(), post.getExamType(), post.getMember().getName());
-//    }
+        List<UnifiedPost> postList = unifiedPostRepository.findUnifiedPostByType(offset, limit, unifiedPostType);
 
+        List<UnifiedPostListDto> resultList = new ArrayList<>();
 
-    // Read ---> 통합 게시판 조회
-    public List<UnifiedPostDto> findAllFromUnifiedPost(UnifiedPostType unifiedPostType, int offset, int limit) {
-
-        List<UnifiedPost> postList = new ArrayList<>();
-
-        if (unifiedPostType.equals("자유")) {
-            postList = unifiedPostRepository.findUnifiedFreePost(offset, limit);
-        } else if (unifiedPostType.equals("개발")) {
-            postList = unifiedPostRepository.findUnifiedDevPost(offset, limit);
-        } else if (unifiedPostType.equals("진로")) {
-            postList = unifiedPostRepository.findUnifiedCareerPost(offset, limit);
+        for(UnifiedPost post : postList){
+            resultList.add(new UnifiedPostListDto(post.getMember().getName(), post.getTitle(),
+                    post.getCreatedTime(), post.getViewCount(), post.getLikeCount()));
         }
 
-        List<UnifiedPostDto> PostDtos = new ArrayList<>();
+        return resultList;
+    }
 
-        for (UnifiedPost Post : postList) {
-            PostDtos.add(new UnifiedPostDto(Post.getMember().getId(), Post.getTitle(), Post.getBodyContent(),
-                    Post.getPostCategory(), Post.getUnifiedPostType()));
-        }
+    /*
+    통합 게시판 게시물 단건 조회
+     */
+    public UnifiedPostDto findPostById(Long id, String memberLoginId){
 
-        return PostDtos;
+        UnifiedPost post = unifiedPostRepository.findById(id);
+        unifiedPostRepository.addViewCount(post, memberLoginId);
+
+        return UnifiedPostDto.builder()
+                .id(post.getId())
+                .title(post.getTitle())
+                .bodyContent(post.getBodyContent())
+                .viewCount(post.getViewCount())
+                .likeCount(post.getLikeCount())
+                .unifiedPostType(post.getUnifiedPostType())
+                .userName(post.getMember().getName())
+                .build();
     }
 }

@@ -7,7 +7,7 @@ import NestNet.NestNetWebSite.domain.post.photo.ThumbNail;
 import NestNet.NestNetWebSite.dto.request.PhotoPostRequestDto;
 import NestNet.NestNetWebSite.dto.response.PhotoPostDto;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
-import NestNet.NestNetWebSite.repository.post.AttachedFileRepository;
+import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import NestNet.NestNetWebSite.repository.post.PhotoPostRepository;
 import NestNet.NestNetWebSite.repository.post.ThumbNailRepository;
 import lombok.RequiredArgsConstructor;
@@ -65,6 +65,6 @@ public class PhotoPostService {
         photoPostRepository.addViewCount(post, memberLoginId);
 
         return new PhotoPostDto(post.getId(), post.getTitle(),
-                post.getBodyContent(), post.getViewCount(), post.getMember().getName());
+                post.getBodyContent(), post.getViewCount(), post.getLikeCount(), post.getMember().getName());
     }
 }
