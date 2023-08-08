@@ -2,6 +2,7 @@ package NestNet.NestNetWebSite.service.post;
 
 import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.member.Member;
+import NestNet.NestNetWebSite.domain.post.exam.ExamCollectionPost;
 import NestNet.NestNetWebSite.domain.post.photo.PhotoPost;
 import NestNet.NestNetWebSite.domain.post.photo.ThumbNail;
 import NestNet.NestNetWebSite.dto.request.PhotoPostRequestDto;
@@ -66,5 +67,30 @@ public class PhotoPostService {
 
         return new PhotoPostDto(post.getId(), post.getTitle(),
                 post.getBodyContent(), post.getViewCount(), post.getLikeCount(), post.getMember().getName());
+    }
+
+    /*
+    좋아요
+     */
+    public void like(Long id){
+
+        PhotoPost post = photoPostRepository.findById(id);
+        photoPostRepository.like(post);
+    }
+
+    /*
+    좋아요 취소
+     */
+    public void cancelLike(Long id){
+
+        PhotoPost post = photoPostRepository.findById(id);
+        photoPostRepository.cancelLike(post);
+    }
+
+    /*
+    족보 게시물 삭제
+     */
+    public void deletePost(Long id){
+        photoPostRepository.deletePost(id);
     }
 }

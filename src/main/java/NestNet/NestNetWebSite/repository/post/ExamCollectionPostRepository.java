@@ -36,6 +36,15 @@ public class ExamCollectionPostRepository {
         }
     }
 
+    // 좋아요
+    public void like(Post post){
+        post.like();
+    }
+    // 좋아요 취소
+    public void cancelLike(Post post){
+        post.cancelLike();
+    }
+
     //=========================================조회=========================================//
 
     // Id(PK)로 단건 조회

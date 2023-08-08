@@ -79,6 +79,16 @@ public abstract class Post {
         this.viewCount++;
     }
 
+    /*
+    좋아요 / 좋아요 취소
+    */
+    public void like(){
+        this.likeCount++;
+    }
+    public void cancelLike(){
+        this.likeCount--;
+    }
+
     //== setter ==//
     public void setTitle(String title) {
         this.title = title;

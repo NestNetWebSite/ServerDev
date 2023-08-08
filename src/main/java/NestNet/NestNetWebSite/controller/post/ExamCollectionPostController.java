@@ -92,6 +92,7 @@ public class ExamCollectionPostController {
     public void like(@PathVariable("post_id") Long postId, @AuthenticationPrincipal UserDetails userDetails){
 
         postLikeService.saveLike(postId, userDetails.getUsername());
+        examCollectionPostService.like(postId);
     }
 
     /*
@@ -101,6 +102,7 @@ public class ExamCollectionPostController {
     public void dislike(@PathVariable("post_id") Long postId, @AuthenticationPrincipal UserDetails userDetails){
 
         postLikeService.cancelLike(postId, userDetails.getUsername());
+        examCollectionPostService.cancelLike(postId);
     }
 
 }

@@ -2,6 +2,7 @@ package NestNet.NestNetWebSite.service.post;
 
 import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.member.Member;
+import NestNet.NestNetWebSite.domain.post.photo.PhotoPost;
 import NestNet.NestNetWebSite.domain.post.unified.UnifiedPost;
 import NestNet.NestNetWebSite.domain.post.unified.UnifiedPostType;
 import NestNet.NestNetWebSite.dto.request.UnifiedPostRequestDto;
@@ -82,5 +83,30 @@ public class UnifiedPostService {
                 .unifiedPostType(post.getUnifiedPostType())
                 .userName(post.getMember().getName())
                 .build();
+    }
+
+    /*
+    좋아요
+     */
+    public void like(Long id){
+
+        UnifiedPost post = unifiedPostRepository.findById(id);
+        unifiedPostRepository.like(post);
+    }
+
+    /*
+    좋아요 취소
+     */
+    public void cancelLike(Long id){
+
+        UnifiedPost post = unifiedPostRepository.findById(id);
+        unifiedPostRepository.cancelLike(post);
+    }
+
+    /*
+    족보 게시물 삭제
+     */
+    public void deletePost(Long id){
+        unifiedPostRepository.deletePost(id);
     }
 }

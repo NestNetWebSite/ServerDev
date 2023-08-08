@@ -96,6 +96,24 @@ public class ExamCollectionPostService {
     }
 
     /*
+    좋아요
+     */
+    public void like(Long id){
+
+        ExamCollectionPost post = examCollectionPostRepository.findById(id);
+        examCollectionPostRepository.like(post);
+    }
+
+    /*
+    좋아요 취소
+     */
+    public void cancelLike(Long id){
+
+        ExamCollectionPost post = examCollectionPostRepository.findById(id);
+        examCollectionPostRepository.cancelLike(post);
+    }
+
+    /*
     족보 게시물 삭제
      */
     public void deletePost(Long id){

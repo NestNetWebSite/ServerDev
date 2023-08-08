@@ -80,6 +80,7 @@ public class UnifiedPostController {
     public void like(@PathVariable("post_id") Long postId, @AuthenticationPrincipal UserDetails userDetails){
 
         postLikeService.saveLike(postId, userDetails.getUsername());
+        unifiedPostService.like(postId);
     }
 
     /*
@@ -89,6 +90,7 @@ public class UnifiedPostController {
     public void dislike(@PathVariable("post_id") Long postId, @AuthenticationPrincipal UserDetails userDetails){
 
         postLikeService.cancelLike(postId, userDetails.getUsername());
+        unifiedPostService.cancelLike(postId);
     }
 
 }

@@ -84,6 +84,7 @@ public class PhotoPostController {
     public void like(@PathVariable("post_id") Long postId, @AuthenticationPrincipal UserDetails userDetails){
 
         postLikeService.saveLike(postId, userDetails.getUsername());
+        photoPostService.like(postId);
     }
 
     /*
@@ -93,5 +94,6 @@ public class PhotoPostController {
     public void dislike(@PathVariable("post_id") Long postId, @AuthenticationPrincipal UserDetails userDetails){
 
         postLikeService.cancelLike(postId, userDetails.getUsername());
+        photoPostService.cancelLike(postId);
     }
 }

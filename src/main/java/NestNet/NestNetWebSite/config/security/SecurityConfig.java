@@ -78,19 +78,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+
                 //API 통신을 하는 애플리케이션의 경우 csrf 공격을 받을 가능성이 없기 때문에 @EnableWebSecurity의 csrf 보호 기능을 해제
                 .csrf(csrf -> csrf.disable())
 
                 //jwt를 사용하기 때문에 세션 사용하지 않음
                 .sessionManagement((sessionManagement) -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
-                //UsernamePasswordAuthenticationFilter 앞에 corsFilter 추가
-//                .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
-
-
-                //jwt 커스텀 필터 추가
-//                .addFilterBefore(new CustomJwtFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class)
-//                .addFilterBefore(customAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
 
                 //각 예외 인터페이스를 커스텀한 두 예외 등록. 401, 403 에러
                 .exceptionHandling(exceptionHandling -> exceptionHandling
@@ -114,13 +107,6 @@ public class SecurityConfig {
                         .anyRequest().authenticated()       //나머지 요청은 모두 권한 필요함.
 
                 )
-
-                //브라우저 자동 로그인
-//                .rememberMe(rememberMe -> rememberMe
-//                        .key("uniqueKey")                       // 토큰을 암호화하는 데 사용될 키
-//                        .rememberMeServices(rememberMeServices) // RememberMeServices 인터페이스를 구현한 구체적인 서비스
-//                        .tokenValiditySeconds(86400)            // 토큰의 유효 기간과 같게 설정
-//                )
 
                 // 헤더 관련 설정
                 .headers(headers ->

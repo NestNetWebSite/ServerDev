@@ -33,6 +33,7 @@ import java.util.Date;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+//@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:3000", "http://172.30.1.33:8080", "http://172.30.1.33:3000" })
 public class AuthController {
 
     private final MemberService memberService;
