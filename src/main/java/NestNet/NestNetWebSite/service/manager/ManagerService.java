@@ -3,11 +3,14 @@ package NestNet.NestNetWebSite.service.manager;
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.manager.MemberSignUpManagement;
 import NestNet.NestNetWebSite.domain.member.Member;
+import NestNet.NestNetWebSite.domain.member.MemberAuthority;
 import NestNet.NestNetWebSite.dto.request.MemberSignUpManagementRequestDto;
+import NestNet.NestNetWebSite.dto.response.MemberInfoDto;
 import NestNet.NestNetWebSite.dto.response.MemberSignUpManagementDto;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import NestNet.NestNetWebSite.repository.manager.MemberSignUpManagementRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,9 +60,38 @@ public class ManagerService {
     재학생 -> 졸업생으로 전환
     */
     @Transactional
-    public void changeAuthorityGraduate(Long id){
+    public ApiResult<?> changeAuthorityGraduate(Long id){
 
         Member member = memberRepository.findById(id);
         member.changeMemberToGraduate();
+
+        return ApiResult.success(member.getName() + "님의 권한이 졸업생으로 변경되었습니다.");
+    }
+
+    /*
+    권한 변경
+     */
+    @Transactional
+    public ApiResult<?> changeAuthority(Long id, MemberAuthority authority){
+
+        Member member = memberRepository.findById(id);
+        member.changeAuthority(authority);
+
+        return ApiResult.success(member.getName() + "님의 권한이 " + member.getMemberAuthority().toString() + "(으)로 변경되었습니다.");
+    }
+
+    /*
+    전체 회원 정보 조회 (권한에 따른 필터링)
+     */
+    public List<MemberInfoDto> findAllMemberInfo(){
+
+        List<Member> memberList = memberRepository.findAllMember();
+        List<MemberInfoDto> memberInfoDtoList = new ArrayList<>();
+        for(Member member : memberList){
+            memberInfoDtoList.add(new MemberInfoDto(member.getMemberAuthority(), member.getName(), member.getLoginId(), member.getEmailAddress(),
+                    member.getStudentId(), member.getGrade(), member.getGraduateYear()));
+        }
+
+        return memberInfoDtoList;
     }
 }

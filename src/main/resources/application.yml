@@ -64,5 +64,6 @@ logging:
     org.hibernate.SQL: debug    # 하이버네이트가 생성하는 sql 로그로 출력
     org.hibernate.orm.jdbc.bind: trace    # 쿼리 파라미터 로그 남김
 server:
-  address: 0.0.0.0    # 모든 접속 허용
+#  address: 0.0.0.0    # 모든 접속 허용
   port: 8080
+  address: localhost

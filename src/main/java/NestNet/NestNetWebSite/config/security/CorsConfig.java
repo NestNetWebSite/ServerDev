@@ -27,7 +27,7 @@ public class CorsConfig {
         configuration.addAllowedHeader("*");             //모든 header에 대해 응답을 허용
         configuration.addAllowedMethod("*");             //모든 매서드(get, post, put, delete..)에 대해 응답을 허용
 
-        source.registerCorsConfiguration("/api/**", configuration);     //configuration을 모든 /api/ 하위 경로에 적용
+        source.registerCorsConfiguration("*", configuration);     //configuration을 모든 경로에 적용
 
         return new CorsFilter(source);
     }

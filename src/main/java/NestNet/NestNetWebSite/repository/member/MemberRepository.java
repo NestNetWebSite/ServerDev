@@ -48,4 +48,9 @@ public class MemberRepository {
                 .getResultList();
     }
 
+    // 모든 회원 조회
+    public List<Member> findAllMember(){
+        return entityManager.createQuery("select m from Member m", Member.class)
+                .getResultList();
+    }
 }

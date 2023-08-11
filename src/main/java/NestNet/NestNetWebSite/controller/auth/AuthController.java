@@ -102,10 +102,6 @@ public class AuthController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    //테스트용!!!!!!!!!!!!!!!!!11111111
-    @GetMapping("auth/president")
-    public void test(){
-        log.info("회장 권한 수행 ");      // 인가 성공 시 로그
-    }
+
 
 }

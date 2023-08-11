@@ -99,12 +99,13 @@ public class SecurityConfig {
                         // 관리자 패이지는 관리자만 접근 가능
                         .requestMatchers("/manager/**").hasAuthority("MANAGER")                  //manager하위 리소스는 MANAGER 권한으로 허용
                         // 통합 게시판은 모든 회원 접근 가능
-                        .requestMatchers("/unified-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "GRADUATED_MEMBER")
+                        .requestMatchers("/unified-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER")
                         // 족보 게시판은 졸업생을 제외한 모든 회원 접근 가능
-                        .requestMatchers("/exam-collection-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER")
+                        .requestMatchers("/exam-collection-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER")
                         // 사진 게시판은 모든 회원 접근 가능
-                        .requestMatchers("/photo-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "GRADUATED_MEMBER")
-                        .anyRequest().authenticated()       //나머지 요청은 모두 권한 필요함.
+                        .requestMatchers("/photo-post/post").hasAnyAuthority("PRESIDENT", "VICE_PRESIDENT", "MANAGER")
+                        .requestMatchers("/photo-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER")
+                        .anyRequest().authenticated()       //나머지 요청은 모두 권한 필요함.git
 
                 )
 

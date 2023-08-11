@@ -67,4 +67,10 @@ public class Member {
         this.memberAuthority = MemberAuthority.GRADUATED_MEMBER;
     }
 
+    /*
+    회원 권한 변경
+     */
+    public void changeAuthority(MemberAuthority authority){
+        this.memberAuthority = authority;
+    }
 }
