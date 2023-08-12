@@ -1,6 +1,7 @@
 package NestNet.NestNetWebSite.repository.post;
 
 import NestNet.NestNetWebSite.config.redis.RedisUtil;
+import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.domain.post.exam.ExamCollectionPost;
 import NestNet.NestNetWebSite.domain.post.exam.ExamType;
@@ -91,6 +92,7 @@ public class ExamCollectionPostRepository {
 
         return resultList;
     }
+
     //=====================================================================================//
 
     // 족보 게시물 삭제
