@@ -1,21 +1,13 @@
-# 실제 운영에서의 설정
-spring:
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/nestnet?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: root
-    password: kksshh1735
+# 기본 설정
+server:
+  #  address: 0.0.0.0    # 모든 접속 허용
+  port: 8080
+  address: localhost
 
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        default_batch_fetch_size: 100
-        show_sql: true            # sout으로 sql 출력
-        format_sql: true
-        dialect: org.hibernate.dialect.MySQL8Dialect
-    open-in-view: false
+spring:
+  profiles:
+    default: dev
+    active: dev           # 메인으로 사용할 설정
 
   data:
     redis:
@@ -25,21 +17,12 @@ spring:
   servlet:
     multipart:
       enabled: true
+      max-file-size: 5MB
+      max-request-size: 10MB
 
-#springdoc:
-#  packages-to-scan: NestNet-WebSite.NestNet.NestNetWebSite
-#  default-consumes-media-type: application/json;charset=UTF-8
-#  default-produces-media-type: application/json;charset=UTF-8
-#  swagger-ui:
-#    path: localhost:8000/demo-ui.html           # Swagger UI 경로 => localhost:8000/demo-ui.html
-#    tags-sorter: alpha            # alpha: 알파벳 순 태그 정렬, method: HTTP Method 순 정렬
-#    operations-sorter: alpha      # alpha: 알파벳 순 태그 정렬, method: HTTP Method 순 정렬
-#    api-docs:
-#      path: /api-docs/json
-#      groups:
-#        enabled: true
-#    cache:
-#      disabled: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
 
 springdoc:
   swagger-ui:
@@ -53,8 +36,9 @@ springdoc:
 jwt:
   header: Authorization
   # HS512 알고리즘을 사용할 것이기 때문에 512bit, 즉 64byte 이상의 secret key를 사용
-  # cbnu-club-nestnet-website-seongho-kim-kangmin-kim-wonil-heo-jwt-secret-key-who-is-the-best  base64로 인코딩
-  secret: Y2JudS1jbHViLW5lc3RuZXQtd2Vic2l0ZS1zZW9uZ2hvLWtpbS1rYW5nbWluLWtpbS13b25pbC1oZW8tand0LXNlY3JldC1rZXktd2hvLWlzLXRoZS1iZXN0
+  # who-is-the-best-nestnet-seongho-kim-kangmin-kim-wonil-heo-cbnu-club-nestnet-website-jwt-secret-key
+  # d2hvLWlzLXRoZS1iZXN0LW5lc3RuZXQtc2Vvbmdoby1raW0ta2FuZ21pbi1raW0td29uaWwtaGVvLWNibnUtY2x1Yi1uZXN0bmV0LXdlYnNpdGUtand0LXNlY3JldC1rZXkK
+  secret : ${secret-key}
   access-exp-time: 7200000    # 2시간 7200000
   refresh-exp-time: 1209600000    # 14일
 
@@ -63,7 +47,3 @@ logging:
   level:
     org.hibernate.SQL: debug    # 하이버네이트가 생성하는 sql 로그로 출력
     org.hibernate.orm.jdbc.bind: trace    # 쿼리 파라미터 로그 남김
-server:
-#  address: 0.0.0.0    # 모든 접속 허용
-  port: 8080
-  address: localhost
