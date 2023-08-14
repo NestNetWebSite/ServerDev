@@ -35,9 +35,6 @@ springdoc:
 
 jwt:
   header: Authorization
-  # HS512 알고리즘을 사용할 것이기 때문에 512bit, 즉 64byte 이상의 secret key를 사용
-  # who-is-the-best-nestnet-seongho-kim-kangmin-kim-wonil-heo-cbnu-club-nestnet-website-jwt-secret-key
-  # d2hvLWlzLXRoZS1iZXN0LW5lc3RuZXQtc2Vvbmdoby1raW0ta2FuZ21pbi1raW0td29uaWwtaGVvLWNibnUtY2x1Yi1uZXN0bmV0LXdlYnNpdGUtand0LXNlY3JldC1rZXkK
   secret : ${secret-key}
   access-exp-time: 7200000    # 2시간 7200000
   refresh-exp-time: 1209600000    # 14일
