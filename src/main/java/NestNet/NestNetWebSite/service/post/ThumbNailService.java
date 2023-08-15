@@ -37,7 +37,7 @@ public class ThumbNailService {
         List<ThumbNail> thumbNailList = thumbNailRepository.findAllPhotoThumbNailByPaging(offset, limit);
         List<ThumbNailDto> thumbNailDtoList = new ArrayList<>();
         for(ThumbNail thumbNail : thumbNailList){
-            thumbNailDtoList.add(new ThumbNailDto(thumbNail.getPost().getId(), thumbNail.getSaveFileName(), thumbNail.getSaveFilePath()));
+            thumbNailDtoList.add(new ThumbNailDto(thumbNail.getPost().getId(), thumbNail.getTitle(), thumbNail.getSaveFileName(), thumbNail.getSaveFilePath()));
         }
 
         return thumbNailDtoList;

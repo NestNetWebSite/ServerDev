@@ -12,6 +12,7 @@ import NestNet.NestNetWebSite.service.member.MemberService;
 import NestNet.NestNetWebSite.service.token.RefreshTokenService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -33,6 +34,7 @@ import java.util.Date;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+//@RequestMapping("/auth")
 //@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:3000", "http://172.30.1.33:8080", "http://172.30.1.33:3000" })
 public class AuthController {
 
@@ -45,6 +47,7 @@ public class AuthController {
     /*
     회원가입 post 요청
      */
+    @Operation(summary = "회원가입 요청", description = "파라미터로 회원가입 폼 받음")
     @PostMapping("/auth/signup")
     public ApiResult<?> signUp(@Valid @RequestBody SignUpRequestDto signUpRequestDto){
 
@@ -56,6 +59,7 @@ public class AuthController {
     /*
     로그인 post 요청
      */
+    @Operation(summary = "로그인 요청", description = "access 토큰은 헤더에 Authorization에, refresh 토큰은 헤더에 쿠키로 반환")
     @PostMapping("/auth/login")
     public ResponseEntity<TokenDto> login(@Valid @RequestBody LoginRequestDto loginRequestDto){
 
@@ -63,12 +67,8 @@ public class AuthController {
 
         TokenDto tokenDto = memberService.login(loginRequestDto);
 
-
-        System.out.println("혹시 이게...?" + refreshTokenExpTime);
         // 현재 시간 + 만료 기간 == 만료 시간
         LocalDateTime expTime = Instant.now().plusMillis((long)refreshTokenExpTime).atZone(ZoneId.systemDefault()).toLocalDateTime();
-
-        System.out.println("만료 시간 : " +expTime);
 
         // 리프레시 토큰 저장
         refreshTokenService.save(new RefreshtokenRequestDto(tokenDto.getAccessToken(), tokenDto.getRefreshToken(), expTime));

@@ -1,8 +1,8 @@
 # 기본 설정
 server:
-  #  address: 0.0.0.0    # 모든 접속 허용
+  address: 0.0.0.0    # 모든 접속 허용
   port: 8080
-  address: localhost
+#  address: localhost
 
 spring:
   profiles:
@@ -25,13 +25,16 @@ spring:
       matching-strategy: ant_path_matcher
 
 springdoc:
+  packages-to-scan: NestNet.NestNetWebSite.controller
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
   swagger-ui:
     path: /api-docs.html
+    disable-swagger-default-url: false
+    display-request-duration: true
+    operations-sorter: method
   api-docs:
-    path: /api-docs
-  show-actuator: true
-  default-produces-media-type: application/json
-
+    path: /api-docs.html
 
 jwt:
   header: Authorization

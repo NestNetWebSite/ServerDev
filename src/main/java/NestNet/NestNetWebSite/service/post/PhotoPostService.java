@@ -60,6 +60,7 @@ public class PhotoPostService {
     /*
     사진 게시물 단건 조회
      */
+    @Transactional
     public PhotoPostDto findPostById(Long id, String memberLoginId){
 
         PhotoPost post = photoPostRepository.findById(id);
@@ -72,6 +73,7 @@ public class PhotoPostService {
     /*
     좋아요
      */
+    @Transactional
     public void like(Long id){
 
         PhotoPost post = photoPostRepository.findById(id);
@@ -81,6 +83,7 @@ public class PhotoPostService {
     /*
     좋아요 취소
      */
+    @Transactional
     public void cancelLike(Long id){
 
         PhotoPost post = photoPostRepository.findById(id);

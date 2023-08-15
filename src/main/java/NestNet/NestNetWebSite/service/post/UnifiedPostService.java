@@ -69,6 +69,7 @@ public class UnifiedPostService {
     /*
     통합 게시판 게시물 단건 조회
      */
+    @Transactional
     public UnifiedPostDto findPostById(Long id, String memberLoginId){
 
         UnifiedPost post = unifiedPostRepository.findById(id);
@@ -88,6 +89,7 @@ public class UnifiedPostService {
     /*
     좋아요
      */
+    @Transactional
     public void like(Long id){
 
         UnifiedPost post = unifiedPostRepository.findById(id);
@@ -97,6 +99,7 @@ public class UnifiedPostService {
     /*
     좋아요 취소
      */
+    @Transactional
     public void cancelLike(Long id){
 
         UnifiedPost post = unifiedPostRepository.findById(id);

@@ -10,31 +10,29 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+//@RequestMapping("/manager")
 public class ManagerController {
 
     private final ManagerService managerService;
 
-    @PostMapping("manager/approve-signup")
+    @PostMapping("/manager/approve-signup")
     public ApiResult<?> approveSignUpMember(@Valid @RequestBody MemberSignUpManagementRequestDto dto){
         return managerService.approveSignUp(dto);
     }
 
-    @PostMapping("manager/change-authority")
+    @PostMapping("/manager/change-authority")
     public ApiResult<?> changeMemberAuthority(@Valid @RequestBody MemberChangeAuthorityRequestDto dto){
 
         return managerService.changeAuthority(dto.getId(), dto.getMemberAuthority());
     }
 
-    @GetMapping("manager/member-info")
+    @GetMapping("/manager/member-info")
     public ResponseEntity<List<MemberInfoDto>> showMemberInfo(){
 
         List<MemberInfoDto> result = managerService.findAllMemberInfo();

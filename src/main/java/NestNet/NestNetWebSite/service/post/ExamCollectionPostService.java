@@ -2,6 +2,7 @@ package NestNet.NestNetWebSite.service.post;
 
 import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.member.Member;
+import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.domain.post.exam.ExamCollectionPost;
 import NestNet.NestNetWebSite.domain.post.exam.ExamType;
 import NestNet.NestNetWebSite.dto.request.ExamCollectionPostRequestDto;
@@ -86,6 +87,7 @@ public class ExamCollectionPostService {
                 .title(post.getTitle())
                 .bodyContent(post.getBodyContent())
                 .viewCount(post.getViewCount())
+                .likeCount(post.getLikeCount())
                 .subject(post.getSubject())
                 .professor(post.getProfessor())
                 .year(post.getYear())
@@ -98,6 +100,7 @@ public class ExamCollectionPostService {
     /*
     좋아요
      */
+    @Transactional
     public void like(Long id){
 
         ExamCollectionPost post = examCollectionPostRepository.findById(id);
@@ -107,6 +110,7 @@ public class ExamCollectionPostService {
     /*
     좋아요 취소
      */
+    @Transactional
     public void cancelLike(Long id){
 
         ExamCollectionPost post = examCollectionPostRepository.findById(id);

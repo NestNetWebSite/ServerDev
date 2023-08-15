@@ -22,7 +22,7 @@ dependencies {
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate5-jakarta'      //jackson이 지연로딩 프록시 객체에 대한 처리를 못해서 넣은 코드
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-	implementation 'org.springdoc:springdoc-openapi-ui:1.6.14'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'	// swagger-ui
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'

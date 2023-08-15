@@ -38,7 +38,7 @@ public class PhotoPostRepository {
         if(!redisUtil.hasKey(viewRecordKey)){
             post.addViewCount();        //변경 감지에 의해 update
 //            redisUtil.setData(viewRecordKey, "v", 24, TimeUnit.HOURS);      //24시간 유지 -> 자동 삭제
-            redisUtil.setData(viewRecordKey, "v", 1000*8);      //24시간 유지 -> 자동 삭제
+            redisUtil.setData(viewRecordKey, "v", 1000*8);      //8초 유지 -> 자동 삭제
         }
     }
 
