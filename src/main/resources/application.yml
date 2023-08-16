@@ -25,16 +25,16 @@ spring:
       matching-strategy: ant_path_matcher
 
 springdoc:
+#  packages-to-scan: NestNet.NestNetWebSite.NestNet-WebSite
   packages-to-scan: NestNet.NestNetWebSite.controller
   default-consumes-media-type: application/json;charset=UTF-8
   default-produces-media-type: application/json;charset=UTF-8
   swagger-ui:
-    path: /api-docs.html
     disable-swagger-default-url: false
     display-request-duration: true
     operations-sorter: method
-  api-docs:
-    path: /api-docs.html
+
+
 
 jwt:
   header: Authorization
