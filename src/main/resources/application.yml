@@ -24,9 +24,18 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
 
+  mail:
+    host: smtp.naver.com          # 네이버 SMTP 호스트 주소
+    port: 465                     # 네이버 SMTP 포트
+    username: ${email-address}
+    password: ${email-pw}
+    properties:
+      mail.smtp.auth: true        # SMTP 서버와의 인증
+      mail.smtp.ssl.enable: true  # SSL 보안연결(필수)
+
 springdoc:
 #  packages-to-scan: NestNet.NestNetWebSite.NestNet-WebSite
-  packages-to-scan: NestNet.NestNetWebSite.controller
+#  packages-to-scan: NestNet.NestNetWebSite.controller
   default-consumes-media-type: application/json;charset=UTF-8
   default-produces-media-type: application/json;charset=UTF-8
   swagger-ui:
@@ -34,12 +43,10 @@ springdoc:
     display-request-duration: true
     operations-sorter: method
 
-
-
 jwt:
   header: Authorization
   secret : ${secret-key}
-  access-exp-time: 7200000    # 2시간 7200000
+  access-exp-time: 10000    # 2시간 7200000
   refresh-exp-time: 1209600000    # 14일
 
 

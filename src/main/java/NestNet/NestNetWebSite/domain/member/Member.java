@@ -45,9 +45,9 @@ public class Member {
     private LocalDateTime joinDate;                 // 회원가입 날짜
 
     //== setter ==//
-    public void setMemberAuthority(MemberAuthority memberAuthority) {
-        this.memberAuthority = memberAuthority;
-    }
+//    public void setMemberAuthority(MemberAuthority memberAuthority) {
+//        this.memberAuthority = memberAuthority;
+//    }
 
     //== 비지니스 로직 ==//
     /*
@@ -73,4 +73,23 @@ public class Member {
     public void changeAuthority(MemberAuthority authority){
         this.memberAuthority = authority;
     }
+
+    /*
+    회원 정보 수정 -> 아이디, 이름, 학번, 학년, 이메일
+     */
+    public void modifyInfo(String loginId, String name, String studentId, int grade, String emailAddress){
+        this.loginId = loginId;
+        this.name = name;
+        this.studentId = studentId;
+        this.grade = grade;
+        this.emailAddress = emailAddress;
+    }
+
+    /*
+    비밀번호 변경
+     */
+    public void changePassword(String loginPassword, PasswordEncoder passwordEncoder){
+        this.loginPassword = passwordEncoder.encode(loginPassword);
+    }
+
 }

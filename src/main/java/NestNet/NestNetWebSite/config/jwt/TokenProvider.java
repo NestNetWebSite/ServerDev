@@ -106,6 +106,8 @@ public class TokenProvider implements InitializingBean {
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
 
+        log.info("createRefreshToken :" + authentication.getName() + refreshToken);
+
         return refreshToken;
     }
 
@@ -157,6 +159,7 @@ public class TokenProvider implements InitializingBean {
             //리프레쉬 토큰이 유효하면 DB 기존 값 지우고 엑세스 토큰 재발급
             if(validateRefreshToken(refreshToken, accessToken)){
 
+                log.info("validateAccessToken 매서드 리프레시 토큰 : " + refreshToken);
                 log.info("JWT access 토큰 재발급");
 
                 Authentication authentication = getAuthentication(refreshToken);
@@ -202,10 +205,14 @@ public class TokenProvider implements InitializingBean {
         String refreshToken = null;
 
         Cookie[] cookies = request.getCookies();
+        System.out.println("쿠키없음 / ");
         if (cookies != null && cookies.length > 0){
+            System.out.println("쿠키는 있는데 좀 이상");
             for(Cookie cookie : cookies){
+                System.out.println("리프레시 토큰 얻는덴데 역 ㅣ오냐");
                 if(cookie.getName().equals("refresh-token")){
                     refreshToken = cookie.getValue();
+                    System.out.println("최종 : " + refreshToken);
                     break;
                 }
             }

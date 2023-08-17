@@ -1,6 +1,7 @@
 package NestNet.NestNetWebSite.controller.auth;
 
 import NestNet.NestNetWebSite.api.ApiResult;
+import NestNet.NestNetWebSite.api.LoginApiResult;
 import NestNet.NestNetWebSite.config.auth.CustomAuthorizationFilter;
 import NestNet.NestNetWebSite.config.jwt.TokenProvider;
 import NestNet.NestNetWebSite.dto.request.LoginRequestDto;
@@ -35,7 +36,6 @@ import java.util.Date;
 @RequiredArgsConstructor
 @Slf4j
 //@RequestMapping("/auth")
-//@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:3000", "http://172.30.1.33:8080", "http://172.30.1.33:3000" })
 public class AuthController {
 
     private final MemberService memberService;
@@ -61,7 +61,7 @@ public class AuthController {
      */
     @Operation(summary = "로그인 요청", description = "access 토큰은 헤더에 Authorization에, refresh 토큰은 헤더에 쿠키로 반환")
     @PostMapping("/auth/login")
-    public ResponseEntity<TokenDto> login(@Valid @RequestBody LoginRequestDto loginRequestDto){
+    public ApiResult<?> login(@Valid @RequestBody LoginRequestDto loginRequestDto){
 
         log.info("로그인 컨트롤러 : " + loginRequestDto.getLoginId() + " " + loginRequestDto.getPassword());
 
@@ -75,18 +75,13 @@ public class AuthController {
 
         HttpHeaders httpHeaders = new HttpHeaders();
 
-        httpHeaders.add(CustomAuthorizationFilter.AUTHORIZATION_HEADER, "Bearer " + tokenDto.getAccessToken());
+        httpHeaders.set(CustomAuthorizationFilter.AUTHORIZATION_HEADER, "Bearer " + tokenDto.getAccessToken());
+        httpHeaders.set("refresh-token", tokenDto.getRefreshToken());
+        httpHeaders.set("refresh-token-exp-time", Integer.toString((int)refreshTokenExpTime / 1000));
 
-        //리프레시 토큰 담은 쿠키 생성
-        Cookie cookie = new Cookie("refresh-token", tokenDto.getRefreshToken());
-        cookie.setHttpOnly(true);       //클라이언트에서 쿠키에 접근하지 못함
-        cookie.setSecure(true);
-        cookie.setPath("/");
-        cookie.setMaxAge((int)(refreshTokenExpTime / 1000));       //초단위. 음수가 되면 브라우저가 종료될 때 쿠키 자동 삭제
+        System.out.println(" 로그인 완료 : " + tokenDto.getRefreshToken());
 
-        httpHeaders.add("Set-Cookie", cookie.toString());
-
-        return new ResponseEntity<>(httpHeaders, HttpStatus.OK);
+        return ApiResult.success(httpHeaders);
     }
 
     /*

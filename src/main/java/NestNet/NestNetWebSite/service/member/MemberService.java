@@ -8,6 +8,7 @@ import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.member.MemberAuthority;
 import NestNet.NestNetWebSite.domain.token.RefreshToken;
 import NestNet.NestNetWebSite.dto.request.LoginRequestDto;
+import NestNet.NestNetWebSite.dto.request.MemberModifyInfoRequestDto;
 import NestNet.NestNetWebSite.dto.request.SignUpRequestDto;
 import NestNet.NestNetWebSite.dto.response.JwtAccessTokenDto;
 import NestNet.NestNetWebSite.dto.response.TokenDto;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -50,7 +52,7 @@ public class MemberService {
 
         // 아이디 중복 확인
         if(memberRepository.findByLoginId(signUpRequestDto.getLoginId()) != null){
-            return ApiResult.error(409, "이미 가입된 유저 아이디입니다.");
+            return ApiResult.error(HttpStatus.CONFLICT, "이미 가입된 유저 아이디입니다.");
 //            throw new DuplicateMemberException("이미 가입된 유저입니다.");
         }
 
@@ -124,6 +126,46 @@ public class MemberService {
             return true;
         }
         return false;
+    }
+
+    /*
+    회원 정보 변경
+     */
+    @Transactional
+    public ApiResult<?> modifyMemberInfo(MemberModifyInfoRequestDto dto, String loginId){
+
+        Member member = memberRepository.findByLoginId(loginId);
+        member.modifyInfo(dto.getLoginId(), dto.getName(), dto.getStudentId(), dto.getGrade(), dto.getEmailAddress());
+
+        return ApiResult.success("회원 정보가 수정되었습니다.");
+    }
+
+    /*
+    아이디 찾기
+     */
+    public String findMemberId(String name, String email){
+
+        Optional<Member> member = memberRepository.findByNameAndEmail(name, email);
+
+        if(member != null){
+            return member.get().getLoginId();
+        }
+
+        return null;
+    }
+
+    /*
+    임시 비밀번호 발급
+     */
+
+
+    /*
+    회원 비밀번호 변경
+     */
+    public void changeMemberPassword(String password, String loginId){
+
+        Member member = memberRepository.findByLoginId(loginId);
+        member.changePassword(password, passwordEncoder);
     }
 
 }

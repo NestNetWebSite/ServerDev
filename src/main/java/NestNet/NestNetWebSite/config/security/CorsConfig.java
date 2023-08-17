@@ -5,9 +5,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class CorsConfig {
+public class CorsConfig implements WebMvcConfigurer {
 
     /*
    Cross-Origin Resource Sharing (CORS)
@@ -27,8 +29,16 @@ public class CorsConfig {
         configuration.addAllowedHeader("*");             //모든 header에 대해 응답을 허용
         configuration.addAllowedMethod("*");             //모든 매서드(get, post, put, delete..)에 대해 응답을 허용
 
-        source.registerCorsConfiguration("*", configuration);     //configuration을 모든 경로에 적용
+        source.registerCorsConfiguration("/**", configuration);     //configuration을 모든 경로에 적용
 
         return new CorsFilter(source);
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("/**")
+                .allowCredentials(true)
+                .allowedMethods("OPTIONS", "GET", "POST", "PUT", "DELETE");
     }
 }

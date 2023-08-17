@@ -48,15 +48,15 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {       //ht
             log.info("CustomAuthorizationFilter / doFilterInternal :" + servletPath +  ": 엑세스 토큰을 검사");
             try{
                 String accessToken = tokenProvider.resolveToken(request);
+                System.out.println("엑세스 토큰 : " + accessToken);
 
                 // 블랙리스트에 있으면 401에러
                 if(redisUtil.hasKey(accessToken)){
+                    System.out.println("블랙리스트??");
                     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                     response.setStatus(HttpStatus.UNAUTHORIZED.value());
                     return;
                 }
-
-                String refreshToken = tokenProvider.getRefreshToken(request);
 
                 // access 토큰 검증
                 if(StringUtils.hasText(accessToken) && tokenProvider.validateAccessToken(accessToken, request, response)){

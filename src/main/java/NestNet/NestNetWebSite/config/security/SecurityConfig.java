@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -78,7 +79,6 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-
                 //API 통신을 하는 애플리케이션의 경우 csrf 공격을 받을 가능성이 없기 때문에 @EnableWebSecurity의 csrf 보호 기능을 해제
                 .csrf(csrf -> csrf.disable())
 
@@ -94,7 +94,9 @@ public class SecurityConfig {
                 //http 요청에 대한 접근 권한을 설정한다.
                 //로그인, 회원가입 api는 토큰이 없는 상태로 요청이 들어오기 때문에 permitAll()로 열어줌
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()        //html, css같은 정적 리소스에 대해 접근 허용
+                        .requestMatchers( "/v3/**", "/swagger-ui/**").permitAll()
                         .requestMatchers("/auth/signup", "auth/login").permitAll()                      //로그인, 회원가입 접근 허용
                         // 관리자 패이지는 관리자만 접근 가능
                         .requestMatchers("/manager/**").hasAuthority("MANAGER")                  //manager하위 리소스는 MANAGER 권한으로 허용
@@ -108,6 +110,7 @@ public class SecurityConfig {
                         .requestMatchers("/photo-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER")
                         // 멤버 프로필
                         .requestMatchers("/member-profile/member-info").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER")
+                        .requestMatchers("/member/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER")
                         .anyRequest().authenticated()       //나머지 요청은 모두 권한 필요함.
 
                 )

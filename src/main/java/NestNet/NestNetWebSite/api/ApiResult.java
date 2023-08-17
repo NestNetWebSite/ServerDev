@@ -1,8 +1,7 @@
 package NestNet.NestNetWebSite.api;
 
-import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 
 @Getter
 public class ApiResult<T> {
@@ -22,7 +21,7 @@ public class ApiResult<T> {
         return new ApiResult<>(true, response, null);
     }
 
-    public static <T> ApiResult<?> error(int status, String message) {
+    public static <T> ApiResult<?> error(HttpStatus status, String message) {
 
         return new ApiResult<>(false, null, new ApiError(status, message));
     }

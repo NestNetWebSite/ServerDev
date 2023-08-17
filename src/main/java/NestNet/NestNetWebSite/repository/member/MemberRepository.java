@@ -41,6 +41,17 @@ public class MemberRepository {
 
     }
 
+    // 이름 + 이메일로 회원 단건 조회
+    public Optional<Member> findByNameAndEmail(String name, String emailAddress){
+
+        Member member = entityManager.createQuery("select m from Member m where m.name =: name and m.emailAddress =: emailAddress", Member.class)
+                .setParameter("name", name)
+                .setParameter("emailAddress", emailAddress)
+                .getSingleResult();
+
+        return Optional.ofNullable(member);
+    }
+
     // 권한으로 회원 조회
     public List<Member> findByAuthority(MemberAuthority memberAuthority){
         return entityManager.createQuery("select m from Member m where m.memberAuthority =: memberAuthority", Member.class)
