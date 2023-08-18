@@ -57,7 +57,7 @@ public class MailService {
     /*
     임시 비밀번호를 이메일로 전송
      */
-    public void sendEmailTemporaryPassword(String email, String password){
+    public ApiResult<?> sendEmailTemporaryPassword(String email, String password){
 
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper;
@@ -82,10 +82,9 @@ public class MailService {
             javaMailSender.send(mimeMessage);
 
         } catch (MessagingException e){
-
-            // 예외처리하기
-
             e.printStackTrace();
+            return ApiResult.error(HttpStatus.INTERNAL_SERVER_ERROR, "서버에서 이메일 전송을 실패하였습니다. 관리자에게 문의하세요");
         }
+        return ApiResult.success(email + " 에게 이메일을 전송하였습니다.");
     }
 }

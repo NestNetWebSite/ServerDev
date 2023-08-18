@@ -27,8 +27,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -157,7 +156,25 @@ public class MemberService {
     /*
     임시 비밀번호 발급
      */
+    public Map<String, String> createTemporaryPassword(String logindId){
 
+        Map<String, String> result = new HashMap<>();
+
+//        Optional<Member> member = memberRepository.findByLoginId(logindId);       //나중에 이렇게 고치기
+        Member member = memberRepository.findByLoginId(logindId);
+        if(member == null){
+            return null;
+        }
+        System.out.println("dasdffffff : " + member.getLoginId());
+
+        String tempPassword = UUID.randomUUID().toString().replace("-", "");
+        tempPassword = tempPassword.substring(0,15);
+
+        result.put("email", member.getEmailAddress());
+        result.put("tempPassword", tempPassword);
+
+        return result;
+    }
 
     /*
     회원 비밀번호 변경

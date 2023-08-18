@@ -1,9 +1,7 @@
 package NestNet.NestNetWebSite.controller.auth;
 
 import NestNet.NestNetWebSite.api.ApiResult;
-import NestNet.NestNetWebSite.api.LoginApiResult;
 import NestNet.NestNetWebSite.config.auth.CustomAuthorizationFilter;
-import NestNet.NestNetWebSite.config.jwt.TokenProvider;
 import NestNet.NestNetWebSite.dto.request.LoginRequestDto;
 import NestNet.NestNetWebSite.dto.request.RefreshtokenRequestDto;
 import NestNet.NestNetWebSite.dto.request.SignUpRequestDto;
@@ -11,26 +9,19 @@ import NestNet.NestNetWebSite.dto.response.JwtAccessTokenDto;
 import NestNet.NestNetWebSite.dto.response.TokenDto;
 import NestNet.NestNetWebSite.service.member.MemberService;
 import NestNet.NestNetWebSite.service.token.RefreshTokenService;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
 
 @RestController
 @RequiredArgsConstructor

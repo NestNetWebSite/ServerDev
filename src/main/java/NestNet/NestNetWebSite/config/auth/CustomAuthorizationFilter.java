@@ -41,7 +41,8 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {       //ht
         String requestURI = request.getRequestURI();
 
         //회원가입 or 로그인 or 리프레시 요청이면 토큰을 검사하지 않음
-        if(servletPath.equals("/auth/signup") || servletPath.equals("/auth/login") || servletPath.equals("/auth/refresh")){
+        if(servletPath.equals("/auth/signup") || servletPath.equals("/auth/login") ||
+                servletPath.equals("/auth/refresh") || servletPath.equals("/member/find-id") || servletPath.equals("/member/get-temp-pw")){
             log.info("CustomAuthorizationFilter / doFilterInternal :" + servletPath +  ": 엑세스 토큰을 검사하지 않음");
         }
         else{

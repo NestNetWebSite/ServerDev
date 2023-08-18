@@ -30,26 +30,26 @@ public class MemberRepository {
     // 로그인 아이디로 회원 단건 조회
     public Member findByLoginId(String loginId){
 
-        List<Member> members = entityManager.createQuery("select m from Member m where m.loginId =: loginId", Member.class)
+        List<Member> member = entityManager.createQuery("select m from Member m where m.loginId =: loginId", Member.class)
                 .setParameter("loginId", loginId)
                 .getResultList();
 
-        if(members.isEmpty()){
+        if(member.isEmpty()){
             return null;
         }
-        return members.get(0);
 
+        return member.get(0);
     }
 
     // 이름 + 이메일로 회원 단건 조회
     public Optional<Member> findByNameAndEmail(String name, String emailAddress){
 
-        Member member = entityManager.createQuery("select m from Member m where m.name =: name and m.emailAddress =: emailAddress", Member.class)
+        List<Member> member = entityManager.createQuery("select m from Member m where m.name =: name and m.emailAddress =: emailAddress", Member.class)
                 .setParameter("name", name)
                 .setParameter("emailAddress", emailAddress)
-                .getSingleResult();
+                .getResultList();
 
-        return Optional.ofNullable(member);
+        return member.stream().findAny();
     }
 
     // 권한으로 회원 조회

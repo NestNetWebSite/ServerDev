@@ -2,6 +2,7 @@ package NestNet.NestNetWebSite.controller.member;
 
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.dto.request.MemberFindIdRequestDto;
+import NestNet.NestNetWebSite.dto.request.MemberGetTemporaryPwRequestDto;
 import NestNet.NestNetWebSite.dto.request.MemberModifyInfoRequestDto;
 import NestNet.NestNetWebSite.service.mail.MailService;
 import NestNet.NestNetWebSite.service.member.MemberService;
@@ -15,6 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -49,9 +52,25 @@ public class MemberController {
         return mailService.sendEmailLoginId(memberFindIdRequestDto.getEmailAddress(), memberLoginId);
     }
 
-    @GetMapping("/member/test")
-    public void test(){
-        log.info("인가 테스트");
+    /*
+    회원 아이디로 임시비밀번호 발급받기 -> 이메일로 임시 비밀번호 전송
+    */
+    @PostMapping("/member/get-temp-pw")
+    public ApiResult<?> getTemporaryPassword(@Valid @RequestBody MemberGetTemporaryPwRequestDto dto){
+
+        Map<String, String> emailAndPw = memberService.createTemporaryPassword(dto.getLoginId());
+
+        memberService.changeMemberPassword(emailAndPw.get("tempPassword"), dto.getLoginId());
+
+        return mailService.sendEmailTemporaryPassword(emailAndPw.get("email"), emailAndPw.get("tempPassword"));
     }
+
+    /*
+    회원 비밀번호 변경
+     */
+//    @PostMapping("/member/change-pw")
+//    public ApiResult<?> changePassword(@Valid @RequestBody )
+
+
 
 }
