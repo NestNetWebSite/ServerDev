@@ -7,7 +7,7 @@ import NestNet.NestNetWebSite.dto.request.RefreshtokenRequestDto;
 import NestNet.NestNetWebSite.dto.request.SignUpRequestDto;
 import NestNet.NestNetWebSite.dto.response.JwtAccessTokenDto;
 import NestNet.NestNetWebSite.dto.response.TokenDto;
-import NestNet.NestNetWebSite.service.member.MemberService;
+import NestNet.NestNetWebSite.service.auth.AuthService;
 import NestNet.NestNetWebSite.service.token.RefreshTokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -29,7 +29,7 @@ import java.time.ZoneId;
 //@RequestMapping("/auth")
 public class AuthController {
 
-    private final MemberService memberService;
+    private final AuthService authService;
     private final RefreshTokenService refreshTokenService;
 
     @Value("#{environment['jwt.refresh-exp-time']}")
@@ -44,7 +44,7 @@ public class AuthController {
 
         log.info("회원가입 컨트롤러 동작");
 
-        return memberService.sendSignUpRequest(signUpRequestDto);
+        return authService.sendSignUpRequest(signUpRequestDto);
     }
 
     /*
@@ -56,7 +56,7 @@ public class AuthController {
 
         log.info("로그인 컨트롤러 : " + loginRequestDto.getLoginId() + " " + loginRequestDto.getPassword());
 
-        TokenDto tokenDto = memberService.login(loginRequestDto);
+        TokenDto tokenDto = authService.login(loginRequestDto);
 
         // 현재 시간 + 만료 기간 == 만료 시간
         LocalDateTime expTime = Instant.now().plusMillis((long)refreshTokenExpTime).atZone(ZoneId.systemDefault()).toLocalDateTime();
@@ -83,7 +83,7 @@ public class AuthController {
 
         log.info("로그아웃 컨트롤러 : JWT access 토큰 : " + accessTokenDto.getToken());
 
-        boolean isLogoutComplete = memberService.logout(accessTokenDto);
+        boolean isLogoutComplete = authService.logout(accessTokenDto);
 
         return ResponseEntity.ok(HttpStatus.OK);
     }

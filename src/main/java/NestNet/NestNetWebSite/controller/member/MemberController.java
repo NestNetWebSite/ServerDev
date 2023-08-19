@@ -4,6 +4,7 @@ import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.dto.request.MemberFindIdRequestDto;
 import NestNet.NestNetWebSite.dto.request.MemberGetTemporaryPwRequestDto;
 import NestNet.NestNetWebSite.dto.request.MemberModifyInfoRequestDto;
+import NestNet.NestNetWebSite.dto.request.MemberPasswordChangeRequestDto;
 import NestNet.NestNetWebSite.service.mail.MailService;
 import NestNet.NestNetWebSite.service.member.MemberService;
 import jakarta.servlet.http.Cookie;
@@ -68,8 +69,12 @@ public class MemberController {
     /*
     회원 비밀번호 변경
      */
-//    @PostMapping("/member/change-pw")
-//    public ApiResult<?> changePassword(@Valid @RequestBody )
+    @PostMapping("/member/change-pw")
+    public ApiResult<?> changePassword(@Valid @RequestBody MemberPasswordChangeRequestDto dto,
+                                       @AuthenticationPrincipal UserDetails userDetails){
+
+        return memberService.changeMemberPassword(dto.getPassword(), userDetails.getUsername());
+    }
 
 
 
