@@ -16,6 +16,7 @@ import NestNet.NestNetWebSite.repository.manager.MemberSignUpManagementRepositor
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import NestNet.NestNetWebSite.repository.token.RefreshTokenRepository;
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -78,15 +79,13 @@ public class AuthService {
     public TokenDto login(LoginRequestDto loginRequestDto){
 
         try{
-            //인증되기 전의 Authentication 객체
+            //인증 전의 UsernamePasswordAuthenticationToken 객체(Authentication의 구현체)
             UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(loginRequestDto.getLoginId(), loginRequestDto.getPassword());
 
-            //인증 후의 객체
-            //authenticationManager가 UserDetailsService의 loadByUsername매서드를 호출한 후 인증 수행
+            //인증 후의 Authentication 객체
+            //authenticationManager가 UserDetailsService의 loadByUsername매서드를 호출하여 인증 수행
             Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-
-            log.info("MemberService / login 매서드 : 인증 후의 Authentication 객체 " + authentication);
 
             TokenDto tokenDto = new TokenDto(tokenProvider.createAccessToken(authentication), tokenProvider.createRefreshToken(authentication));
 
@@ -100,29 +99,31 @@ public class AuthService {
     로그아웃
      */
     @Transactional
-    public boolean logout(JwtAccessTokenDto accessTokenDto){
+    public ApiResult<?> logout(HttpServletRequest request){
 
-        Claims claims = tokenProvider.getTokenClaims(accessTokenDto.getToken());
+        String accessToken = tokenProvider.resolveToken(request);
+
+        Claims claims = tokenProvider.getTokenClaims(accessToken);
 
         long expTime = claims.getExpiration().getTime();     //토큰의 만료 시각
         long now = new Date().getTime();                     //현재 시각
 
-        System.out.println("!!!!!!!!!!!!!1만료시간 : " + expTime);
-        System.out.println("!!!!!!!!!!!!!현재시간 : " + now);
-        long remainTime = expTime - now;
+        // 남은 엑세스토큰 유효 시간
+        long remainTime = expTime - now;        // 테스트 사이트 : https://currentmillis.com/
 
-        if(remainTime < 0){
-            remainTime = 0;
+        //기간이 만료된 엑세스 토큰인 경우는 필터에서 걸러지기 때문에 없음.
+
+        //리프레시 토큰 삭제
+        RefreshToken findRefreshToken = refreshTokenRepository.findByAccessToken(accessToken);
+        int rows = refreshTokenRepository.delete(findRefreshToken.getId());
+
+        //레디스에 블랙리스트 등록
+        redisUtil.setData(accessToken, "logout", remainTime);
+
+        //블랙리스트(key : 엑세스 토큰 / value : logout)
+        if(redisUtil.hasKey(accessToken) && rows == 1){
+            return ApiResult.success("로그아웃 되었습니다");
         }
-
-        RefreshToken findRefreshToken = refreshTokenRepository.findByAccessToken(accessTokenDto.getToken());
-        int rows = refreshTokenRepository.delete(findRefreshToken.getId());        //리프레시 토큰 삭제
-
-        redisUtil.setData(accessTokenDto.getToken(), "logout", remainTime);
-
-        if(redisUtil.hasKey(accessTokenDto.getToken()) && rows == 1){
-            return true;
-        }
-        return false;
+        return ApiResult.error(HttpStatus.INTERNAL_SERVER_ERROR, "서버 에러/ 관리자에게 문의하세요");
     }
 }

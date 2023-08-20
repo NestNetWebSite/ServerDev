@@ -10,6 +10,7 @@ import NestNet.NestNetWebSite.dto.response.TokenDto;
 import NestNet.NestNetWebSite.service.auth.AuthService;
 import NestNet.NestNetWebSite.service.token.RefreshTokenService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
@@ -54,7 +58,7 @@ public class AuthController {
     @PostMapping("/auth/login")
     public ApiResult<?> login(@Valid @RequestBody LoginRequestDto loginRequestDto){
 
-        log.info("로그인 컨트롤러 : " + loginRequestDto.getLoginId() + " " + loginRequestDto.getPassword());
+        log.info("로그인 컨트롤러");
 
         TokenDto tokenDto = authService.login(loginRequestDto);
 
@@ -78,14 +82,10 @@ public class AuthController {
     /*
     로그아웃
      */
-    @DeleteMapping("/auth/logout")
-    public ResponseEntity<?> logout(@Valid @RequestBody JwtAccessTokenDto accessTokenDto){
+    @GetMapping("/auth/logout")
+    public ApiResult<?> logout(@AuthenticationPrincipal UserDetails userDetails, HttpServletRequest request){
 
-        log.info("로그아웃 컨트롤러 : JWT access 토큰 : " + accessTokenDto.getToken());
-
-        boolean isLogoutComplete = authService.logout(accessTokenDto);
-
-        return ResponseEntity.ok(HttpStatus.OK);
+        return authService.logout(request);
     }
 
 

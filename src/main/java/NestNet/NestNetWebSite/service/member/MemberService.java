@@ -59,7 +59,6 @@ public class MemberService {
         if(member == null){
             return null;
         }
-        System.out.println("dasdffffff : " + member.getLoginId());
 
         String tempPassword = UUID.randomUUID().toString().replace("-", "");
         tempPassword = tempPassword.substring(0,15);
@@ -78,7 +77,6 @@ public class MemberService {
 
         Member member = memberRepository.findByLoginId(loginId);
         member.changePassword(password, passwordEncoder);
-        System.out.println();
 
         return ApiResult.success("비밀번호가 변경되었습니다.");
     }

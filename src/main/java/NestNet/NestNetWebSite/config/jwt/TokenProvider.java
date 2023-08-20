@@ -1,7 +1,6 @@
 package NestNet.NestNetWebSite.config.jwt;
 
 import NestNet.NestNetWebSite.dto.response.RefreshTokenDto;
-import NestNet.NestNetWebSite.dto.response.TokenDto;
 import NestNet.NestNetWebSite.service.member.CustomUserDetailsService;
 import NestNet.NestNetWebSite.service.token.RefreshTokenService;
 import io.jsonwebtoken.*;
@@ -10,29 +9,19 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import java.security.Key;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -53,7 +42,6 @@ public class TokenProvider implements InitializingBean {
 
     private final CustomUserDetailsService customUserDetailsService;
     private final RefreshTokenService refreshTokenService;
-    private final RedisTemplate<String, String> redisTemplate;
 
     /*
    빈이 생성되고 의존관계 주입까지 완료된 후, Key 변수에 값 할당
@@ -142,25 +130,26 @@ public class TokenProvider implements InitializingBean {
     /*
    유효한 토큰인지 확인
     */
-    public boolean validateAccessToken(String accessToken, HttpServletRequest request, HttpServletResponse response) {
+    public String validateAccessToken(String accessToken, HttpServletRequest request, HttpServletResponse response) {
 
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken);
-            return true;
+            return accessToken;
+
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
-            log.info("잘못된 JWT 서명 / 다시 로그인 해야함");
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return false;
+            log.info("TokenProvider.class / validateAccessToken : 잘못된 JWT 서명");
+            return null;
+
         } catch (ExpiredJwtException e) {
-            log.info("만료된 JWT access 토큰");
+            log.info("TokenProvider.class / validateAccessToken : 만료된 JWT access 토큰");
 
             String refreshToken = getRefreshToken(request);
 
             //리프레쉬 토큰이 유효하면 DB 기존 값 지우고 엑세스 토큰 재발급
             if(validateRefreshToken(refreshToken, accessToken)){
 
-                log.info("validateAccessToken 매서드 리프레시 토큰 : " + refreshToken);
-                log.info("JWT access 토큰 재발급");
+                log.info("TokenProvider.class / validateAccessToken : validateAccessToken 매서드 리프레시 토큰 : " + refreshToken);
+                log.info("TokenProvider.class / validateAccessToken : JWT access 토큰 재발급");
 
                 Authentication authentication = getAuthentication(refreshToken);
 
@@ -169,14 +158,15 @@ public class TokenProvider implements InitializingBean {
                 refreshTokenService.updateRefreshToken(accessToken, newAccessToken);
 
                 response.setHeader(AUTHORIZATION_HEADER, newAccessToken);
+
+                return newAccessToken;
             }
             else{       //리프레쉬 토큰이 유효하지 않으면 다시 로그인하라는 예외 발생
                 log.info("refresh 토큰 만료 / 다시 로그인 해야함");
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                return false;
+                return null;
             }
         }
-        return false;
+
     }
 
     /*
@@ -221,25 +211,31 @@ public class TokenProvider implements InitializingBean {
     }
 
     /*
-    HTTP 요청의 refreshToken이 유효한지 판정
+    HTTP 요청에서 받은 refreshToken이 유효한지 판정
      */
     public boolean validateRefreshToken(String requestRefreshToken, String accessToken){
 
         //쿠키에서 받은 리프레시 토큰이 없음
         if(requestRefreshToken == null){
-            System.out.println("없어요 여기");
+            log.info("TokenProvider.class / validateRefreshToken : refresh 토큰 없음");
             return false;
         }
+
+        System.out.println("리프레시 토큰 가져오기 전 access : " + accessToken);
 
         RefreshTokenDto dbRefreshToken = refreshTokenService.findByAccessToken(accessToken);
 
         // 해당하는 리프레쉬 토큰이 아예 없거나, 만료돼서 삭제되어 없음.
         if(dbRefreshToken.getRefreshToken() == null){
+            log.info("TokenProvider.class / validateRefreshToken : 데이터베이스에 refresh 토큰 없음");
             return false;
         }
 
+        System.out.println("데이터베이스 리프레시 : " + dbRefreshToken.getRefreshToken());
+
         // http 요청의 리프레쉬 토큰과 데이터베이스 리프레쉬 토큰이 일치하면 ( + 만료되지 않았으면 )
         if(requestRefreshToken.equals(dbRefreshToken.getRefreshToken())){
+            log.info("TokenProvider.class / validateRefreshToken : refresh 토큰이 유효함");
             return true;
         }
         return false;

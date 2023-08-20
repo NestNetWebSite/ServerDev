@@ -1,6 +1,7 @@
 package NestNet.NestNetWebSite.config.auth;
 
 import NestNet.NestNetWebSite.config.jwt.TokenProvider;
+import NestNet.NestNetWebSite.config.jwt.errorHandler.JwtAuthenticationEntryPoint;
 import NestNet.NestNetWebSite.config.redis.RedisUtil;
 import NestNet.NestNetWebSite.exception.CustomException;
 import NestNet.NestNetWebSite.service.token.RefreshTokenService;
@@ -43,35 +44,44 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {       //ht
         //회원가입 or 로그인 or 리프레시 요청이면 토큰을 검사하지 않음
         if(servletPath.equals("/auth/signup") || servletPath.equals("/auth/login") ||
                 servletPath.equals("/auth/refresh") || servletPath.equals("/member/find-id") || servletPath.equals("/member/get-temp-pw")){
-            log.info("CustomAuthorizationFilter / doFilterInternal :" + servletPath +  ": 엑세스 토큰을 검사하지 않음");
+            log.info("CustomAuthorizationFilter.class / doFilterInternal :" + servletPath +  ": 엑세스 토큰을 검사하지 않음");
         }
         else{
-            log.info("CustomAuthorizationFilter / doFilterInternal :" + servletPath +  ": 엑세스 토큰을 검사");
-            try{
-                String accessToken = tokenProvider.resolveToken(request);
-                System.out.println("엑세스 토큰 : " + accessToken);
+            log.info("CustomAuthorizationFilter.class / doFilterInternal :" + servletPath +  ": 엑세스 토큰을 검사");
 
-                // 블랙리스트에 있으면 401에러
-                if(redisUtil.hasKey(accessToken)){
-                    System.out.println("블랙리스트??");
-                    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                    response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                    return;
-                }
+            String accessToken = tokenProvider.resolveToken(request);
+            System.out.println("엑세스 토큰 : " + accessToken);
 
-                // access 토큰 검증
-                if(StringUtils.hasText(accessToken) && tokenProvider.validateAccessToken(accessToken, request, response)){
-                    Authentication authentication = tokenProvider.getAuthentication(accessToken);
+            // 엑세스 토큰 없으면
+            if(!StringUtils.hasText(accessToken)){
+                log.info("CustomAuthorizationFilter.class / doFilterInternal : 엑세스 토큰 없음");
+                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                response.setStatus(HttpStatus.FORBIDDEN.value());
+            }
 
-                    //토큰을 통해 생성한 Authentication 객체 스프링 시큐리티 컨텍스트에 저장
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                    log.debug("Security Context에 '{}' 인증 정보를 저장했습니다, uri: {}", authentication.getName(), requestURI);
-                }
+            // 블랙리스트에 있으면 401에러
+            if(redisUtil.hasKey(accessToken)){
+                log.info("CustomAuthorizationFilter.class / doFilterInternal : 블랙리스트에 등록된 엑세스 토큰");
+                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                return;
+            }
 
-            } catch (CustomException e) {      //만료됐을때 처리. refresh 토큰으로부터 access토큰 발행받도록
-                SecurityContextHolder.clearContext();
-                log.debug("access 토큰 만료");
+            System.out.println("필터 access : " + accessToken);
 
+            // access 토큰 검증
+            String validatedAccessToken = tokenProvider.validateAccessToken(accessToken, request, response);
+
+            if(StringUtils.hasText(validatedAccessToken)){
+                Authentication authentication = tokenProvider.getAuthentication(accessToken);
+
+                //토큰을 통해 생성한 Authentication 객체 스프링 시큐리티 컨텍스트에 저장
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                log.debug("Security Context에 '{}' 인증 정보를 저장했습니다, uri: {}", authentication.getName(), requestURI);
+            }
+            else{
+                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
                 return;
             }
         }

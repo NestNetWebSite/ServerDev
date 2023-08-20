@@ -28,10 +28,14 @@ public class RefreshTokenRepository {
     // access 토큰으로 단건 조회
     public RefreshToken findByAccessToken(String accessToken){
 
+        System.out.println("RefreshTokenRepository / findByAccessToken");
+
         RefreshToken findRefreshToken = entityManager.createQuery(
                 "select rt from RefreshToken rt where rt.accessToken =: accessToken", RefreshToken.class)
                 .setParameter("accessToken", accessToken)
                 .getSingleResult();
+
+        //eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImF1dGgiOiJBRE1JTiIsImV4cCI6MTY5MjQ2MTkwN30.fWPn1i-FzrYVYAx-wg3T46Wr6FqtsbbeVMwXMr5_IZaPPLMDcAlUk-vvzAI2wi12wqcF5WnCUuc4JXcS6YTP7w
 
         return findRefreshToken;
     }

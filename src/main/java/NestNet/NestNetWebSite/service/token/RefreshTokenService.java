@@ -1,5 +1,6 @@
 package NestNet.NestNetWebSite.service.token;
 
+import NestNet.NestNetWebSite.config.redis.RedisUtil;
 import NestNet.NestNetWebSite.domain.token.RefreshToken;
 import NestNet.NestNetWebSite.dto.request.RefreshtokenRequestDto;
 import NestNet.NestNetWebSite.dto.response.RefreshTokenDto;
@@ -18,12 +19,14 @@ import java.time.LocalDateTime;
 public class RefreshTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
+    private final RedisUtil redisUtil;
 
     /*
     리프레쉬 토큰 저장
      */
     @Transactional
     public void save(RefreshtokenRequestDto refreshtokenRequestDto){
+
         refreshTokenRepository.save(refreshtokenRequestDto.toEntity());
     }
 
