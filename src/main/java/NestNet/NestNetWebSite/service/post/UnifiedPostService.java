@@ -1,5 +1,6 @@
 package NestNet.NestNetWebSite.service.post;
 
+import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.post.photo.PhotoPost;
@@ -52,7 +53,7 @@ public class UnifiedPostService {
     /*
     통합 게시판 목록 조회
      */
-    public List<UnifiedPostListDto> findPostList(UnifiedPostType unifiedPostType, int offset, int limit){
+    public ApiResult<?> findPostList(UnifiedPostType unifiedPostType, int offset, int limit){
 
         List<UnifiedPost> postList = unifiedPostRepository.findUnifiedPostByType(offset, limit, unifiedPostType);
 
@@ -63,7 +64,7 @@ public class UnifiedPostService {
                     post.getCreatedTime(), post.getViewCount(), post.getLikeCount()));
         }
 
-        return resultList;
+        return ApiResult.success(resultList);
     }
 
     /*

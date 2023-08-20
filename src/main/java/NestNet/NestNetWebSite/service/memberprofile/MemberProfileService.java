@@ -1,5 +1,6 @@
 package NestNet.NestNetWebSite.service.memberprofile;
 
+import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.dto.response.MemberProfileMemberInfoDto;
@@ -24,18 +25,20 @@ public class MemberProfileService {
     /*
     회원 프로필 조회
      */
-    public MemberProfileMemberInfoDto findMemberInfoById(Long id){
+    public ApiResult<?> findMemberInfoById(Long id){
 
         Member member = memberRepository.findById(id);
 
-        return new MemberProfileMemberInfoDto(member.getLoginId(), member.getName(),
+        MemberProfileMemberInfoDto memberInfoDto = new MemberProfileMemberInfoDto(member.getLoginId(), member.getName(),
                 member.getEmailAddress(), member.getMemberAuthority(), member.getGrade(), member.getGraduateYear());
+
+        return ApiResult.success(memberInfoDto);
     }
 
     /*
     본인이 작성한 글 목록 조회
      */
-    public List<PostTitleDto> findAllPostById(String loginId){
+    public ApiResult<?> findAllPostById(String loginId){
 
         Member member = memberRepository.findByLoginId(loginId);
 
@@ -45,7 +48,7 @@ public class MemberProfileService {
             result.add(new PostTitleDto(post.getId(), post.getTitle(), post.getPostCategory()));
         }
 
-        return result;
+        return ApiResult.success(result);
     }
 
 }

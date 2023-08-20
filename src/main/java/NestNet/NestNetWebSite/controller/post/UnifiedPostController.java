@@ -1,5 +1,6 @@
 package NestNet.NestNetWebSite.controller.post;
 
+import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.post.unified.UnifiedPostType;
 import NestNet.NestNetWebSite.dto.request.UnifiedPostRequestDto;
 import NestNet.NestNetWebSite.dto.response.*;
@@ -43,19 +44,17 @@ public class UnifiedPostController {
     통합 게시판 Type에 따른 목록 조회 (FREE, DEV, CAREER)
      */
     @GetMapping("unified-post")
-    public ResponseEntity<List<UnifiedPostListDto>> showPostListByType(@RequestParam(value = "post-type") UnifiedPostType unifiedPostType,
-                                                                      @RequestParam("offset") int offset, @RequestParam("limit") int limit){
+    public ApiResult<?> showPostListByType(@RequestParam(value = "post-type") UnifiedPostType unifiedPostType,
+                                        @RequestParam("offset") int offset, @RequestParam("limit") int limit){
 
-        List<UnifiedPostListDto> unifiedPostListDtoList = unifiedPostService.findPostList(unifiedPostType, offset, limit);
-
-        return new ResponseEntity<>(unifiedPostListDtoList, HttpStatus.OK);
+        return unifiedPostService.findPostList(unifiedPostType, offset, limit);
     }
 
     /*
     통합 게시판 게시물 조회
      */
     @GetMapping("/unified-post/{post_id}")
-    public ResponseEntity<Map<String, Object>> showPost(@PathVariable("post_id") Long postId,
+    public ApiResult<?> showPost(@PathVariable("post_id") Long postId,
                                                         @AuthenticationPrincipal UserDetails userDetails){
 
         Map<String, Object> result = new HashMap<>();
@@ -70,7 +69,7 @@ public class UnifiedPostController {
         result.put("comment-data", commentDtoList);
         result.put("is-member-liked", isMemberLiked);
 
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return ApiResult.success(result);
     }
 
     /*

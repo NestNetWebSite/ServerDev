@@ -21,21 +21,38 @@ public class ManagerController {
 
     private final ManagerService managerService;
 
+    /*
+    회원가입 요청 조회
+     */
+    @GetMapping("/manager/singup-request")
+    public ApiResult<?> showSignUpRequests(){
+
+        return managerService.findAllRequests();
+    }
+
+    /*
+    회원가입 승인
+     */
     @PostMapping("/manager/approve-signup")
     public ApiResult<?> approveSignUpMember(@Valid @RequestBody MemberSignUpManagementRequestDto dto){
         return managerService.approveSignUp(dto);
     }
 
+    /*
+    회원 권한 변경
+     */
     @PostMapping("/manager/change-authority")
     public ApiResult<?> changeMemberAuthority(@Valid @RequestBody MemberChangeAuthorityRequestDto dto){
 
         return managerService.changeAuthority(dto.getId(), dto.getMemberAuthority());
     }
 
+    /*
+    회원 정보 조회
+     */
     @GetMapping("/manager/member-info")
-    public ResponseEntity<List<MemberInfoDto>> showMemberInfo(){
+    public ApiResult<?> showMemberInfo(){
 
-        List<MemberInfoDto> result = managerService.findAllMemberInfo();
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return managerService.findAllMemberInfo();
     }
 }

@@ -1,5 +1,6 @@
 package NestNet.NestNetWebSite.service.post;
 
+import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.post.Post;
@@ -52,7 +53,7 @@ public class ExamCollectionPostService {
     /*
     필터에 따른 족보 리스트 조희
      */
-    public List<ExamCollectionPostListDto> findPostByFilter(String subject, String professor, Integer year, Integer semester, ExamType examType){
+    public ApiResult<?> findPostByFilter(String subject, String professor, Integer year, Integer semester, ExamType examType){
 
         List<ExamCollectionPost> posts = examCollectionPostRepository.findAllExamCollectionPostByFilter(subject, professor, year, semester, examType);
 
@@ -70,7 +71,7 @@ public class ExamCollectionPostService {
                             .build());
         }
 
-        return resultList;
+        return ApiResult.success(resultList);
     }
 
     /*

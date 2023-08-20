@@ -1,5 +1,6 @@
 package NestNet.NestNetWebSite.controller.comment;
 
+import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.dto.request.CommentRequestDto;
 import NestNet.NestNetWebSite.service.comment.CommentService;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ public class CommentController {
      */
     @PostMapping("/comment/{post_id}")
     public void writeComment(@PathVariable("post_id") Long postId, @RequestBody CommentRequestDto commentRequestDto,
-                             @AuthenticationPrincipal UserDetails userDetails){
+                                  @AuthenticationPrincipal UserDetails userDetails){
 
         commentService.saveComment(commentRequestDto, postId, userDetails.getUsername());
     }

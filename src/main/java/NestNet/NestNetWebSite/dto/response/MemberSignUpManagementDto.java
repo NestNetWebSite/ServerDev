@@ -11,6 +11,8 @@ import lombok.Getter;
 @Builder
 public class MemberSignUpManagementDto {
 
+    private String name;
+    private String studentId;
     private String loginId;
     private MemberAuthority memberAuthority;
 }

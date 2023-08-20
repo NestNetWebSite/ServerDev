@@ -1,5 +1,6 @@
 package NestNet.NestNetWebSite.controller.post;
 
+import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.dto.request.ExamCollectionPostRequestDto;
 import NestNet.NestNetWebSite.dto.request.PhotoPostRequestDto;
 import NestNet.NestNetWebSite.dto.response.AttachedFileDto;
@@ -48,19 +49,17 @@ public class PhotoPostController {
     사진 게시판 목록(썸네일) 조회
      */
     @GetMapping("/photo-post")
-    public ResponseEntity<List<ThumbNailDto>> showThumbNail(@RequestParam("offset") int offset, @RequestParam("limit") int limit){
+    public ApiResult<?> showThumbNail(@RequestParam("offset") int offset, @RequestParam("limit") int limit){
 
-        List<ThumbNailDto> thumbNailDtoList = thumbNailService.findAllThumbNail(offset, limit);
-
-        return new ResponseEntity<>(thumbNailDtoList, HttpStatus.OK);
+        return thumbNailService.findAllThumbNail(offset, limit);
     }
 
     /*
     사진 게시물 조회
      */
     @GetMapping("/photo-post/{post_id}")
-    public ResponseEntity<Map<String, Object>> showPost(@PathVariable("post_id") Long postId,
-                                                        @AuthenticationPrincipal UserDetails userDetails){
+    public ApiResult<?> showPost(@PathVariable("post_id") Long postId,
+                              @AuthenticationPrincipal UserDetails userDetails){
 
         Map<String, Object> result = new HashMap<>();
 
@@ -74,7 +73,7 @@ public class PhotoPostController {
         result.put("comment-data", commentDtoList);
         result.put("is-member-liked", isMemberLiked);
 
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return ApiResult.success(result);
     }
 
     /*

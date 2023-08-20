@@ -1,5 +1,6 @@
 package NestNet.NestNetWebSite.service.post;
 
+import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.domain.post.photo.ThumbNail;
 import NestNet.NestNetWebSite.dto.response.ThumbNailDto;
@@ -32,7 +33,7 @@ public class ThumbNailService {
     /*
     게시판 화면에서 썸네일 모두 조회
      */
-    public List<ThumbNailDto> findAllThumbNail(int offset, int limit){
+    public ApiResult<?> findAllThumbNail(int offset, int limit){
 
         List<ThumbNail> thumbNailList = thumbNailRepository.findAllPhotoThumbNailByPaging(offset, limit);
         List<ThumbNailDto> thumbNailDtoList = new ArrayList<>();
@@ -40,6 +41,6 @@ public class ThumbNailService {
             thumbNailDtoList.add(new ThumbNailDto(thumbNail.getPost().getId(), thumbNail.getTitle(), thumbNail.getSaveFileName(), thumbNail.getSaveFilePath()));
         }
 
-        return thumbNailDtoList;
+        return ApiResult.success(thumbNailDtoList);
     }
 }

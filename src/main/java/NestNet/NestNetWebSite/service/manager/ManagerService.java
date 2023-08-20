@@ -28,15 +28,17 @@ public class ManagerService {
     /*
     회원 가입 요청 조회
      */
-    public List<MemberSignUpManagementDto> findAllRequests(){
-        List<MemberSignUpManagementDto> resultList = new ArrayList<>();
+    public ApiResult<?> findAllRequests(){
+
         List<MemberSignUpManagement> list = memberSignUpManagementRepository.findAll();
 
+        List<MemberSignUpManagementDto> resultList = new ArrayList<>();
         for(MemberSignUpManagement request : list){
-            resultList.add(new MemberSignUpManagementDto(request.getMember().getLoginId(), request.getRequestMemberAuthority()));
+            resultList.add(new MemberSignUpManagementDto(request.getMember().getName(),  request.getMember().getStudentId(),
+                    request.getMember().getLoginId(), request.getRequestMemberAuthority()));
         }
 
-        return resultList;
+        return ApiResult.success(resultList);
     }
 
     /*
@@ -83,7 +85,7 @@ public class ManagerService {
     /*
     전체 회원 정보 조회 (권한에 따른 필터링)
      */
-    public List<MemberInfoDto> findAllMemberInfo(){
+    public ApiResult<?> findAllMemberInfo(){
 
         List<Member> memberList = memberRepository.findAllMember();
         List<MemberInfoDto> memberInfoDtoList = new ArrayList<>();
@@ -92,6 +94,6 @@ public class ManagerService {
                     member.getStudentId(), member.getGrade(), member.getGraduateYear()));
         }
 
-        return memberInfoDtoList;
+        return ApiResult.success(memberInfoDtoList);
     }
 }

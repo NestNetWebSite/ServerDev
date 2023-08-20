@@ -1,5 +1,6 @@
 package NestNet.NestNetWebSite.controller.post;
 
+import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.post.exam.ExamCollectionPost;
 import NestNet.NestNetWebSite.domain.post.exam.ExamType;
@@ -51,23 +52,20 @@ public class ExamCollectionPostController {
     족보 게시판 목록 조희
      */
     @GetMapping("/exam-collection-post")
-    public ResponseEntity<List<ExamCollectionPostListDto>> showPostListByFilter(@RequestParam(value = "subject", required = false) String subject,
-                                                                                @RequestParam(value = "professor", required = false) String professor,
-                                                                                @RequestParam(value = "year", required = false) Integer year,
-                                                                                @RequestParam(value = "semester", required = false) Integer semester,
-                                                                                @RequestParam(value = "examType", required = false) ExamType examType){
+    public ApiResult<?> showPostListByFilter(@RequestParam(value = "subject", required = false) String subject,
+                                          @RequestParam(value = "professor", required = false) String professor,
+                                          @RequestParam(value = "year", required = false) Integer year,
+                                          @RequestParam(value = "semester", required = false) Integer semester,
+                                          @RequestParam(value = "examType", required = false) ExamType examType){
 
-        List<ExamCollectionPostListDto> resultList = examCollectionPostService.findPostByFilter(subject, professor, year, semester, examType);
-
-        return new ResponseEntity<>(resultList, HttpStatus.OK);
-
+        return examCollectionPostService.findPostByFilter(subject, professor, year, semester, examType);
     }
 
     /*
     족보 게시판 게시물 단건 조회
      */
     @GetMapping("exam-collection-post/{post_id}")
-    public ResponseEntity<Map<String, Object>> showPost(@PathVariable("post_id") Long postId,
+    public ApiResult<?> showPost(@PathVariable("post_id") Long postId,
                                                         @AuthenticationPrincipal UserDetails userDetails){
 
         Map<String, Object> result = new HashMap<>();
@@ -82,7 +80,7 @@ public class ExamCollectionPostController {
         result.put("comment-data", commentDtoList);
         result.put("is-member-liked", isMemberLiked);
 
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return ApiResult.success(result);
     }
 
     /*
