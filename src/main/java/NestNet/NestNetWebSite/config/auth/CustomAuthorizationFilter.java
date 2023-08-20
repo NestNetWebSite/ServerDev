@@ -25,6 +25,7 @@ import org.springframework.web.ErrorResponse;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -52,14 +53,14 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {       //ht
             String accessToken = tokenProvider.resolveToken(request);
             System.out.println("엑세스 토큰 : " + accessToken);
 
-            // 엑세스 토큰 없으면
+            // 엑세스 토큰 없으면 -> 다시 로그인 해야함
             if(!StringUtils.hasText(accessToken)){
                 log.info("CustomAuthorizationFilter.class / doFilterInternal : 엑세스 토큰 없음");
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                 response.setStatus(HttpStatus.FORBIDDEN.value());
             }
 
-            // 블랙리스트에 있으면 401에러
+            // 블랙리스트에 있으면 401에러 -> 다시 로그인 해야함.
             if(redisUtil.hasKey(accessToken)){
                 log.info("CustomAuthorizationFilter.class / doFilterInternal : 블랙리스트에 등록된 엑세스 토큰");
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -70,16 +71,21 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {       //ht
             System.out.println("필터 access : " + accessToken);
 
             // access 토큰 검증
-            String validatedAccessToken = tokenProvider.validateAccessToken(accessToken, request, response);
+            Map<String, Object> map = tokenProvider.validateAccessToken(accessToken, request, response);
 
-            if(StringUtils.hasText(validatedAccessToken)){
-                Authentication authentication = tokenProvider.getAuthentication(accessToken);
+            response = (HttpServletResponse) map.get("response");
+
+            if(map.get("accessToken") != null){
+                String validatedAccessToken = map.get("accessToken").toString();
+
+                Authentication authentication = tokenProvider.getAuthentication(validatedAccessToken);
 
                 //토큰을 통해 생성한 Authentication 객체 스프링 시큐리티 컨텍스트에 저장
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 log.debug("Security Context에 '{}' 인증 정보를 저장했습니다, uri: {}", authentication.getName(), requestURI);
             }
             else{
+                log.info("CustomAuthorizationFilter.class / doFilterInternal : JWT access 토큰, refresh 토큰 모두 유효하지 않음");
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
                 return;

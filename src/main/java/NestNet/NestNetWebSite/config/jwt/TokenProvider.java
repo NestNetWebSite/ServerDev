@@ -22,6 +22,8 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 @Slf4j
@@ -130,15 +132,25 @@ public class TokenProvider implements InitializingBean {
     /*
    유효한 토큰인지 확인
     */
-    public String validateAccessToken(String accessToken, HttpServletRequest request, HttpServletResponse response) {
+    public Map<String, Object> validateAccessToken(String accessToken, HttpServletRequest request, HttpServletResponse response) {
+
+        Map<String, Object> map = new HashMap<>();
 
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken);
-            return accessToken;
+
+            map.put("accessToken", accessToken);
+            map.put("response", response);
+
+            return map;
 
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             log.info("TokenProvider.class / validateAccessToken : 잘못된 JWT 서명");
-            return null;
+
+            map.put("accessToken", null);
+            map.put("response", response);
+
+            return map;
 
         } catch (ExpiredJwtException e) {
             log.info("TokenProvider.class / validateAccessToken : 만료된 JWT access 토큰");
@@ -146,7 +158,7 @@ public class TokenProvider implements InitializingBean {
             String refreshToken = getRefreshToken(request);
 
             //리프레쉬 토큰이 유효하면 DB 기존 값 지우고 엑세스 토큰 재발급
-            if(validateRefreshToken(refreshToken, accessToken)){
+            if(refreshToken != null && validateRefreshToken(refreshToken, accessToken)){
 
                 log.info("TokenProvider.class / validateAccessToken : validateAccessToken 매서드 리프레시 토큰 : " + refreshToken);
                 log.info("TokenProvider.class / validateAccessToken : JWT access 토큰 재발급");
@@ -157,17 +169,65 @@ public class TokenProvider implements InitializingBean {
 
                 refreshTokenService.updateRefreshToken(accessToken, newAccessToken);
 
-                response.setHeader(AUTHORIZATION_HEADER, newAccessToken);
+                response.addHeader(AUTHORIZATION_HEADER, newAccessToken);       //새 발급한 access 토큰 응답헤더에 추가
 
-                return newAccessToken;
+                System.out.println("넣어준거 : " + response.getHeader("Authorization"));
+
+                map.put("accessToken", newAccessToken);
+                map.put("response", response);
+
+                return map;
             }
             else{       //리프레쉬 토큰이 유효하지 않으면 다시 로그인하라는 예외 발생
                 log.info("refresh 토큰 만료 / 다시 로그인 해야함");
-                return null;
+
+                map.put("accessToken", null);
+                map.put("response", response);
+
+                return map;
             }
         }
 
     }
+//    public String validateAccessToken(String accessToken, HttpServletRequest request, HttpServletResponse response) {
+//
+//        try {
+//            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken);
+//            return accessToken;
+//
+//        } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
+//            log.info("TokenProvider.class / validateAccessToken : 잘못된 JWT 서명");
+//            return null;
+//
+//        } catch (ExpiredJwtException e) {
+//            log.info("TokenProvider.class / validateAccessToken : 만료된 JWT access 토큰");
+//
+//            String refreshToken = getRefreshToken(request);
+//
+//            //리프레쉬 토큰이 유효하면 DB 기존 값 지우고 엑세스 토큰 재발급
+//            if(validateRefreshToken(refreshToken, accessToken)){
+//
+//                log.info("TokenProvider.class / validateAccessToken : validateAccessToken 매서드 리프레시 토큰 : " + refreshToken);
+//                log.info("TokenProvider.class / validateAccessToken : JWT access 토큰 재발급");
+//
+//                Authentication authentication = getAuthentication(refreshToken);
+//
+//                String newAccessToken = createAccessToken(authentication);
+//
+//                refreshTokenService.updateRefreshToken(accessToken, newAccessToken);
+//
+//                response.addHeader(AUTHORIZATION_HEADER, newAccessToken);
+////                response.setHeader(AUTHORIZATION_HEADER, newAccessToken);
+//
+//                return newAccessToken;
+//            }
+//            else{       //리프레쉬 토큰이 유효하지 않으면 다시 로그인하라는 예외 발생
+//                log.info("refresh 토큰 만료 / 다시 로그인 해야함");
+//                return null;
+//            }
+//        }
+//
+//    }
 
     /*
     HTTP 헤더에서 access 토큰 가져옴
@@ -207,6 +267,11 @@ public class TokenProvider implements InitializingBean {
                 }
             }
         }
+
+        if(refreshToken == null){
+            log.info("TokenProvider.class / getRefreshToken : 쿠키에 refresh-token이 없음");
+        }
+
         return refreshToken;
     }
 
