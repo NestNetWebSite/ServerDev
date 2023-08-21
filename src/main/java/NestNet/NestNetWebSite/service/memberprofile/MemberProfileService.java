@@ -3,8 +3,8 @@ package NestNet.NestNetWebSite.service.memberprofile;
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.post.Post;
-import NestNet.NestNetWebSite.dto.response.MemberProfileMemberInfoDto;
-import NestNet.NestNetWebSite.dto.response.PostTitleDto;
+import NestNet.NestNetWebSite.dto.response.MemberProfileMemberInfoResponse;
+import NestNet.NestNetWebSite.dto.response.PostTitleResponse;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import NestNet.NestNetWebSite.repository.post.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ public class MemberProfileService {
 
         Member member = memberRepository.findById(id);
 
-        MemberProfileMemberInfoDto memberInfoDto = new MemberProfileMemberInfoDto(member.getLoginId(), member.getName(),
+        MemberProfileMemberInfoResponse memberInfoDto = new MemberProfileMemberInfoResponse(member.getLoginId(), member.getName(),
                 member.getEmailAddress(), member.getMemberAuthority(), member.getGrade(), member.getGraduateYear());
 
         return ApiResult.success(memberInfoDto);
@@ -43,9 +43,9 @@ public class MemberProfileService {
         Member member = memberRepository.findByLoginId(loginId);
 
         List<Post> postList = postRepository.findAllPostByMember(member);
-        List<PostTitleDto> result = new ArrayList<>();
+        List<PostTitleResponse> result = new ArrayList<>();
         for(Post post : postList){
-            result.add(new PostTitleDto(post.getId(), post.getTitle(), post.getPostCategory()));
+            result.add(new PostTitleResponse(post.getId(), post.getTitle(), post.getPostCategory()));
         }
 
         return ApiResult.success(result);

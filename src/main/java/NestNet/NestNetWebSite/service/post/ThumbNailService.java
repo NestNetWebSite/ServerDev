@@ -3,7 +3,7 @@ package NestNet.NestNetWebSite.service.post;
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.domain.post.photo.ThumbNail;
-import NestNet.NestNetWebSite.dto.response.ThumbNailDto;
+import NestNet.NestNetWebSite.dto.response.ThumbNailResponse;
 import NestNet.NestNetWebSite.repository.post.ThumbNailRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -36,11 +36,11 @@ public class ThumbNailService {
     public ApiResult<?> findAllThumbNail(int offset, int limit){
 
         List<ThumbNail> thumbNailList = thumbNailRepository.findAllPhotoThumbNailByPaging(offset, limit);
-        List<ThumbNailDto> thumbNailDtoList = new ArrayList<>();
+        List<ThumbNailResponse> thumbNailResponseList = new ArrayList<>();
         for(ThumbNail thumbNail : thumbNailList){
-            thumbNailDtoList.add(new ThumbNailDto(thumbNail.getPost().getId(), thumbNail.getTitle(), thumbNail.getSaveFileName(), thumbNail.getSaveFilePath()));
+            thumbNailResponseList.add(new ThumbNailResponse(thumbNail.getPost().getId(), thumbNail.getTitle(), thumbNail.getSaveFileName(), thumbNail.getSaveFilePath()));
         }
 
-        return ApiResult.success(thumbNailDtoList);
+        return ApiResult.success(thumbNailResponseList);
     }
 }

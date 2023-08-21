@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class PostTitleDto {
+public class PostTitleResponse {
 
     private Long id;
     private String title;

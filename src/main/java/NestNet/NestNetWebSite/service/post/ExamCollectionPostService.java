@@ -3,12 +3,11 @@ package NestNet.NestNetWebSite.service.post;
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.member.Member;
-import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.domain.post.exam.ExamCollectionPost;
 import NestNet.NestNetWebSite.domain.post.exam.ExamType;
-import NestNet.NestNetWebSite.dto.request.ExamCollectionPostRequestDto;
-import NestNet.NestNetWebSite.dto.response.ExamCollectionPostDto;
-import NestNet.NestNetWebSite.dto.response.ExamCollectionPostListDto;
+import NestNet.NestNetWebSite.dto.request.ExamCollectionPostRequest;
+import NestNet.NestNetWebSite.dto.response.ExamCollectionPostResponse;
+import NestNet.NestNetWebSite.dto.response.ExamCollectionPostListResponse;
 import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import NestNet.NestNetWebSite.repository.post.ExamCollectionPostRepository;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
@@ -33,11 +32,11 @@ public class ExamCollectionPostService {
     족보 게시판에 게시물 저장
      */
     @Transactional
-    public void savePost(ExamCollectionPostRequestDto examCollectionPostRequestDto, List<MultipartFile> files, String memberLoginId){
+    public void savePost(ExamCollectionPostRequest examCollectionPostRequest, List<MultipartFile> files, String memberLoginId){
 
         Member member = memberRepository.findByLoginId(memberLoginId);
 
-        ExamCollectionPost post = examCollectionPostRequestDto.toEntity(member);
+        ExamCollectionPost post = examCollectionPostRequest.toEntity(member);
 
         List<AttachedFile> attachedFileList = new ArrayList<>();
         for(MultipartFile file : files){
@@ -57,10 +56,10 @@ public class ExamCollectionPostService {
 
         List<ExamCollectionPost> posts = examCollectionPostRepository.findAllExamCollectionPostByFilter(subject, professor, year, semester, examType);
 
-        List<ExamCollectionPostListDto> resultList = new ArrayList<>();
+        List<ExamCollectionPostListResponse> resultList = new ArrayList<>();
         for(ExamCollectionPost post : posts){
             resultList.add(
-                    ExamCollectionPostListDto.builder()
+                    ExamCollectionPostListResponse.builder()
                             .id(post.getId())
                             .subject(post.getSubject())
                             .professor(post.getProfessor())
@@ -78,12 +77,12 @@ public class ExamCollectionPostService {
     족보 게시물 단건 상세 조회
      */
     @Transactional
-    public ExamCollectionPostDto findPostById(Long id, String memberLoginId){
+    public ExamCollectionPostResponse findPostById(Long id, String memberLoginId){
 
         ExamCollectionPost post = examCollectionPostRepository.findById(id);
         examCollectionPostRepository.addViewCount(post, memberLoginId);
 
-        return ExamCollectionPostDto.builder()
+        return ExamCollectionPostResponse.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .bodyContent(post.getBodyContent())

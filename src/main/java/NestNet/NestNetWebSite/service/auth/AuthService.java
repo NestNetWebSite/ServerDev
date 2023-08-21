@@ -7,10 +7,9 @@ import NestNet.NestNetWebSite.domain.manager.MemberSignUpManagement;
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.member.MemberAuthority;
 import NestNet.NestNetWebSite.domain.token.RefreshToken;
-import NestNet.NestNetWebSite.dto.request.LoginRequestDto;
-import NestNet.NestNetWebSite.dto.request.SignUpRequestDto;
-import NestNet.NestNetWebSite.dto.response.JwtAccessTokenDto;
-import NestNet.NestNetWebSite.dto.response.TokenDto;
+import NestNet.NestNetWebSite.dto.request.LoginRequest;
+import NestNet.NestNetWebSite.dto.request.SignUpRequest;
+import NestNet.NestNetWebSite.dto.response.TokenResponse;
 import NestNet.NestNetWebSite.exception.CustomException;
 import NestNet.NestNetWebSite.repository.manager.MemberSignUpManagementRepository;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
@@ -47,7 +46,7 @@ public class AuthService {
     관리자에게 회원가입 요청을 보냄
      */
     @Transactional
-    public ApiResult<?> sendSignUpRequest(SignUpRequestDto signUpRequestDto){
+    public ApiResult<?> sendSignUpRequest(SignUpRequest signUpRequestDto){
 
         // 아이디 중복 확인
         if(memberRepository.findByLoginId(signUpRequestDto.getLoginId()) != null){
@@ -69,27 +68,27 @@ public class AuthService {
 
         log.info("MemberService.class / sendSignUpRequest");
 
-        return ApiResult.success("회원가입 신청이 성공적으로 처리되었습니다.");
+        return ApiResult.success("회원가입 신청이 성공적으로 처리되었습니다. 관리자에게 문의하세요");
     }
 
     /*
     로그인
      */
     @Transactional
-    public TokenDto login(LoginRequestDto loginRequestDto){
+    public TokenResponse login(LoginRequest loginRequest){
 
         try{
             //인증 전의 UsernamePasswordAuthenticationToken 객체(Authentication의 구현체)
             UsernamePasswordAuthenticationToken authenticationToken =
-                    new UsernamePasswordAuthenticationToken(loginRequestDto.getLoginId(), loginRequestDto.getPassword());
+                    new UsernamePasswordAuthenticationToken(loginRequest.getLoginId(), loginRequest.getPassword());
 
             //인증 후의 Authentication 객체
             //authenticationManager가 UserDetailsService의 loadByUsername매서드를 호출하여 인증 수행
             Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
-            TokenDto tokenDto = new TokenDto(tokenProvider.createAccessToken(authentication), tokenProvider.createRefreshToken(authentication));
+            TokenResponse tokenResponse = new TokenResponse(tokenProvider.createAccessToken(authentication), tokenProvider.createRefreshToken(authentication));
 
-            return tokenDto;
+            return tokenResponse;
         } catch (CustomException e){
             throw new CustomException("로그인 아이디 / 비밀번호 불일치", HttpStatus.BAD_REQUEST);
         }

@@ -1,18 +1,15 @@
-package NestNet.NestNetWebSite.dto.response;
+package NestNet.NestNetWebSite.dto.request;
 
 import NestNet.NestNetWebSite.domain.member.MemberAuthority;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 @AllArgsConstructor
-public class MemberProfileMemberInfoDto {
+public class MemberSignUpManagementRequest {
 
     private String loginId;
-    private String name;
-    private String emailAddress;
     private MemberAuthority memberAuthority;
-    private int grade;
-    private int graduateYear;
-
 }

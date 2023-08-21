@@ -1,25 +1,17 @@
 package NestNet.NestNetWebSite.controller.post;
 
 import NestNet.NestNetWebSite.api.ApiResult;
-import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
-import NestNet.NestNetWebSite.domain.post.exam.ExamCollectionPost;
 import NestNet.NestNetWebSite.domain.post.exam.ExamType;
-import NestNet.NestNetWebSite.dto.request.ExamCollectionPostRequestDto;
-import NestNet.NestNetWebSite.dto.response.AttachedFileDto;
-import NestNet.NestNetWebSite.dto.response.CommentDto;
-import NestNet.NestNetWebSite.dto.response.ExamCollectionPostDto;
-import NestNet.NestNetWebSite.dto.response.ExamCollectionPostListDto;
+import NestNet.NestNetWebSite.dto.request.ExamCollectionPostRequest;
+import NestNet.NestNetWebSite.dto.response.AttachedFileResponse;
+import NestNet.NestNetWebSite.dto.response.CommentResponse;
+import NestNet.NestNetWebSite.dto.response.ExamCollectionPostResponse;
 import NestNet.NestNetWebSite.service.attachedfile.AttachedFileService;
 import NestNet.NestNetWebSite.service.comment.CommentService;
 import NestNet.NestNetWebSite.service.like.PostLikeService;
 import NestNet.NestNetWebSite.service.post.ExamCollectionPostService;
-import NestNet.NestNetWebSite.service.post.UnifiedPostService;
-import NestNet.NestNetWebSite.service.member.MemberService;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -42,10 +34,10 @@ public class ExamCollectionPostController {
     족보 게시판 게시물 저장
      */
     @PostMapping("/exam-collection-post/post")
-    public void savePost(@RequestPart("data") @Valid ExamCollectionPostRequestDto examCollectionPostRequestDto, @RequestPart("file") List<MultipartFile> files,
+    public void savePost(@RequestPart("data") @Valid ExamCollectionPostRequest examCollectionPostRequest, @RequestPart("file") List<MultipartFile> files,
                          @AuthenticationPrincipal UserDetails userDetails){
 
-        examCollectionPostService.savePost(examCollectionPostRequestDto, files, userDetails.getUsername());
+        examCollectionPostService.savePost(examCollectionPostRequest, files, userDetails.getUsername());
     }
 
     /*
@@ -70,14 +62,14 @@ public class ExamCollectionPostController {
 
         Map<String, Object> result = new HashMap<>();
 
-        ExamCollectionPostDto postDto = examCollectionPostService.findPostById(postId, userDetails.getUsername());
-        List<AttachedFileDto> fileDtoList = attachedFileService.findAllFilesByPost(postId);
-        List<CommentDto> commentDtoList = commentService.findCommentByPost(postId);
+        ExamCollectionPostResponse postDto = examCollectionPostService.findPostById(postId, userDetails.getUsername());
+        List<AttachedFileResponse> fileDtoList = attachedFileService.findAllFilesByPost(postId);
+        List<CommentResponse> commentResponseList = commentService.findCommentByPost(postId);
         boolean isMemberLiked = postLikeService.isMemberLikedByPost(postId, userDetails.getUsername());
 
         result.put("post-data", postDto);
         result.put("file-data", fileDtoList);
-        result.put("comment-data", commentDtoList);
+        result.put("comment-data", commentResponseList);
         result.put("is-member-liked", isMemberLiked);
 
         return ApiResult.success(result);

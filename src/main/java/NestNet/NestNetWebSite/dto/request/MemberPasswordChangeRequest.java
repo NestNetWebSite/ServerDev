@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberGetTemporaryPwRequestDto {
+public class MemberPasswordChangeRequest {
 
-    private String loginId;
+    private String password;
 }

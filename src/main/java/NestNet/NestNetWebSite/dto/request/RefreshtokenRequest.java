@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RefreshtokenRequestDto {
+public class RefreshtokenRequest {
 
     private String accessToken;
     private String refreshToken;

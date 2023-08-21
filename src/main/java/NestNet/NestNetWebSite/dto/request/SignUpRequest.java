@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SignUpRequestDto {
+public class SignUpRequest {
 
     private String loginId;                         // 로그인 아이디
     private String loginPassword;                   // 로그인 비밀번호

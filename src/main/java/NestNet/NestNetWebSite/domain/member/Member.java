@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * 회원 정보를 담고 있는 엔티티
@@ -40,7 +41,7 @@ public class Member {
     private String emailAddress;                    // 이메일 주소
 
     @Enumerated(EnumType.STRING)
-    private MemberAuthority memberAuthority;        // 권한 (PRESIDENT, VICE_PRESIDENT, MANAGER, GENERAL_MEMBER, GRADUATED_MEMBER, WAITING_FOR_APPROVAL)
+    private MemberAuthority memberAuthority;        // 권한 (PRESIDENT, VICE_PRESIDENT, MANAGER, GENERAL_MEMBER, GRADUATED_MEMBER, WAITING_FOR_APPROVAL, WITHDRAWN_MEMBER)
 
     private LocalDateTime joinDate;                 // 회원가입 날짜
 
@@ -90,6 +91,17 @@ public class Member {
      */
     public void changePassword(String loginPassword, PasswordEncoder passwordEncoder){
         this.loginPassword = passwordEncoder.encode(loginPassword);
+    }
+
+    /*
+    탈퇴
+     */
+    public void withdraw(){
+        this.loginId = UUID.randomUUID().toString().replace("-", "").substring(0, 10);
+        this.loginPassword = UUID.randomUUID().toString().replace("-", "").substring(0, 10);
+        this.name = "알수없음";
+        this.emailAddress = "";
+        this.memberAuthority = MemberAuthority.WITHDRAWN_MEMBER;
     }
 
 }

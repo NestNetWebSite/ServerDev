@@ -1,12 +1,10 @@
 package NestNet.NestNetWebSite.controller.post;
 
 import NestNet.NestNetWebSite.api.ApiResult;
-import NestNet.NestNetWebSite.dto.request.ExamCollectionPostRequestDto;
-import NestNet.NestNetWebSite.dto.request.PhotoPostRequestDto;
-import NestNet.NestNetWebSite.dto.response.AttachedFileDto;
-import NestNet.NestNetWebSite.dto.response.CommentDto;
-import NestNet.NestNetWebSite.dto.response.PhotoPostDto;
-import NestNet.NestNetWebSite.dto.response.ThumbNailDto;
+import NestNet.NestNetWebSite.dto.request.PhotoPostRequest;
+import NestNet.NestNetWebSite.dto.response.AttachedFileResponse;
+import NestNet.NestNetWebSite.dto.response.CommentResponse;
+import NestNet.NestNetWebSite.dto.response.PhotoPostResponse;
 import NestNet.NestNetWebSite.service.attachedfile.AttachedFileService;
 import NestNet.NestNetWebSite.service.comment.CommentService;
 import NestNet.NestNetWebSite.service.like.PostLikeService;
@@ -14,8 +12,6 @@ import NestNet.NestNetWebSite.service.post.PhotoPostService;
 import NestNet.NestNetWebSite.service.post.ThumbNailService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -39,10 +35,10 @@ public class PhotoPostController {
     사진 게시판 게시물 저장
      */
     @PostMapping("/photo-post/post")
-    public void savePost(@RequestPart("data") @Valid PhotoPostRequestDto photoPostRequestDto, @RequestPart("photo-file") List<MultipartFile> files,
+    public void savePost(@RequestPart("data") @Valid PhotoPostRequest photoPostRequest, @RequestPart("photo-file") List<MultipartFile> files,
                          @AuthenticationPrincipal UserDetails userDetails){
 
-        photoPostService.savePost(photoPostRequestDto, files, userDetails.getUsername());
+        photoPostService.savePost(photoPostRequest, files, userDetails.getUsername());
     }
 
     /*
@@ -63,14 +59,14 @@ public class PhotoPostController {
 
         Map<String, Object> result = new HashMap<>();
 
-        PhotoPostDto photoPostDto = photoPostService.findPostById(postId, userDetails.getUsername());
-        List<AttachedFileDto> fileDtoList = attachedFileService.findAllFilesByPost(postId);
-        List<CommentDto> commentDtoList = commentService.findCommentByPost(postId);
+        PhotoPostResponse photoPostResponse = photoPostService.findPostById(postId, userDetails.getUsername());
+        List<AttachedFileResponse> fileDtoList = attachedFileService.findAllFilesByPost(postId);
+        List<CommentResponse> commentResponseList = commentService.findCommentByPost(postId);
         boolean isMemberLiked = postLikeService.isMemberLikedByPost(postId, userDetails.getUsername());
 
-        result.put("post-data", photoPostDto);
+        result.put("post-data", photoPostResponse);
         result.put("file-data", fileDtoList);
-        result.put("comment-data", commentDtoList);
+        result.put("comment-data", commentResponseList);
         result.put("is-member-liked", isMemberLiked);
 
         return ApiResult.success(result);

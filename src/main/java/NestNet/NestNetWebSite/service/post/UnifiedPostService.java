@@ -3,12 +3,11 @@ package NestNet.NestNetWebSite.service.post;
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.member.Member;
-import NestNet.NestNetWebSite.domain.post.photo.PhotoPost;
 import NestNet.NestNetWebSite.domain.post.unified.UnifiedPost;
 import NestNet.NestNetWebSite.domain.post.unified.UnifiedPostType;
-import NestNet.NestNetWebSite.dto.request.UnifiedPostRequestDto;
-import NestNet.NestNetWebSite.dto.response.UnifiedPostDto;
-import NestNet.NestNetWebSite.dto.response.UnifiedPostListDto;
+import NestNet.NestNetWebSite.dto.request.UnifiedPostRequest;
+import NestNet.NestNetWebSite.dto.response.UnifiedPostResponse;
+import NestNet.NestNetWebSite.dto.response.UnifiedPostListResponse;
 import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import NestNet.NestNetWebSite.repository.post.UnifiedPostRepository;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
@@ -33,11 +32,11 @@ public class UnifiedPostService {
     통합 게시판 게시물 저장
      */
     @Transactional
-    public void savePost(UnifiedPostRequestDto unifiedPostRequestDto, List<MultipartFile> files, String memberLoginId) {
+    public void savePost(UnifiedPostRequest unifiedPostRequest, List<MultipartFile> files, String memberLoginId) {
 
         Member member = memberRepository.findByLoginId(memberLoginId);
 
-        UnifiedPost post = unifiedPostRequestDto.toEntity(member);
+        UnifiedPost post = unifiedPostRequest.toEntity(member);
 
         List<AttachedFile> attachedFileList = new ArrayList<>();
         for(MultipartFile file : files){
@@ -57,10 +56,10 @@ public class UnifiedPostService {
 
         List<UnifiedPost> postList = unifiedPostRepository.findUnifiedPostByType(offset, limit, unifiedPostType);
 
-        List<UnifiedPostListDto> resultList = new ArrayList<>();
+        List<UnifiedPostListResponse> resultList = new ArrayList<>();
 
         for(UnifiedPost post : postList){
-            resultList.add(new UnifiedPostListDto(post.getMember().getName(), post.getTitle(),
+            resultList.add(new UnifiedPostListResponse(post.getMember().getName(), post.getTitle(),
                     post.getCreatedTime(), post.getViewCount(), post.getLikeCount()));
         }
 
@@ -71,12 +70,12 @@ public class UnifiedPostService {
     통합 게시판 게시물 단건 조회
      */
     @Transactional
-    public UnifiedPostDto findPostById(Long id, String memberLoginId){
+    public UnifiedPostResponse findPostById(Long id, String memberLoginId){
 
         UnifiedPost post = unifiedPostRepository.findById(id);
         unifiedPostRepository.addViewCount(post, memberLoginId);
 
-        return UnifiedPostDto.builder()
+        return UnifiedPostResponse.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .bodyContent(post.getBodyContent())

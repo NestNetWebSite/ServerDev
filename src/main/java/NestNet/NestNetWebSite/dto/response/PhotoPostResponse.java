@@ -3,15 +3,14 @@ package NestNet.NestNetWebSite.dto.response;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
-
 @Getter
 @AllArgsConstructor
-public class UnifiedPostListDto {
+public class PhotoPostResponse {
 
-    private String username;
+    private Long id;
     private String title;
-    private LocalDateTime createdTime;
+    private String bodyContent;
     private Long viewCount;
     private int likeCount;
+    private String username;
 }

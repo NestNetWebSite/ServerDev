@@ -1,7 +1,6 @@
 package NestNet.NestNetWebSite.dto.request;
 
 import NestNet.NestNetWebSite.domain.member.Member;
-import NestNet.NestNetWebSite.domain.post.exam.ExamCollectionPost;
 import NestNet.NestNetWebSite.domain.post.photo.PhotoPost;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
-public class PhotoPostRequestDto {
+public class PhotoPostRequest {
 
     private String title;
     private String bodyContent;

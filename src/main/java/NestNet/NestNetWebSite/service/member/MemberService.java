@@ -2,7 +2,7 @@ package NestNet.NestNetWebSite.service.member;
 
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.member.Member;
-import NestNet.NestNetWebSite.dto.request.MemberModifyInfoRequestDto;
+import NestNet.NestNetWebSite.dto.request.MemberModifyInfoRequest;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ public class MemberService {
     회원 정보 변경
      */
     @Transactional
-    public ApiResult<?> modifyMemberInfo(MemberModifyInfoRequestDto dto, String loginId){
+    public ApiResult<?> modifyMemberInfo(MemberModifyInfoRequest dto, String loginId){
 
         Member member = memberRepository.findByLoginId(loginId);
         member.modifyInfo(dto.getLoginId(), dto.getName(), dto.getStudentId(), dto.getGrade(), dto.getEmailAddress());
@@ -79,6 +79,20 @@ public class MemberService {
         member.changePassword(password, passwordEncoder);
 
         return ApiResult.success("비밀번호가 변경되었습니다.");
+    }
+
+    /*
+    회원 탈퇴 -> 모든 정보 초기화 + 아이디, 비밀번호 랜덤 문자열(10자리)로 변경 + 이름 '알수없음'으로 변경
+     */
+    @Transactional
+    public ApiResult<?> withDrawMember(String loginId){
+
+        Member member = memberRepository.findByLoginId(loginId);
+        String memberName = member.getName();
+
+        member.withdraw();
+
+        return ApiResult.success(memberName + "(" + loginId + ") 님 탈퇴 처리 되었습니다. 감사합니다.");
     }
 
 }

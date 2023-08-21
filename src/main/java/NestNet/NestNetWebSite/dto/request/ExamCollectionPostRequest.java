@@ -1,6 +1,5 @@
 package NestNet.NestNetWebSite.dto.request;
 
-import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.domain.post.PostCategory;
 import NestNet.NestNetWebSite.domain.post.exam.ExamCollectionPost;
 import NestNet.NestNetWebSite.domain.post.exam.ExamType;
@@ -14,7 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ExamCollectionPostRequestDto {
+public class ExamCollectionPostRequest {
 
     private String title;
     private String bodyContent;

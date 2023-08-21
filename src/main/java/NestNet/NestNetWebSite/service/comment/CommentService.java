@@ -1,11 +1,10 @@
 package NestNet.NestNetWebSite.service.comment;
 
-import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.comment.Comment;
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.post.Post;
-import NestNet.NestNetWebSite.dto.request.CommentRequestDto;
-import NestNet.NestNetWebSite.dto.response.CommentDto;
+import NestNet.NestNetWebSite.dto.request.CommentRequest;
+import NestNet.NestNetWebSite.dto.response.CommentResponse;
 import NestNet.NestNetWebSite.repository.comment.CommentRepository;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import jakarta.persistence.EntityManager;
@@ -34,11 +33,11 @@ public class CommentService {
     댓글 저장
      */
     @Transactional
-    public void saveComment(CommentRequestDto commentRequestDto, Long postId, String memberLoginId){
+    public void saveComment(CommentRequest commentRequest, Long postId, String memberLoginId){
 
         Post post = findPost(postId);
         Member member = memberRepository.findByLoginId(memberLoginId);
-        Comment comment = commentRequestDto.toEntity(post, member);
+        Comment comment = commentRequest.toEntity(post, member);
 
         commentRepository.save(comment);
     }
@@ -46,15 +45,15 @@ public class CommentService {
     /*
     게시물에 따른 댓글 모두 조회
      */
-    public List<CommentDto> findCommentByPost(Long postId){
+    public List<CommentResponse> findCommentByPost(Long postId){
 
         Post post = findPost(postId);
         List<Comment> commentList = commentRepository.findCommentsByPost(post);
 
-        List<CommentDto> resultList = new ArrayList<>();
+        List<CommentResponse> resultList = new ArrayList<>();
         for(Comment comment : commentList){
             resultList.add(
-                    CommentDto.builder()
+                    CommentResponse.builder()
                             .id(comment.getId())
                             .username(comment.getMember().getName())
                             .content(comment.getContent())

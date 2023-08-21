@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class MemberModifyInfoRequestDto {
+public class MemberModifyInfoRequest {
 
     String loginId;
     String name;

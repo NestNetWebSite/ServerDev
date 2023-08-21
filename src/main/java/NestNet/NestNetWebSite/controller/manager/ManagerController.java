@@ -1,18 +1,12 @@
 package NestNet.NestNetWebSite.controller.manager;
 
 import NestNet.NestNetWebSite.api.ApiResult;
-import NestNet.NestNetWebSite.domain.member.MemberAuthority;
-import NestNet.NestNetWebSite.dto.request.MemberChangeAuthorityRequestDto;
-import NestNet.NestNetWebSite.dto.request.MemberSignUpManagementRequestDto;
-import NestNet.NestNetWebSite.dto.response.MemberInfoDto;
+import NestNet.NestNetWebSite.dto.request.MemberChangeAuthorityRequest;
+import NestNet.NestNetWebSite.dto.request.MemberSignUpManagementRequest;
 import NestNet.NestNetWebSite.service.manager.ManagerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,7 +28,7 @@ public class ManagerController {
     회원가입 승인
      */
     @PostMapping("/manager/approve-signup")
-    public ApiResult<?> approveSignUpMember(@Valid @RequestBody MemberSignUpManagementRequestDto dto){
+    public ApiResult<?> approveSignUpMember(@Valid @RequestBody MemberSignUpManagementRequest dto){
         return managerService.approveSignUp(dto);
     }
 
@@ -42,7 +36,7 @@ public class ManagerController {
     회원 권한 변경
      */
     @PostMapping("/manager/change-authority")
-    public ApiResult<?> changeMemberAuthority(@Valid @RequestBody MemberChangeAuthorityRequestDto dto){
+    public ApiResult<?> changeMemberAuthority(@Valid @RequestBody MemberChangeAuthorityRequest dto){
 
         return managerService.changeAuthority(dto.getId(), dto.getMemberAuthority());
     }
@@ -54,5 +48,14 @@ public class ManagerController {
     public ApiResult<?> showMemberInfo(){
 
         return managerService.findAllMemberInfo();
+    }
+
+    /*
+    회원 탈퇴
+     */
+    @GetMapping("/manager/member-withdraw")
+    public ApiResult<?> withdrawMember(@RequestParam(value = "member-id") Long id){
+
+        return managerService.withDrawMember(id);
     }
 }

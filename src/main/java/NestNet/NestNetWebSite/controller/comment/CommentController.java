@@ -1,7 +1,6 @@
 package NestNet.NestNetWebSite.controller.comment;
 
-import NestNet.NestNetWebSite.api.ApiResult;
-import NestNet.NestNetWebSite.dto.request.CommentRequestDto;
+import NestNet.NestNetWebSite.dto.request.CommentRequest;
 import NestNet.NestNetWebSite.service.comment.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,9 +18,9 @@ public class CommentController {
     댓글 작성
      */
     @PostMapping("/comment/{post_id}")
-    public void writeComment(@PathVariable("post_id") Long postId, @RequestBody CommentRequestDto commentRequestDto,
+    public void writeComment(@PathVariable("post_id") Long postId, @RequestBody CommentRequest commentRequest,
                                   @AuthenticationPrincipal UserDetails userDetails){
 
-        commentService.saveComment(commentRequestDto, postId, userDetails.getUsername());
+        commentService.saveComment(commentRequest, postId, userDetails.getUsername());
     }
 }

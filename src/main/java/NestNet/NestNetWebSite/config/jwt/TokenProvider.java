@@ -1,6 +1,6 @@
 package NestNet.NestNetWebSite.config.jwt;
 
-import NestNet.NestNetWebSite.dto.response.RefreshTokenDto;
+import NestNet.NestNetWebSite.dto.response.RefreshTokenResponse;
 import NestNet.NestNetWebSite.service.member.CustomUserDetailsService;
 import NestNet.NestNetWebSite.service.token.RefreshTokenService;
 import io.jsonwebtoken.*;
@@ -13,8 +13,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -288,7 +286,7 @@ public class TokenProvider implements InitializingBean {
 
         System.out.println("리프레시 토큰 가져오기 전 access : " + accessToken);
 
-        RefreshTokenDto dbRefreshToken = refreshTokenService.findByAccessToken(accessToken);
+        RefreshTokenResponse dbRefreshToken = refreshTokenService.findByAccessToken(accessToken);
 
         // 해당하는 리프레쉬 토큰이 아예 없거나, 만료돼서 삭제되어 없음.
         if(dbRefreshToken.getRefreshToken() == null){

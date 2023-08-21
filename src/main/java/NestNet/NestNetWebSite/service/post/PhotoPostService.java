@@ -2,11 +2,10 @@ package NestNet.NestNetWebSite.service.post;
 
 import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.member.Member;
-import NestNet.NestNetWebSite.domain.post.exam.ExamCollectionPost;
 import NestNet.NestNetWebSite.domain.post.photo.PhotoPost;
 import NestNet.NestNetWebSite.domain.post.photo.ThumbNail;
-import NestNet.NestNetWebSite.dto.request.PhotoPostRequestDto;
-import NestNet.NestNetWebSite.dto.response.PhotoPostDto;
+import NestNet.NestNetWebSite.dto.request.PhotoPostRequest;
+import NestNet.NestNetWebSite.dto.response.PhotoPostResponse;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import NestNet.NestNetWebSite.repository.post.PhotoPostRepository;
@@ -33,11 +32,11 @@ public class PhotoPostService {
     사진 게시판에 게시물 저장
      */
     @Transactional
-    public void savePost(PhotoPostRequestDto photoPostRequestDto, List<MultipartFile> files, String memberLoginId){
+    public void savePost(PhotoPostRequest photoPostRequest, List<MultipartFile> files, String memberLoginId){
 
         Member member = memberRepository.findByLoginId(memberLoginId);
 
-        PhotoPost post = photoPostRequestDto.toEntity(member);
+        PhotoPost post = photoPostRequest.toEntity(member);
 
         List<AttachedFile> attachedFileList = new ArrayList<>();
 
@@ -61,12 +60,12 @@ public class PhotoPostService {
     사진 게시물 단건 조회
      */
     @Transactional
-    public PhotoPostDto findPostById(Long id, String memberLoginId){
+    public PhotoPostResponse findPostById(Long id, String memberLoginId){
 
         PhotoPost post = photoPostRepository.findById(id);
         photoPostRepository.addViewCount(post, memberLoginId);
 
-        return new PhotoPostDto(post.getId(), post.getTitle(),
+        return new PhotoPostResponse(post.getId(), post.getTitle(),
                 post.getBodyContent(), post.getViewCount(), post.getLikeCount(), post.getMember().getName());
     }
 

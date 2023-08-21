@@ -2,6 +2,7 @@ package NestNet.NestNetWebSite.api;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
 @Getter
 public class ApiError {

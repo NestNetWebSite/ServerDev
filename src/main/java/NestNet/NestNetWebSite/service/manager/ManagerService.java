@@ -4,13 +4,12 @@ import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.manager.MemberSignUpManagement;
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.member.MemberAuthority;
-import NestNet.NestNetWebSite.dto.request.MemberSignUpManagementRequestDto;
-import NestNet.NestNetWebSite.dto.response.MemberInfoDto;
-import NestNet.NestNetWebSite.dto.response.MemberSignUpManagementDto;
+import NestNet.NestNetWebSite.dto.request.MemberSignUpManagementRequest;
+import NestNet.NestNetWebSite.dto.response.MemberInfoResponse;
+import NestNet.NestNetWebSite.dto.response.MemberSignUpManagementResponse;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import NestNet.NestNetWebSite.repository.manager.MemberSignUpManagementRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,9 +31,9 @@ public class ManagerService {
 
         List<MemberSignUpManagement> list = memberSignUpManagementRepository.findAll();
 
-        List<MemberSignUpManagementDto> resultList = new ArrayList<>();
+        List<MemberSignUpManagementResponse> resultList = new ArrayList<>();
         for(MemberSignUpManagement request : list){
-            resultList.add(new MemberSignUpManagementDto(request.getMember().getName(),  request.getMember().getStudentId(),
+            resultList.add(new MemberSignUpManagementResponse(request.getMember().getName(),  request.getMember().getStudentId(),
                     request.getMember().getLoginId(), request.getRequestMemberAuthority()));
         }
 
@@ -45,7 +44,7 @@ public class ManagerService {
     회원 가입 요청 승인
      */
     @Transactional
-    public ApiResult<?> approveSignUp(MemberSignUpManagementRequestDto dto){
+    public ApiResult<?> approveSignUp(MemberSignUpManagementRequest dto){
 
         Member member = memberRepository.findByLoginId(dto.getLoginId());
         member.changeAuthority(dto.getMemberAuthority());         //권한 설정
@@ -88,12 +87,27 @@ public class ManagerService {
     public ApiResult<?> findAllMemberInfo(){
 
         List<Member> memberList = memberRepository.findAllMember();
-        List<MemberInfoDto> memberInfoDtoList = new ArrayList<>();
+        List<MemberInfoResponse> memberInfoResponseList = new ArrayList<>();
         for(Member member : memberList){
-            memberInfoDtoList.add(new MemberInfoDto(member.getMemberAuthority(), member.getName(), member.getLoginId(), member.getEmailAddress(),
+            memberInfoResponseList.add(new MemberInfoResponse(member.getMemberAuthority(), member.getName(), member.getLoginId(), member.getEmailAddress(),
                     member.getStudentId(), member.getGrade(), member.getGraduateYear()));
         }
 
-        return ApiResult.success(memberInfoDtoList);
+        return ApiResult.success(memberInfoResponseList);
+    }
+
+    /*
+    회원 탈퇴 -> 모든 정보 초기화 + 아이디, 비밀번호 랜덤 문자열(10자리)로 변경 + 이름 '알수없음'으로 변경
+     */
+    @Transactional
+    public ApiResult<?> withDrawMember(Long id){
+
+        Member member = memberRepository.findById(id);
+        String memberName = member.getName();
+        String memberLoginId = member.getLoginId();
+
+        member.withdraw();
+
+        return ApiResult.success(memberName + "(" + memberLoginId + ") 님 탈퇴 처리 되었습니다.");
     }
 }

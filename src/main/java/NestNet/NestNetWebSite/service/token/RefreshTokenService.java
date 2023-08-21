@@ -2,8 +2,8 @@ package NestNet.NestNetWebSite.service.token;
 
 import NestNet.NestNetWebSite.config.redis.RedisUtil;
 import NestNet.NestNetWebSite.domain.token.RefreshToken;
-import NestNet.NestNetWebSite.dto.request.RefreshtokenRequestDto;
-import NestNet.NestNetWebSite.dto.response.RefreshTokenDto;
+import NestNet.NestNetWebSite.dto.request.RefreshtokenRequest;
+import NestNet.NestNetWebSite.dto.response.RefreshTokenResponse;
 import NestNet.NestNetWebSite.repository.token.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,31 +25,31 @@ public class RefreshTokenService {
     리프레쉬 토큰 저장
      */
     @Transactional
-    public void save(RefreshtokenRequestDto refreshtokenRequestDto){
+    public void save(RefreshtokenRequest refreshtokenRequest){
 
-        refreshTokenRepository.save(refreshtokenRequestDto.toEntity());
+        refreshTokenRepository.save(refreshtokenRequest.toEntity());
     }
 
     /*
     엑세스 토큰으로 리프레쉬 토큰 찾고, 만약 만료됐으면 RefreshToken 삭제
      */
     @Transactional
-    public RefreshTokenDto findByAccessToken(String accessToken){
+    public RefreshTokenResponse findByAccessToken(String accessToken){
 
-        RefreshTokenDto refreshTokenDto = new RefreshTokenDto(null);
+        RefreshTokenResponse refreshTokenResponse = new RefreshTokenResponse(null);
 
         RefreshToken refreshToken = refreshTokenRepository.findByAccessToken(accessToken);
         LocalDateTime now = LocalDateTime.now();
 
         if(refreshToken.getExpTime().isAfter(now)){     //리프레쉬 토큰이 만료되지 않았으면
-            refreshTokenDto.setRefreshToken(refreshToken.getRefreshToken());
+            refreshTokenResponse.setRefreshToken(refreshToken.getRefreshToken());
         }
         else{       //리프레쉬 토큰이 만료된 경우
             log.info("RefreshTokenService / findByAccessToken : 리프리쉐 토큰 만료");
             deleteRefreshToken(refreshToken);
         }
 
-        return refreshTokenDto;
+        return refreshTokenResponse;
     }
 
     /*

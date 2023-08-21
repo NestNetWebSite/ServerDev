@@ -1,15 +1,13 @@
-package NestNet.NestNetWebSite.dto.response;
+package NestNet.NestNetWebSite.dto.request;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class JwtAccessTokenDto {
+public class MemberGetTemporaryPwRequest {
 
-    private String token;
+    private String loginId;
 }

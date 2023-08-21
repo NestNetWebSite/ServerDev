@@ -2,7 +2,7 @@ package NestNet.NestNetWebSite.service.attachedfile;
 
 import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.post.Post;
-import NestNet.NestNetWebSite.dto.response.AttachedFileDto;
+import NestNet.NestNetWebSite.dto.response.AttachedFileResponse;
 import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -32,13 +32,13 @@ public class AttachedFileService {
     /*
     게시물에 해당된 첨부파일 모두 조회
      */
-    public List<AttachedFileDto> findAllFilesByPost(Long postId){
+    public List<AttachedFileResponse> findAllFilesByPost(Long postId){
 
         List<AttachedFile> files = attachedFileRepository.findByPost(findPost(postId));
 
-        List<AttachedFileDto> fileDtos = new ArrayList<>();
+        List<AttachedFileResponse> fileDtos = new ArrayList<>();
         for(AttachedFile file : files){
-            fileDtos.add(new AttachedFileDto(file.getOriginalFileName(), file.getSaveFileName(), file.getSaveFilePath()));
+            fileDtos.add(new AttachedFileResponse(file.getOriginalFileName(), file.getSaveFileName(), file.getSaveFilePath()));
         }
 
         return fileDtos;

@@ -1,14 +1,15 @@
-package NestNet.NestNetWebSite.dto.request;
+package NestNet.NestNetWebSite.dto.response;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberFindIdRequestDto {
+@Builder
+public class JwtAccessTokenResponse {
 
-    private String name;
-    private String emailAddress;
+    private String token;
 }

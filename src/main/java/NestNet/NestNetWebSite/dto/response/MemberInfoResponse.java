@@ -2,14 +2,13 @@ package NestNet.NestNetWebSite.dto.response;
 
 import NestNet.NestNetWebSite.domain.member.MemberAuthority;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberInfoDto {
+public class MemberInfoResponse {
 
     private MemberAuthority memberAuthority;
     private String name;
