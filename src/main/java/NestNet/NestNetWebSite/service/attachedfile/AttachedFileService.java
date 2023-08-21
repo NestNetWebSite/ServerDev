@@ -2,7 +2,7 @@ package NestNet.NestNetWebSite.service.attachedfile;
 
 import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.post.Post;
-import NestNet.NestNetWebSite.dto.response.AttachedFileResponse;
+import NestNet.NestNetWebSite.domain.token.dto.response.AttachedFileResponse;
 import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;

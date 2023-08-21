@@ -19,10 +19,10 @@ public class MemberProfileController {
     /*
     회원 정보 조회
      */
-    @GetMapping("/member-profile/member-info/{member_id}")
-    public ApiResult<?> showMemberInfo(@PathVariable("member_id") Long memberId){
+    @GetMapping("/member-profile/member-info")
+    public ApiResult<?> showMemberInfo(@AuthenticationPrincipal UserDetails userDetails){
 
-        return memberProfileService.findMemberInfoById(memberId);
+        return memberProfileService.findMemberInfoById(userDetails.getUsername());
     }
 
     /*

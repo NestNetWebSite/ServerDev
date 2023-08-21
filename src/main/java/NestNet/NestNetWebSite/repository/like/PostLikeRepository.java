@@ -30,16 +30,6 @@ public class PostLikeRepository {
 
     //=========================================조회=========================================//
 
-    // 좋아요 수 조회     -> 좋아요 수는 엔티티에 저장
-//    public Long likeCount(Post post){
-//
-//        Long count = entityManager.createQuery("select COUNT(l) from PostLike l where l.post =: post", Long.class)
-//                .setParameter("post", post)
-//                .getSingleResult();
-//
-//        return count;
-//    }
-
     // 회원 좋아요 상태 조회
     public boolean isMemberLiked(Post post, Member member){
 

@@ -1,4 +1,4 @@
-package NestNet.NestNetWebSite.dto.request;
+package NestNet.NestNetWebSite.domain.token.dto.request;
 
 import NestNet.NestNetWebSite.domain.member.MemberAuthority;
 import lombok.AllArgsConstructor;
@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberSignUpManagementRequest {
+public class MemberChangeAuthorityRequest {
 
-    private String loginId;
+    private Long id;
     private MemberAuthority memberAuthority;
 }

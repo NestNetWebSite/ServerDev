@@ -7,15 +7,16 @@ import NestNet.NestNetWebSite.domain.manager.MemberSignUpManagement;
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.member.MemberAuthority;
 import NestNet.NestNetWebSite.domain.token.RefreshToken;
-import NestNet.NestNetWebSite.dto.request.LoginRequest;
-import NestNet.NestNetWebSite.dto.request.SignUpRequest;
-import NestNet.NestNetWebSite.dto.response.TokenResponse;
+import NestNet.NestNetWebSite.domain.token.dto.request.LoginRequest;
+import NestNet.NestNetWebSite.domain.token.dto.request.SignUpRequest;
+import NestNet.NestNetWebSite.domain.token.dto.response.TokenResponse;
 import NestNet.NestNetWebSite.exception.CustomException;
 import NestNet.NestNetWebSite.repository.manager.MemberSignUpManagementRepository;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import NestNet.NestNetWebSite.repository.token.RefreshTokenRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -46,11 +47,11 @@ public class AuthService {
     관리자에게 회원가입 요청을 보냄
      */
     @Transactional
-    public ApiResult<?> sendSignUpRequest(SignUpRequest signUpRequestDto){
+    public ApiResult<?> sendSignUpRequest(SignUpRequest signUpRequestDto, HttpServletResponse response){
 
         // 아이디 중복 확인
         if(memberRepository.findByLoginId(signUpRequestDto.getLoginId()) != null){
-            return ApiResult.error(HttpStatus.CONFLICT, "이미 가입된 유저 아이디입니다.");
+            return ApiResult.error(response, HttpStatus.CONFLICT, "이미 가입된 유저 아이디입니다.");
 //            throw new DuplicateMemberException("이미 가입된 유저입니다.");
         }
 
@@ -98,7 +99,7 @@ public class AuthService {
     로그아웃
      */
     @Transactional
-    public ApiResult<?> logout(HttpServletRequest request){
+    public ApiResult<?> logout(HttpServletRequest request, HttpServletResponse response){
 
         String accessToken = tokenProvider.resolveToken(request);
 
@@ -123,6 +124,6 @@ public class AuthService {
         if(redisUtil.hasKey(accessToken) && rows == 1){
             return ApiResult.success("로그아웃 되었습니다");
         }
-        return ApiResult.error(HttpStatus.INTERNAL_SERVER_ERROR, "서버 에러/ 관리자에게 문의하세요");
+        return ApiResult.error(response, HttpStatus.INTERNAL_SERVER_ERROR, "서버 에러/ 관리자에게 문의하세요");
     }
 }

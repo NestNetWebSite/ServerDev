@@ -53,7 +53,7 @@ public class ExamCollectionPostRepositoryTest {
         //when
         memberRepository.save(member);
         examCollectionPostRepository.save(examCollectionPost);
-        List<ExamCollectionPost> findPost = examCollectionPostRepository.findAllExamCollectionPostByFilter(examCollectionPost.getSubject(), null, null, null, null);
+        List<ExamCollectionPost> findPost = examCollectionPostRepository.findAllExamCollectionPostByFilter(examCollectionPost.getSubject(), null, null, null, null, 0, 12);
 
         //then
         Assertions.assertEquals(examCollectionPost, findPost.get(0));

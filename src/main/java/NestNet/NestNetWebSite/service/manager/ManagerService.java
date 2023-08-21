@@ -4,9 +4,9 @@ import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.manager.MemberSignUpManagement;
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.member.MemberAuthority;
-import NestNet.NestNetWebSite.dto.request.MemberSignUpManagementRequest;
-import NestNet.NestNetWebSite.dto.response.MemberInfoResponse;
-import NestNet.NestNetWebSite.dto.response.MemberSignUpManagementResponse;
+import NestNet.NestNetWebSite.domain.token.dto.request.MemberSignUpManagementRequest;
+import NestNet.NestNetWebSite.domain.token.dto.response.MemberInfoResponse;
+import NestNet.NestNetWebSite.domain.token.dto.response.MemberSignUpManagementResponse;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import NestNet.NestNetWebSite.repository.manager.MemberSignUpManagementRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,8 +33,8 @@ public class ManagerService {
 
         List<MemberSignUpManagementResponse> resultList = new ArrayList<>();
         for(MemberSignUpManagement request : list){
-            resultList.add(new MemberSignUpManagementResponse(request.getMember().getName(),  request.getMember().getStudentId(),
-                    request.getMember().getLoginId(), request.getRequestMemberAuthority()));
+            resultList.add(new MemberSignUpManagementResponse(request.getMember().getName(), request.getMember().getLoginId(), request.getMember().getStudentId(),
+                    request.getMember().getGrade(), request.getMember().getGraduateYear(), request.getRequestMemberAuthority()));
         }
 
         return ApiResult.success(resultList);
@@ -84,9 +84,9 @@ public class ManagerService {
     /*
     전체 회원 정보 조회 (권한에 따른 필터링)
      */
-    public ApiResult<?> findAllMemberInfo(){
+    public ApiResult<?> findAllMemberInfo(String name, MemberAuthority memberAuthority){
 
-        List<Member> memberList = memberRepository.findAllMember();
+        List<Member> memberList = memberRepository.findAllMember(name, memberAuthority);
         List<MemberInfoResponse> memberInfoResponseList = new ArrayList<>();
         for(Member member : memberList){
             memberInfoResponseList.add(new MemberInfoResponse(member.getMemberAuthority(), member.getName(), member.getLoginId(), member.getEmailAddress(),

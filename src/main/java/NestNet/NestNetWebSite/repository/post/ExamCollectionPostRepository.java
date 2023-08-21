@@ -32,8 +32,8 @@ public class ExamCollectionPostRepository {
         //24시간 내에 조회하지 않았으면 레디스에 없음 -> 조회수 + 1
         if(!redisUtil.hasKey(viewRecordKey)){
             post.addViewCount();        //변경 감지에 의해 update
-//            redisUtil.setData(viewRecordKey, "v", 24, TimeUnit.HOURS);      //24시간 유지 -> 자동 삭제
-            redisUtil.setData(viewRecordKey, "v", 1000*8);      //8초 유지 -> 자동 삭제
+            redisUtil.setData(viewRecordKey, "v", 24, TimeUnit.HOURS);      //24시간 유지 -> 자동 삭제
+//            redisUtil.setData(viewRecordKey, "v", 1000*8);      //8초 유지 -> 자동 삭제
         }
     }
 
@@ -54,7 +54,8 @@ public class ExamCollectionPostRepository {
     }
 
     // 족보 게시물 조건에 따른 리스트 조회
-    public List<ExamCollectionPost> findAllExamCollectionPostByFilter(String subject, String professor, Integer year, Integer semester, ExamType examType){
+    public List<ExamCollectionPost> findAllExamCollectionPostByFilter(String subject, String professor, Integer year, Integer semester, ExamType examType,
+                                                                      int offset, int limit){
 
         List<ExamCollectionPost> resultList = entityManager.createQuery(
                 "select p from ExamCollectionPost p where" +
@@ -62,12 +63,15 @@ public class ExamCollectionPostRepository {
                         "(:professor is null or p.professor =: professor )" + " and " +
                         "(:year is null or p.year =: year )" + " and " +
                         "(:semester is null or p.semester =: semester )" + " and " +
-                        "(:examType is null or p.examType =: examType )", ExamCollectionPost.class)
+                        "(:examType is null or p.examType =: examType )" +
+                        "order by p.id desc", ExamCollectionPost.class)
                 .setParameter("subject", subject)
                 .setParameter("professor", professor)
                 .setParameter("year", year)
                 .setParameter("semester", semester)
                 .setParameter("examType", examType)
+                .setFirstResult(offset)
+                .setMaxResults(limit)
                 .getResultList();
 
         return resultList;

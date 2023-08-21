@@ -2,10 +2,10 @@ package NestNet.NestNetWebSite.controller.post;
 
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.post.exam.ExamType;
-import NestNet.NestNetWebSite.dto.request.ExamCollectionPostRequest;
-import NestNet.NestNetWebSite.dto.response.AttachedFileResponse;
-import NestNet.NestNetWebSite.dto.response.CommentResponse;
-import NestNet.NestNetWebSite.dto.response.ExamCollectionPostResponse;
+import NestNet.NestNetWebSite.domain.token.dto.request.ExamCollectionPostRequest;
+import NestNet.NestNetWebSite.domain.token.dto.response.AttachedFileResponse;
+import NestNet.NestNetWebSite.domain.token.dto.response.CommentResponse;
+import NestNet.NestNetWebSite.domain.token.dto.response.ExamCollectionPostResponse;
 import NestNet.NestNetWebSite.service.attachedfile.AttachedFileService;
 import NestNet.NestNetWebSite.service.comment.CommentService;
 import NestNet.NestNetWebSite.service.like.PostLikeService;
@@ -48,9 +48,10 @@ public class ExamCollectionPostController {
                                           @RequestParam(value = "professor", required = false) String professor,
                                           @RequestParam(value = "year", required = false) Integer year,
                                           @RequestParam(value = "semester", required = false) Integer semester,
-                                          @RequestParam(value = "examType", required = false) ExamType examType){
+                                          @RequestParam(value = "examType", required = false) ExamType examType,
+                                          @RequestParam("offset") int offset, @RequestParam("limit") int limit){
 
-        return examCollectionPostService.findPostByFilter(subject, professor, year, semester, examType);
+        return examCollectionPostService.findPostByFilter(subject, professor, year, semester, examType, offset, limit);
     }
 
     /*
@@ -64,7 +65,7 @@ public class ExamCollectionPostController {
 
         ExamCollectionPostResponse postDto = examCollectionPostService.findPostById(postId, userDetails.getUsername());
         List<AttachedFileResponse> fileDtoList = attachedFileService.findAllFilesByPost(postId);
-        List<CommentResponse> commentResponseList = commentService.findCommentByPost(postId);
+        List<CommentResponse> commentResponseList = commentService.findCommentByPost(postId, userDetails.getUsername());
         boolean isMemberLiked = postLikeService.isMemberLikedByPost(postId, userDetails.getUsername());
 
         result.put("post-data", postDto);
@@ -88,7 +89,7 @@ public class ExamCollectionPostController {
     /*
     좋아요 취소
      */
-    @GetMapping("/exam-collection-post/{post_id}/cancel_like")
+    @GetMapping("/exam-collection-post/{post_id}/cancel-like")
     public void dislike(@PathVariable("post_id") Long postId, @AuthenticationPrincipal UserDetails userDetails){
 
         postLikeService.cancelLike(postId, userDetails.getUsername());

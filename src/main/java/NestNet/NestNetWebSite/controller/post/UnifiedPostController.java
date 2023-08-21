@@ -2,8 +2,10 @@ package NestNet.NestNetWebSite.controller.post;
 
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.post.unified.UnifiedPostType;
-import NestNet.NestNetWebSite.dto.request.UnifiedPostRequest;
-import NestNet.NestNetWebSite.dto.response.*;
+import NestNet.NestNetWebSite.domain.token.dto.request.UnifiedPostRequest;
+import NestNet.NestNetWebSite.domain.token.dto.response.AttachedFileResponse;
+import NestNet.NestNetWebSite.domain.token.dto.response.CommentResponse;
+import NestNet.NestNetWebSite.domain.token.dto.response.UnifiedPostResponse;
 import NestNet.NestNetWebSite.service.attachedfile.AttachedFileService;
 import NestNet.NestNetWebSite.service.comment.CommentService;
 import NestNet.NestNetWebSite.service.like.PostLikeService;
@@ -59,7 +61,7 @@ public class UnifiedPostController {
 
         UnifiedPostResponse postDto = unifiedPostService.findPostById(postId, userDetails.getUsername());
         List<AttachedFileResponse> fileDtoList = attachedFileService.findAllFilesByPost(postId);
-        List<CommentResponse> commentResponseList = commentService.findCommentByPost(postId);
+        List<CommentResponse> commentResponseList = commentService.findCommentByPost(postId, userDetails.getUsername());
         boolean isMemberLiked = postLikeService.isMemberLikedByPost(postId, userDetails.getUsername());
 
         result.put("post-data", postDto);

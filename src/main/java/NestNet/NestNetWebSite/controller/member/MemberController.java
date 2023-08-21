@@ -1,12 +1,13 @@
 package NestNet.NestNetWebSite.controller.member;
 
 import NestNet.NestNetWebSite.api.ApiResult;
-import NestNet.NestNetWebSite.dto.request.MemberFindIdRequest;
-import NestNet.NestNetWebSite.dto.request.MemberGetTemporaryPwRequest;
-import NestNet.NestNetWebSite.dto.request.MemberModifyInfoRequest;
-import NestNet.NestNetWebSite.dto.request.MemberPasswordChangeRequest;
+import NestNet.NestNetWebSite.domain.token.dto.request.MemberFindIdRequest;
+import NestNet.NestNetWebSite.domain.token.dto.request.MemberGetTemporaryPwRequest;
+import NestNet.NestNetWebSite.domain.token.dto.request.MemberModifyInfoRequest;
+import NestNet.NestNetWebSite.domain.token.dto.request.MemberPasswordChangeRequest;
 import NestNet.NestNetWebSite.service.mail.MailService;
 import NestNet.NestNetWebSite.service.member.MemberService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,28 +40,28 @@ public class MemberController {
     회원 이름 + 이메일로 아이디 찾기 -> 이메일로 아이디 전송
      */
     @PostMapping("/member/find-id")
-    public ApiResult<?> findMemberId(@Valid @RequestBody MemberFindIdRequest memberFindIdRequest){
+    public ApiResult<?> findMemberId(@Valid @RequestBody MemberFindIdRequest memberFindIdRequest, HttpServletResponse response){
 
         String memberLoginId = memberService.findMemberId(memberFindIdRequest.getName(), memberFindIdRequest.getEmailAddress());
 
         if(memberLoginId == null){
-            return ApiResult.error(HttpStatus.NOT_FOUND, "일치하는 회원이 없습니다.");
+            return ApiResult.error(response, HttpStatus.NOT_FOUND, "일치하는 회원이 없습니다.");
         }
 
-        return mailService.sendEmailLoginId(memberFindIdRequest.getEmailAddress(), memberLoginId);
+        return mailService.sendEmailLoginId(response, memberFindIdRequest.getEmailAddress(), memberLoginId);
     }
 
     /*
     회원 아이디로 임시비밀번호 발급받기 -> 이메일로 임시 비밀번호 전송
     */
     @PostMapping("/member/get-temp-pw")
-    public ApiResult<?> getTemporaryPassword(@Valid @RequestBody MemberGetTemporaryPwRequest dto){
+    public ApiResult<?> getTemporaryPassword(@Valid @RequestBody MemberGetTemporaryPwRequest dto, HttpServletResponse response){
 
         Map<String, String> emailAndPw = memberService.createTemporaryPassword(dto.getLoginId());
 
         memberService.changeMemberPassword(emailAndPw.get("tempPassword"), dto.getLoginId());
 
-        return mailService.sendEmailTemporaryPassword(emailAndPw.get("email"), emailAndPw.get("tempPassword"));
+        return mailService.sendEmailTemporaryPassword(response, emailAndPw.get("email"), emailAndPw.get("tempPassword"));
     }
 
     /*

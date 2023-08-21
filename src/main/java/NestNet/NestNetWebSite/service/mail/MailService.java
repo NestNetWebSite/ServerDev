@@ -3,6 +3,7 @@ package NestNet.NestNetWebSite.service.mail;
 import NestNet.NestNetWebSite.api.ApiResult;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -22,7 +23,7 @@ public class MailService {
     /*
     아이디를 이메일로 전송
      */
-    public ApiResult<?> sendEmailLoginId(String email, String loginId){
+    public ApiResult<?> sendEmailLoginId(HttpServletResponse response, String email, String loginId){
 
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper;
@@ -48,7 +49,7 @@ public class MailService {
 
         } catch (MessagingException e){
             e.printStackTrace();
-            return ApiResult.error(HttpStatus.INTERNAL_SERVER_ERROR, "서버에서 이메일 전송을 실패하였습니다. 관리자에게 문의하세요");
+            return ApiResult.error(response, HttpStatus.INTERNAL_SERVER_ERROR, "서버에서 이메일 전송을 실패하였습니다. 관리자에게 문의하세요");
         }
 
         return ApiResult.success(email + " 에게 이메일을 전송하였습니다.");
@@ -57,7 +58,7 @@ public class MailService {
     /*
     임시 비밀번호를 이메일로 전송
      */
-    public ApiResult<?> sendEmailTemporaryPassword(String email, String password){
+    public ApiResult<?> sendEmailTemporaryPassword(HttpServletResponse response, String email, String password){
 
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper;
@@ -83,7 +84,7 @@ public class MailService {
 
         } catch (MessagingException e){
             e.printStackTrace();
-            return ApiResult.error(HttpStatus.INTERNAL_SERVER_ERROR, "서버에서 이메일 전송을 실패하였습니다. 관리자에게 문의하세요");
+            return ApiResult.error(response, HttpStatus.INTERNAL_SERVER_ERROR, "서버에서 이메일 전송을 실패하였습니다. 관리자에게 문의하세요");
         }
         return ApiResult.success(email + " 에게 이메일을 전송하였습니다.");
     }

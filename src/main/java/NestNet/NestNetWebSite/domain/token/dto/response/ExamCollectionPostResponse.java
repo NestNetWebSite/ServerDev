@@ -1,9 +1,12 @@
-package NestNet.NestNetWebSite.dto.response;
+package NestNet.NestNetWebSite.domain.token.dto.response;
 
 import NestNet.NestNetWebSite.domain.post.exam.ExamType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.cglib.core.Local;
+
+import java.time.LocalDateTime;
 
 /**
  * 족보 게시물 하나에 들어가는 데이터
@@ -24,4 +27,6 @@ public class ExamCollectionPostResponse {
     private int semester;
     private ExamType examType;
     private String userName;
+    private LocalDateTime createdTime;
+    private LocalDateTime modifiedTime;
 }

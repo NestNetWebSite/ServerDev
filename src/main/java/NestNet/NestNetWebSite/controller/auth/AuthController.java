@@ -2,14 +2,15 @@ package NestNet.NestNetWebSite.controller.auth;
 
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.config.auth.CustomAuthorizationFilter;
-import NestNet.NestNetWebSite.dto.request.LoginRequest;
-import NestNet.NestNetWebSite.dto.request.RefreshtokenRequest;
-import NestNet.NestNetWebSite.dto.request.SignUpRequest;
-import NestNet.NestNetWebSite.dto.response.TokenResponse;
+import NestNet.NestNetWebSite.domain.token.dto.request.LoginRequest;
+import NestNet.NestNetWebSite.domain.token.dto.request.RefreshtokenRequest;
+import NestNet.NestNetWebSite.domain.token.dto.request.SignUpRequest;
+import NestNet.NestNetWebSite.domain.token.dto.response.TokenResponse;
 import NestNet.NestNetWebSite.service.auth.AuthService;
 import NestNet.NestNetWebSite.service.token.RefreshTokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,11 +41,11 @@ public class AuthController {
      */
     @Operation(summary = "회원가입 요청", description = "파라미터로 회원가입 폼 받음")
     @PostMapping("/auth/signup")
-    public ApiResult<?> signUp(@Valid @RequestBody SignUpRequest signUpRequest){
+    public ApiResult<?> signUp(@Valid @RequestBody SignUpRequest signUpRequest, HttpServletResponse response){
 
         log.info("회원가입 컨트롤러 동작");
 
-        ApiResult<?> apiResult = authService.sendSignUpRequest(signUpRequest);
+        ApiResult<?> apiResult = authService.sendSignUpRequest(signUpRequest, response);
 
         return apiResult;
     }
@@ -81,9 +82,9 @@ public class AuthController {
     로그아웃
      */
     @GetMapping("/auth/logout")
-    public ApiResult<?> logout(@AuthenticationPrincipal UserDetails userDetails, HttpServletRequest request){
+    public ApiResult<?> logout(HttpServletRequest request, HttpServletResponse response){
 
-        return authService.logout(request);
+        return authService.logout(request, response);
     }
 
 }

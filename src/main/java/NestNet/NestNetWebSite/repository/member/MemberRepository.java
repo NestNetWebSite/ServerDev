@@ -2,6 +2,7 @@ package NestNet.NestNetWebSite.repository.member;
 
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.member.MemberAuthority;
+import NestNet.NestNetWebSite.domain.post.exam.ExamCollectionPost;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.TypedQuery;
@@ -60,8 +61,13 @@ public class MemberRepository {
     }
 
     // 모든 회원 조회
-    public List<Member> findAllMember(){
-        return entityManager.createQuery("select m from Member m", Member.class)
+    public List<Member> findAllMember(String name, MemberAuthority memberAuthority){
+        return entityManager.createQuery("select m from Member m where m.name <> '알수없음'" + " and " +
+                        "(:name is null or m.name =: name)" + " and " +
+                        "(:memberAuthority is null or m.memberAuthority =: memberAuthority)", Member.class)
+                .setParameter("name", name)
+                .setParameter("memberAuthority", memberAuthority)
                 .getResultList();
     }
+
 }

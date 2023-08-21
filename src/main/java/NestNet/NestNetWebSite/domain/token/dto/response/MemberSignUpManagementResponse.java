@@ -1,4 +1,4 @@
-package NestNet.NestNetWebSite.dto.response;
+package NestNet.NestNetWebSite.domain.token.dto.response;
 
 import NestNet.NestNetWebSite.domain.member.MemberAuthority;
 import lombok.AllArgsConstructor;
@@ -11,7 +11,9 @@ import lombok.Getter;
 public class MemberSignUpManagementResponse {
 
     private String name;
-    private String studentId;
     private String loginId;
+    private String studentId;
+    private int grade;
+    private int graduateYear;
     private MemberAuthority memberAuthority;
 }

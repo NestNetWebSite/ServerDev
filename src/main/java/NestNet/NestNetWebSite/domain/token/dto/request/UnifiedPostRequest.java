@@ -1,4 +1,4 @@
-package NestNet.NestNetWebSite.dto.request;
+package NestNet.NestNetWebSite.domain.token.dto.request;
 
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.post.unified.UnifiedPost;

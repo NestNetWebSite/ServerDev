@@ -1,8 +1,9 @@
 package NestNet.NestNetWebSite.controller.manager;
 
 import NestNet.NestNetWebSite.api.ApiResult;
-import NestNet.NestNetWebSite.dto.request.MemberChangeAuthorityRequest;
-import NestNet.NestNetWebSite.dto.request.MemberSignUpManagementRequest;
+import NestNet.NestNetWebSite.domain.member.MemberAuthority;
+import NestNet.NestNetWebSite.domain.token.dto.request.MemberChangeAuthorityRequest;
+import NestNet.NestNetWebSite.domain.token.dto.request.MemberSignUpManagementRequest;
 import NestNet.NestNetWebSite.service.manager.ManagerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,7 @@ public class ManagerController {
     /*
     회원가입 요청 조회
      */
-    @GetMapping("/manager/singup-request")
+    @GetMapping("/manager/signup-request")
     public ApiResult<?> showSignUpRequests(){
 
         return managerService.findAllRequests();
@@ -45,9 +46,10 @@ public class ManagerController {
     회원 정보 조회
      */
     @GetMapping("/manager/member-info")
-    public ApiResult<?> showMemberInfo(){
+    public ApiResult<?> showMemberInfo(@RequestParam(value = "name", required = false) String name,
+                                       @RequestParam(value = "memberAuthority", required = false) MemberAuthority memberAuthority){
 
-        return managerService.findAllMemberInfo();
+        return managerService.findAllMemberInfo(name, memberAuthority);
     }
 
     /*

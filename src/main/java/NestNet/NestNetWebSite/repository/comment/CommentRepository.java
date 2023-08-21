@@ -19,6 +19,11 @@ public class CommentRepository {
         entityManager.persist(comment);
     }
 
+    // 수정
+    public void modify(Comment comment, String content){
+        comment.modifyContent(content);
+    }
+
     //=========================================조회=========================================//
     // id(PK)로 단건 조회
     public Comment findById(Long id){
@@ -33,5 +38,12 @@ public class CommentRepository {
                 .getResultList();
 
         return comments;
+    }
+
+    //====================================================================================//
+
+    // 삭제
+    public void delete(Comment comment){
+        entityManager.remove(comment);
     }
 }

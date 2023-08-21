@@ -2,7 +2,7 @@ package NestNet.NestNetWebSite.service.member;
 
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.member.Member;
-import NestNet.NestNetWebSite.dto.request.MemberModifyInfoRequest;
+import NestNet.NestNetWebSite.domain.token.dto.request.MemberModifyInfoRequest;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

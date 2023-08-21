@@ -5,9 +5,9 @@ import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.post.exam.ExamCollectionPost;
 import NestNet.NestNetWebSite.domain.post.exam.ExamType;
-import NestNet.NestNetWebSite.dto.request.ExamCollectionPostRequest;
-import NestNet.NestNetWebSite.dto.response.ExamCollectionPostResponse;
-import NestNet.NestNetWebSite.dto.response.ExamCollectionPostListResponse;
+import NestNet.NestNetWebSite.domain.token.dto.request.ExamCollectionPostRequest;
+import NestNet.NestNetWebSite.domain.token.dto.response.ExamCollectionPostResponse;
+import NestNet.NestNetWebSite.domain.token.dto.response.ExamCollectionPostListResponse;
 import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import NestNet.NestNetWebSite.repository.post.ExamCollectionPostRepository;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
@@ -52,9 +52,9 @@ public class ExamCollectionPostService {
     /*
     필터에 따른 족보 리스트 조희
      */
-    public ApiResult<?> findPostByFilter(String subject, String professor, Integer year, Integer semester, ExamType examType){
+    public ApiResult<?> findPostByFilter(String subject, String professor, Integer year, Integer semester, ExamType examType, int offset, int limit){
 
-        List<ExamCollectionPost> posts = examCollectionPostRepository.findAllExamCollectionPostByFilter(subject, professor, year, semester, examType);
+        List<ExamCollectionPost> posts = examCollectionPostRepository.findAllExamCollectionPostByFilter(subject, professor, year, semester, examType, offset, limit);
 
         List<ExamCollectionPostListResponse> resultList = new ArrayList<>();
         for(ExamCollectionPost post : posts){
@@ -94,6 +94,8 @@ public class ExamCollectionPostService {
                 .semester(post.getSemester())
                 .examType(post.getExamType())
                 .userName(post.getMember().getName())
+                .createdTime(post.getCreatedTime())
+                .modifiedTime(post.getModifiedTime())
                 .build();
     }
 

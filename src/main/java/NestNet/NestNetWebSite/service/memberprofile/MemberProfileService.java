@@ -3,8 +3,8 @@ package NestNet.NestNetWebSite.service.memberprofile;
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.post.Post;
-import NestNet.NestNetWebSite.dto.response.MemberProfileMemberInfoResponse;
-import NestNet.NestNetWebSite.dto.response.PostTitleResponse;
+import NestNet.NestNetWebSite.domain.token.dto.response.MemberProfileMemberInfoResponse;
+import NestNet.NestNetWebSite.domain.token.dto.response.PostTitleResponse;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import NestNet.NestNetWebSite.repository.post.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,9 +25,9 @@ public class MemberProfileService {
     /*
     회원 프로필 조회
      */
-    public ApiResult<?> findMemberInfoById(Long id){
+    public ApiResult<?> findMemberInfoById(String loginId){
 
-        Member member = memberRepository.findById(id);
+        Member member = memberRepository.findByLoginId(loginId);
 
         MemberProfileMemberInfoResponse memberInfoDto = new MemberProfileMemberInfoResponse(member.getLoginId(), member.getName(),
                 member.getEmailAddress(), member.getMemberAuthority(), member.getGrade(), member.getGraduateYear());

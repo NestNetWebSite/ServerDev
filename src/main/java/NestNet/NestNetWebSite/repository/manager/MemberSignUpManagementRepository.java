@@ -21,6 +21,7 @@ public class MemberSignUpManagementRepository {
 
     // 회원가입 요청 모두 조회
     public List<MemberSignUpManagement> findAll(){
+
         List<MemberSignUpManagement> resultList = entityManager.createQuery(
                 "select mr from  MemberSignUpManagement mr where mr.isComplete = false",
                         MemberSignUpManagement.class)
