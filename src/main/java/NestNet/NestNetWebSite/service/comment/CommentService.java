@@ -70,7 +70,7 @@ public class CommentService {
                                 .username(comment.getMember().getName())
                                 .content(comment.getContent())
                                 .createdTime(comment.getCreatedTime())
-                                .isMemberWitten(true)
+                                .isMemberWritten(true)
                                 .build());
             }
             else{
@@ -80,7 +80,7 @@ public class CommentService {
                                 .username(comment.getMember().getName())
                                 .content(comment.getContent())
                                 .createdTime(comment.getCreatedTime())
-                                .isMemberWitten(false)
+                                .isMemberWritten(false)
                                 .build());
             }
         }
