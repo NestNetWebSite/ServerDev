@@ -1,10 +1,10 @@
 package NestNet.NestNetWebSite.controller.post;
 
 import NestNet.NestNetWebSite.api.ApiResult;
-import NestNet.NestNetWebSite.domain.token.dto.request.PhotoPostRequest;
-import NestNet.NestNetWebSite.domain.token.dto.response.AttachedFileResponse;
-import NestNet.NestNetWebSite.domain.token.dto.response.CommentResponse;
-import NestNet.NestNetWebSite.domain.token.dto.response.PhotoPostResponse;
+import NestNet.NestNetWebSite.dto.request.PhotoPostRequest;
+import NestNet.NestNetWebSite.dto.response.AttachedFileResponse;
+import NestNet.NestNetWebSite.dto.response.CommentResponse;
+import NestNet.NestNetWebSite.dto.response.PhotoPostResponse;
 import NestNet.NestNetWebSite.service.attachedfile.AttachedFileService;
 import NestNet.NestNetWebSite.service.comment.CommentService;
 import NestNet.NestNetWebSite.service.like.PostLikeService;

@@ -3,7 +3,7 @@ package NestNet.NestNetWebSite.service.post;
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.domain.post.photo.ThumbNail;
-import NestNet.NestNetWebSite.domain.token.dto.response.ThumbNailResponse;
+import NestNet.NestNetWebSite.dto.response.ThumbNailResponse;
 import NestNet.NestNetWebSite.repository.post.ThumbNailRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;

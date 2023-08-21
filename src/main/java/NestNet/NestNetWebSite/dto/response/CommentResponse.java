@@ -1,4 +1,4 @@
-package NestNet.NestNetWebSite.domain.token.dto.response;
+package NestNet.NestNetWebSite.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,5 +15,5 @@ public class CommentResponse {
     String username;
     String content;
     LocalDateTime createdTime;
-    boolean isMemberWitten;
+    boolean isMemberWritten;
 }

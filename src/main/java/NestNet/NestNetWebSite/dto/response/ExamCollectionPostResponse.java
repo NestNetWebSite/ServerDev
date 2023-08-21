@@ -1,4 +1,4 @@
-package NestNet.NestNetWebSite.domain.token.dto.response;
+package NestNet.NestNetWebSite.dto.response;
 
 import NestNet.NestNetWebSite.domain.post.exam.ExamType;
 import lombok.AllArgsConstructor;

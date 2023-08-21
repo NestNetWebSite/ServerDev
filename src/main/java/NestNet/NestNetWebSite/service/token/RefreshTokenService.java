@@ -2,8 +2,8 @@ package NestNet.NestNetWebSite.service.token;
 
 import NestNet.NestNetWebSite.config.redis.RedisUtil;
 import NestNet.NestNetWebSite.domain.token.RefreshToken;
-import NestNet.NestNetWebSite.domain.token.dto.request.RefreshtokenRequest;
-import NestNet.NestNetWebSite.domain.token.dto.response.RefreshTokenResponse;
+import NestNet.NestNetWebSite.dto.request.RefreshtokenRequest;
+import NestNet.NestNetWebSite.dto.response.RefreshTokenResponse;
 import NestNet.NestNetWebSite.repository.token.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

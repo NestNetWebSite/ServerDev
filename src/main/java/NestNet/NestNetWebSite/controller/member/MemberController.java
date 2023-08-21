@@ -1,10 +1,10 @@
 package NestNet.NestNetWebSite.controller.member;
 
 import NestNet.NestNetWebSite.api.ApiResult;
-import NestNet.NestNetWebSite.domain.token.dto.request.MemberFindIdRequest;
-import NestNet.NestNetWebSite.domain.token.dto.request.MemberGetTemporaryPwRequest;
-import NestNet.NestNetWebSite.domain.token.dto.request.MemberModifyInfoRequest;
-import NestNet.NestNetWebSite.domain.token.dto.request.MemberPasswordChangeRequest;
+import NestNet.NestNetWebSite.dto.request.MemberFindIdRequest;
+import NestNet.NestNetWebSite.dto.request.MemberGetTemporaryPwRequest;
+import NestNet.NestNetWebSite.dto.request.MemberModifyInfoRequest;
+import NestNet.NestNetWebSite.dto.request.MemberPasswordChangeRequest;
 import NestNet.NestNetWebSite.service.mail.MailService;
 import NestNet.NestNetWebSite.service.member.MemberService;
 import jakarta.servlet.http.HttpServletResponse;

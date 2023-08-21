@@ -2,10 +2,10 @@ package NestNet.NestNetWebSite.controller.post;
 
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.post.exam.ExamType;
-import NestNet.NestNetWebSite.domain.token.dto.request.ExamCollectionPostRequest;
-import NestNet.NestNetWebSite.domain.token.dto.response.AttachedFileResponse;
-import NestNet.NestNetWebSite.domain.token.dto.response.CommentResponse;
-import NestNet.NestNetWebSite.domain.token.dto.response.ExamCollectionPostResponse;
+import NestNet.NestNetWebSite.dto.request.ExamCollectionPostRequest;
+import NestNet.NestNetWebSite.dto.response.AttachedFileResponse;
+import NestNet.NestNetWebSite.dto.response.CommentResponse;
+import NestNet.NestNetWebSite.dto.response.ExamCollectionPostResponse;
 import NestNet.NestNetWebSite.service.attachedfile.AttachedFileService;
 import NestNet.NestNetWebSite.service.comment.CommentService;
 import NestNet.NestNetWebSite.service.like.PostLikeService;

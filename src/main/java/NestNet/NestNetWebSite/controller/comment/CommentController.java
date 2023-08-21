@@ -1,6 +1,6 @@
 package NestNet.NestNetWebSite.controller.comment;
 
-import NestNet.NestNetWebSite.domain.token.dto.request.CommentRequest;
+import NestNet.NestNetWebSite.dto.request.CommentRequest;
 import NestNet.NestNetWebSite.service.comment.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

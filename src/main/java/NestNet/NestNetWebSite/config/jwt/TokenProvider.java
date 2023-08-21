@@ -1,6 +1,6 @@
 package NestNet.NestNetWebSite.config.jwt;
 
-import NestNet.NestNetWebSite.domain.token.dto.response.RefreshTokenResponse;
+import NestNet.NestNetWebSite.dto.response.RefreshTokenResponse;
 import NestNet.NestNetWebSite.service.member.CustomUserDetailsService;
 import NestNet.NestNetWebSite.service.token.RefreshTokenService;
 import io.jsonwebtoken.*;

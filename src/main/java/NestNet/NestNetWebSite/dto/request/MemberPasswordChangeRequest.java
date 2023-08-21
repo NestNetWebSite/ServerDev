@@ -1,4 +1,4 @@
-package NestNet.NestNetWebSite.domain.token.dto.request;
+package NestNet.NestNetWebSite.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,9 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginRequest {
+public class MemberPasswordChangeRequest {
 
-    private String loginId;
     private String password;
-
 }

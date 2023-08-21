@@ -1,4 +1,4 @@
-package NestNet.NestNetWebSite.domain.token.dto.response;
+package NestNet.NestNetWebSite.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

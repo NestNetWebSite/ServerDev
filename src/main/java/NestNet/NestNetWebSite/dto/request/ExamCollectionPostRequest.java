@@ -1,4 +1,4 @@
-package NestNet.NestNetWebSite.domain.token.dto.request;
+package NestNet.NestNetWebSite.dto.request;
 
 import NestNet.NestNetWebSite.domain.post.PostCategory;
 import NestNet.NestNetWebSite.domain.post.exam.ExamCollectionPost;

@@ -2,10 +2,10 @@ package NestNet.NestNetWebSite.controller.auth;
 
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.config.auth.CustomAuthorizationFilter;
-import NestNet.NestNetWebSite.domain.token.dto.request.LoginRequest;
-import NestNet.NestNetWebSite.domain.token.dto.request.RefreshtokenRequest;
-import NestNet.NestNetWebSite.domain.token.dto.request.SignUpRequest;
-import NestNet.NestNetWebSite.domain.token.dto.response.TokenResponse;
+import NestNet.NestNetWebSite.dto.request.LoginRequest;
+import NestNet.NestNetWebSite.dto.request.RefreshtokenRequest;
+import NestNet.NestNetWebSite.dto.request.SignUpRequest;
+import NestNet.NestNetWebSite.dto.response.TokenResponse;
 import NestNet.NestNetWebSite.service.auth.AuthService;
 import NestNet.NestNetWebSite.service.token.RefreshTokenService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,8 +16,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
