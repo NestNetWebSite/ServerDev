@@ -73,6 +73,10 @@ public class PhotoPostController {
     }
 
     /*
+    사진 게시물 수정
+     */
+
+    /*
     좋아요 누름
      */
     @GetMapping("/photo-post/{post_id}/like")

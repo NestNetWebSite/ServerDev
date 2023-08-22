@@ -29,4 +29,5 @@ public class ExamCollectionPostResponse {
     private String userName;
     private LocalDateTime createdTime;
     private LocalDateTime modifiedTime;
+    boolean isMemberWritten;
 }

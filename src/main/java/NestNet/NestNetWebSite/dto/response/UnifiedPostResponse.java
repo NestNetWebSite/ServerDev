@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @AllArgsConstructor
 @Builder
@@ -17,4 +19,7 @@ public class UnifiedPostResponse {
     private int likeCount;
     private UnifiedPostType unifiedPostType;
     private String userName;
+    private LocalDateTime createdTime;
+    private LocalDateTime modifiedTime;
+    boolean isMemberWritten;
 }

@@ -82,21 +82,42 @@ public class ExamCollectionPostService {
         ExamCollectionPost post = examCollectionPostRepository.findById(id);
         examCollectionPostRepository.addViewCount(post, memberLoginId);
 
-        return ExamCollectionPostResponse.builder()
-                .id(post.getId())
-                .title(post.getTitle())
-                .bodyContent(post.getBodyContent())
-                .viewCount(post.getViewCount())
-                .likeCount(post.getLikeCount())
-                .subject(post.getSubject())
-                .professor(post.getProfessor())
-                .year(post.getYear())
-                .semester(post.getSemester())
-                .examType(post.getExamType())
-                .userName(post.getMember().getName())
-                .createdTime(post.getCreatedTime())
-                .modifiedTime(post.getModifiedTime())
-                .build();
+        if(memberLoginId.equals(post.getMember().getLoginId())){
+            return ExamCollectionPostResponse.builder()
+                    .id(post.getId())
+                    .title(post.getTitle())
+                    .bodyContent(post.getBodyContent())
+                    .viewCount(post.getViewCount())
+                    .likeCount(post.getLikeCount())
+                    .subject(post.getSubject())
+                    .professor(post.getProfessor())
+                    .year(post.getYear())
+                    .semester(post.getSemester())
+                    .examType(post.getExamType())
+                    .userName(post.getMember().getName())
+                    .createdTime(post.getCreatedTime())
+                    .modifiedTime(post.getModifiedTime())
+                    .isMemberWritten(true)
+                    .build();
+        }
+        else{
+            return ExamCollectionPostResponse.builder()
+                    .id(post.getId())
+                    .title(post.getTitle())
+                    .bodyContent(post.getBodyContent())
+                    .viewCount(post.getViewCount())
+                    .likeCount(post.getLikeCount())
+                    .subject(post.getSubject())
+                    .professor(post.getProfessor())
+                    .year(post.getYear())
+                    .semester(post.getSemester())
+                    .examType(post.getExamType())
+                    .userName(post.getMember().getName())
+                    .createdTime(post.getCreatedTime())
+                    .modifiedTime(post.getModifiedTime())
+                    .isMemberWritten(false)
+                    .build();
+        }
     }
 
     /*

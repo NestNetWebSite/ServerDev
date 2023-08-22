@@ -65,8 +65,32 @@ public class PhotoPostService {
         PhotoPost post = photoPostRepository.findById(id);
         photoPostRepository.addViewCount(post, memberLoginId);
 
-        return new PhotoPostResponse(post.getId(), post.getTitle(),
-                post.getBodyContent(), post.getViewCount(), post.getLikeCount(), post.getMember().getName());
+        if(memberLoginId.equals(post.getMember().getLoginId())){
+            return PhotoPostResponse.builder()
+                    .id(post.getId())
+                    .title(post.getTitle())
+                    .bodyContent(post.getBodyContent())
+                    .viewCount(post.getViewCount())
+                    .likeCount(post.getLikeCount())
+                    .username(post.getMember().getName())
+                    .createdTime(post.getCreatedTime())
+                    .modifiedTime(post.getModifiedTime())
+                    .isMemberWritten(true)
+                    .build();
+        }
+        else{
+            return PhotoPostResponse.builder()
+                    .id(post.getId())
+                    .title(post.getTitle())
+                    .bodyContent(post.getBodyContent())
+                    .viewCount(post.getViewCount())
+                    .likeCount(post.getLikeCount())
+                    .username(post.getMember().getName())
+                    .createdTime(post.getCreatedTime())
+                    .modifiedTime(post.getModifiedTime())
+                    .isMemberWritten(false)
+                    .build();
+        }
     }
 
     /*

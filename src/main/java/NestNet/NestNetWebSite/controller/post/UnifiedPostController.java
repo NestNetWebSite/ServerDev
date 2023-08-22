@@ -73,6 +73,10 @@ public class UnifiedPostController {
     }
 
     /*
+    통합 게시물 수정
+     */
+
+    /*
     좋아요 누름
      */
     @GetMapping("/unified-post/{post_id}/like")

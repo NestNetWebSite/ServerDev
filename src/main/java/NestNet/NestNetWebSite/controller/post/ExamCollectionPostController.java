@@ -77,6 +77,10 @@ public class ExamCollectionPostController {
     }
 
     /*
+    족보 게시물 수정
+     */
+
+    /*
     좋아요 누름
      */
     @GetMapping("/exam-collection-post/{post_id}/like")

@@ -75,15 +75,34 @@ public class UnifiedPostService {
         UnifiedPost post = unifiedPostRepository.findById(id);
         unifiedPostRepository.addViewCount(post, memberLoginId);
 
-        return UnifiedPostResponse.builder()
-                .id(post.getId())
-                .title(post.getTitle())
-                .bodyContent(post.getBodyContent())
-                .viewCount(post.getViewCount())
-                .likeCount(post.getLikeCount())
-                .unifiedPostType(post.getUnifiedPostType())
-                .userName(post.getMember().getName())
-                .build();
+        if(memberLoginId.equals(post.getMember().getLoginId())){
+            return UnifiedPostResponse.builder()
+                    .id(post.getId())
+                    .title(post.getTitle())
+                    .bodyContent(post.getBodyContent())
+                    .viewCount(post.getViewCount())
+                    .likeCount(post.getLikeCount())
+                    .unifiedPostType(post.getUnifiedPostType())
+                    .userName(post.getMember().getName())
+                    .createdTime(post.getCreatedTime())
+                    .modifiedTime(post.getModifiedTime())
+                    .isMemberWritten(true)
+                    .build();
+        }
+        else{
+            return UnifiedPostResponse.builder()
+                    .id(post.getId())
+                    .title(post.getTitle())
+                    .bodyContent(post.getBodyContent())
+                    .viewCount(post.getViewCount())
+                    .likeCount(post.getLikeCount())
+                    .unifiedPostType(post.getUnifiedPostType())
+                    .userName(post.getMember().getName())
+                    .createdTime(post.getCreatedTime())
+                    .modifiedTime(post.getModifiedTime())
+                    .isMemberWritten(true)
+                    .build();
+        }
     }
 
     /*
