@@ -29,11 +29,10 @@ public class ExamCollectionPostRepository {
 
         String viewRecordKey = memberLoginId + "_" +  post.getId().toString();     //사용자아이디 + 게시물 id
 
-        //24시간 내에 조회하지 않았으면 레디스에 없음 -> 조회수 + 1
+        //24시간 내에 다시 조회해도 조회수 올라가지 않음 (조회하지 않았으면 레디스에 없음 -> 조회수 + 1)
         if(!redisUtil.hasKey(viewRecordKey)){
             post.addViewCount();        //변경 감지에 의해 update
             redisUtil.setData(viewRecordKey, "v", 24, TimeUnit.HOURS);      //24시간 유지 -> 자동 삭제
-//            redisUtil.setData(viewRecordKey, "v", 1000*8);      //8초 유지 -> 자동 삭제
         }
     }
 
@@ -80,7 +79,7 @@ public class ExamCollectionPostRepository {
     // 족보 게시물 모두 조회
     public List<ExamCollectionPost> findAllExamCollectionPost(){
 
-        List<ExamCollectionPost> resultList = entityManager.createQuery("select p from ExamCollectionPost p", ExamCollectionPost.class)
+        List<ExamCollectionPost> resultList = entityManager.createQuery("select p from ExamCollectionPost p order by p.id desc", ExamCollectionPost.class)
                 .getResultList();
 
         return resultList;
@@ -89,7 +88,7 @@ public class ExamCollectionPostRepository {
     // 족보 게시물 개수 제한에 따른 리스트 조회
     public List<ExamCollectionPost> findExamCollectionPostLimit(int offset, int limit){
 
-        List<ExamCollectionPost> resultList = entityManager.createQuery("select p from ExamCollectionPost p", ExamCollectionPost.class)
+        List<ExamCollectionPost> resultList = entityManager.createQuery("select p from ExamCollectionPost p order by p.id desc", ExamCollectionPost.class)
                 .setFirstResult(offset)
                 .setMaxResults(limit)
                 .getResultList();

@@ -10,6 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.swing.text.html.Option;
+import java.util.Optional;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -65,6 +68,10 @@ public class PostLikeService {
         Post post = findPost(postId);
         Member member = memberRepository.findByLoginId(memberLoginId);
 
-        postLikeRepository.delete(post, member);
+        Optional<PostLike> postLike = postLikeRepository.findByMemberAndPost(member, post);
+
+        if(postLike.isPresent()){
+            postLikeRepository.delete(postLike.get());
+        }
     }
 }

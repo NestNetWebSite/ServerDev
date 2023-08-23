@@ -79,16 +79,8 @@ public class MemberController {
      */
     @GetMapping("/member/withdraw")
     public ApiResult<?> withdrawMember(@AuthenticationPrincipal UserDetails userDetails){
+
         return memberService.withDrawMember(userDetails.getUsername());
     }
-
-    /*
-    테스트용
-     */
-    @GetMapping("/member/test")
-    public ApiResult<?> test(){
-        return ApiResult.success("테스트 성공");
-    }
-
 
 }

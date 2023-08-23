@@ -11,7 +11,9 @@ import NestNet.NestNetWebSite.dto.response.ExamCollectionPostListResponse;
 import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import NestNet.NestNetWebSite.repository.post.ExamCollectionPostRepository;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,7 +34,8 @@ public class ExamCollectionPostService {
     족보 게시판에 게시물 저장
      */
     @Transactional
-    public void savePost(ExamCollectionPostRequest examCollectionPostRequest, List<MultipartFile> files, String memberLoginId){
+    public ApiResult<?> savePost(ExamCollectionPostRequest examCollectionPostRequest, List<MultipartFile> files,
+                         String memberLoginId, HttpServletResponse response){
 
         Member member = memberRepository.findByLoginId(memberLoginId);
 
@@ -46,7 +49,13 @@ public class ExamCollectionPostService {
         }
 
         examCollectionPostRepository.save(post);
-        attachedFileRepository.saveAll(attachedFileList, files);
+        boolean isFileSaved = attachedFileRepository.saveAll(attachedFileList, files);
+
+        if(isFileSaved == false){
+            return ApiResult.error(response, HttpStatus.INTERNAL_SERVER_ERROR, "파일 저장 실패");
+        }
+
+        return ApiResult.success("게시물 저장 성공");
     }
 
     /*

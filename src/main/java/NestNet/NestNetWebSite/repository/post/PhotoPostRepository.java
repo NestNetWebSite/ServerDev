@@ -34,11 +34,10 @@ public class PhotoPostRepository {
 
         String viewRecordKey = memberLoginId + "_" + post.getId().toString();     //사용자아이디 + 게시물 id
 
-        //24시간 내에 조회하지 않았으면 레디스에 없음 -> 조회수 + 1
+        //24시간 내에 다시 조회해도 조회수 올라가지 않음 (조회하지 않았으면 레디스에 없음 -> 조회수 + 1)
         if(!redisUtil.hasKey(viewRecordKey)){
             post.addViewCount();        //변경 감지에 의해 update
             redisUtil.setData(viewRecordKey, "v", 24, TimeUnit.HOURS);      //24시간 유지 -> 자동 삭제
-//            redisUtil.setData(viewRecordKey, "v", 1000*8);      //8초 유지 -> 자동 삭제
         }
     }
 
@@ -61,7 +60,7 @@ public class PhotoPostRepository {
     // 사진 게시판 리스트 조회(페이징)
     public List<PhotoPost> findAllPhotoPostByPaging(int offset, int limit){
 
-        return entityManager.createQuery("select p from PhotoPost p", PhotoPost.class)
+        return entityManager.createQuery("select p from PhotoPost p order by p.id desc", PhotoPost.class)
                 .setFirstResult(offset)
                 .setMaxResults(limit)
                 .getResultList();

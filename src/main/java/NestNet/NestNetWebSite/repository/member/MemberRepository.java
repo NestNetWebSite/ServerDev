@@ -5,6 +5,7 @@ import NestNet.NestNetWebSite.domain.member.MemberAuthority;
 import NestNet.NestNetWebSite.domain.post.exam.ExamCollectionPost;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EnumType;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -22,6 +23,8 @@ public class MemberRepository {
     public void save(Member member){
         entityManager.persist(member);
     }
+
+    //=========================================조회=========================================//
 
     // Id(PK)로 회원 단건 조회
     public Member findById(Long id){
@@ -45,16 +48,21 @@ public class MemberRepository {
     // 이름 + 이메일로 회원 단건 조회
     public Optional<Member> findByNameAndEmail(String name, String emailAddress){
 
-        List<Member> member = entityManager.createQuery("select m from Member m where m.name =: name and m.emailAddress =: emailAddress", Member.class)
-                .setParameter("name", name)
-                .setParameter("emailAddress", emailAddress)
-                .getResultList();
+        try{
+            Member member = entityManager.createQuery("select m from Member m where m.name =: name and m.emailAddress =: emailAddress", Member.class)
+                    .setParameter("name", name)
+                    .setParameter("emailAddress", emailAddress)
+                    .getSingleResult();
 
-        return member.stream().findAny();
+            return Optional.ofNullable(member);
+        } catch (NoResultException e){
+            return Optional.empty();
+        }
     }
 
     // 권한으로 회원 조회
     public List<Member> findByAuthority(MemberAuthority memberAuthority){
+
         return entityManager.createQuery("select m from Member m where m.memberAuthority =: memberAuthority", Member.class)
                 .setParameter("memberAuthority", memberAuthority)
                 .getResultList();
@@ -70,4 +78,5 @@ public class MemberRepository {
                 .getResultList();
     }
 
+    //====================================================================================//
 }

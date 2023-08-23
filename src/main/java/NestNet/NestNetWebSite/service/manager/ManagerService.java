@@ -9,12 +9,15 @@ import NestNet.NestNetWebSite.dto.response.MemberInfoResponse;
 import NestNet.NestNetWebSite.dto.response.MemberSignUpManagementResponse;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import NestNet.NestNetWebSite.repository.manager.MemberSignUpManagementRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -44,13 +47,18 @@ public class ManagerService {
     회원 가입 요청 승인
      */
     @Transactional
-    public ApiResult<?> approveSignUp(MemberSignUpManagementRequest dto){
+    public ApiResult<?> approveSignUp(MemberSignUpManagementRequest dto, HttpServletResponse response){
 
         Member member = memberRepository.findByLoginId(dto.getLoginId());
         member.changeAuthority(dto.getMemberAuthority());         //권한 설정
-        memberSignUpManagementRepository.findByMember(member).setComplete(true);
+        Optional<MemberSignUpManagement> memberSignUpManagement = memberSignUpManagementRepository.findByMember(member);
 
-        System.out.println("여기여기여기여긱여기");
+        if(memberSignUpManagement.isPresent()){
+            memberSignUpManagement.get().setComplete(true);
+        }
+        else{
+            return ApiResult.error(response, HttpStatus.INTERNAL_SERVER_ERROR, "회원가입 요청을 찾을 수 없습니다.");
+        }
 
         memberRepository.save(member);
 

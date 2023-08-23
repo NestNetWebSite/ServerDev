@@ -1,5 +1,6 @@
 package NestNet.NestNetWebSite.service.post;
 
+import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.post.photo.PhotoPost;
@@ -10,7 +11,9 @@ import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import NestNet.NestNetWebSite.repository.post.PhotoPostRepository;
 import NestNet.NestNetWebSite.repository.post.ThumbNailRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,7 +35,8 @@ public class PhotoPostService {
     사진 게시판에 게시물 저장
      */
     @Transactional
-    public void savePost(PhotoPostRequest photoPostRequest, List<MultipartFile> files, String memberLoginId){
+    public ApiResult<?> savePost(PhotoPostRequest photoPostRequest, List<MultipartFile> files,
+                                 String memberLoginId, HttpServletResponse response){
 
         Member member = memberRepository.findByLoginId(memberLoginId);
 
@@ -52,8 +56,13 @@ public class PhotoPostService {
         }
 
         photoPostRepository.save(post);
-        thumbNailRepository.save(new ThumbNail(post, thumbNailFile), thumbNailFile);
-        attachedFileRepository.saveAll(attachedFileList, files);
+        boolean isthumbNailSaved = thumbNailRepository.save(new ThumbNail(post, thumbNailFile), thumbNailFile);
+        boolean isFileSaved = attachedFileRepository.saveAll(attachedFileList, files);
+
+        if(isthumbNailSaved == false || isFileSaved == false){
+            return ApiResult.error(response, HttpStatus.INTERNAL_SERVER_ERROR, "파일 저장 실패");
+        }
+        return ApiResult.success("게시물 저장 성공");
     }
 
     /*

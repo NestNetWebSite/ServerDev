@@ -5,6 +5,7 @@ import NestNet.NestNetWebSite.domain.member.MemberAuthority;
 import NestNet.NestNetWebSite.dto.request.MemberChangeAuthorityRequest;
 import NestNet.NestNetWebSite.dto.request.MemberSignUpManagementRequest;
 import NestNet.NestNetWebSite.service.manager.ManagerService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -29,8 +30,9 @@ public class ManagerController {
     회원가입 승인
      */
     @PostMapping("/manager/approve-signup")
-    public ApiResult<?> approveSignUpMember(@Valid @RequestBody MemberSignUpManagementRequest dto){
-        return managerService.approveSignUp(dto);
+    public ApiResult<?> approveSignUpMember(@Valid @RequestBody MemberSignUpManagementRequest dto, HttpServletResponse response){
+
+        return managerService.approveSignUp(dto, response);
     }
 
     /*

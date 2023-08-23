@@ -52,10 +52,9 @@ public class AuthService {
         // 아이디 중복 확인
         if(memberRepository.findByLoginId(signUpRequestDto.getLoginId()) != null){
             return ApiResult.error(response, HttpStatus.CONFLICT, "이미 가입된 유저 아이디입니다.");
-//            throw new DuplicateMemberException("이미 가입된 유저입니다.");
         }
 
-        MemberAuthority enrollAuthority = signUpRequestDto.getMemberAuthority();        //사용자가 신청한 권한 (PRESIDENT, VICE_PRESIDENT, MANAGER, GENERAL_MEMBER, GRADUATED_MEMBER)
+        MemberAuthority enrollAuthority = signUpRequestDto.getMemberAuthority();        //사용자가 신청한 권한
 
         signUpRequestDto.setMemberAuthority(MemberAuthority.WAITING_FOR_APPROVAL);                          //권한을 승인대기중으로 변경
 
@@ -67,7 +66,7 @@ public class AuthService {
         memberRepository.save(joinMember);
         memberSignUpManagementRepository.save(signUpRequest);
 
-        log.info("MemberService.class / sendSignUpRequest");
+        log.info("MemberService.class / sendSignUpRequest : 회원가입 신청");
 
         return ApiResult.success("회원가입 신청이 성공적으로 처리되었습니다. 관리자에게 문의하세요");
     }
@@ -90,8 +89,9 @@ public class AuthService {
             TokenResponse tokenResponse = new TokenResponse(tokenProvider.createAccessToken(authentication), tokenProvider.createRefreshToken(authentication));
 
             return tokenResponse;
-        } catch (CustomException e){
-            throw new CustomException("로그인 아이디 / 비밀번호 불일치", HttpStatus.BAD_REQUEST);
+        } catch (Exception e){
+            return null;
+//            throw new CustomException("로그인 아이디 / 비밀번호 불일치", HttpStatus.BAD_REQUEST);
         }
     }
 

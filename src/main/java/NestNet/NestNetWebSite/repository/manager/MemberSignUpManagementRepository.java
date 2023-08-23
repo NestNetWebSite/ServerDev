@@ -3,10 +3,12 @@ package NestNet.NestNetWebSite.repository.manager;
 import NestNet.NestNetWebSite.domain.manager.MemberSignUpManagement;
 import NestNet.NestNetWebSite.domain.member.Member;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -18,6 +20,8 @@ public class MemberSignUpManagementRepository {
     public void save(MemberSignUpManagement memberSignUpManagement){
         entityManager.persist(memberSignUpManagement);
     }
+
+    //=========================================조회=========================================//
 
     // 회원가입 요청 모두 조회
     public List<MemberSignUpManagement> findAll(){
@@ -36,12 +40,20 @@ public class MemberSignUpManagementRepository {
     }
 
     // 회원가입 요청 Member로 조회
-    public MemberSignUpManagement findByMember(Member member){
+    public Optional<MemberSignUpManagement> findByMember(Member member){
 
-        return entityManager.createQuery(
-                        "select mr from MemberSignUpManagement mr where mr.member =: member and mr.isComplete = false ",
-                        MemberSignUpManagement.class)
-                .setParameter("member", member)
-                .getResultList().get(0);
+        try {
+            MemberSignUpManagement memberSignUpManagement =  entityManager.createQuery(
+                            "select mr from MemberSignUpManagement mr where mr.member =: member and mr.isComplete = false ",
+                            MemberSignUpManagement.class)
+                    .setParameter("member", member)
+                    .getSingleResult();
+
+            return Optional.ofNullable(memberSignUpManagement);
+        } catch (NoResultException e) {
+            return Optional.empty();
+        }
     }
+
+    //====================================================================================//
 }

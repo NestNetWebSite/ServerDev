@@ -10,6 +10,7 @@ import NestNet.NestNetWebSite.service.comment.CommentService;
 import NestNet.NestNetWebSite.service.like.PostLikeService;
 import NestNet.NestNetWebSite.service.post.PhotoPostService;
 import NestNet.NestNetWebSite.service.post.ThumbNailService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -36,9 +37,9 @@ public class PhotoPostController {
      */
     @PostMapping("/photo-post/post")
     public void savePost(@RequestPart("data") @Valid PhotoPostRequest photoPostRequest, @RequestPart("photo-file") List<MultipartFile> files,
-                         @AuthenticationPrincipal UserDetails userDetails){
+                         @AuthenticationPrincipal UserDetails userDetails, HttpServletResponse response){
 
-        photoPostService.savePost(photoPostRequest, files, userDetails.getUsername());
+        photoPostService.savePost(photoPostRequest, files, userDetails.getUsername(), response);
     }
 
     /*

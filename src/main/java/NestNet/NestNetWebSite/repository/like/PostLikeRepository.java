@@ -8,6 +8,8 @@ import jakarta.persistence.NoResultException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 @RequiredArgsConstructor
 public class PostLikeRepository {
@@ -16,19 +18,25 @@ public class PostLikeRepository {
 
     // 저장
     public void save(PostLike postLike){
-
-        try {
-            PostLike findPostLike = entityManager.createQuery("select l from PostLike l where l.post =: post and l.member =: member", PostLike.class)
-                    .setParameter("post", postLike.getPost())
-                    .setParameter("member", postLike.getMember())
-                    .getSingleResult();
-
-        } catch (NoResultException e){
-            entityManager.persist(postLike);
-        }
+        entityManager.persist(postLike);
     }
 
     //=========================================조회=========================================//
+
+    // 회원, 게시물로 조회
+    public Optional<PostLike> findByMemberAndPost(Member member, Post post){
+
+        try {
+            PostLike findPostLike = entityManager.createQuery("select l from PostLike l where l.post =: post and l.member =: member", PostLike.class)
+                    .setParameter("post", post)
+                    .setParameter("member", member)
+                    .getSingleResult();
+
+            return Optional.ofNullable(findPostLike);
+        } catch (NoResultException e) {
+            return Optional.empty();
+        }
+    }
 
     // 회원 좋아요 상태 조회
     public boolean isMemberLiked(Post post, Member member){
@@ -48,18 +56,7 @@ public class PostLikeRepository {
     //====================================================================================//
 
     // 삭제
-    public void delete(Post post, Member member){
-
-        try {
-            PostLike findPostLike = entityManager.createQuery("select l from PostLike l where l.post =: post and l.member =: member", PostLike.class)
-                    .setParameter("post", post)
-                    .setParameter("member", member)
-                    .getSingleResult();
-            entityManager.remove(findPostLike);
-
-        } catch (NoResultException e){
-           //여기 처리 어떻게?
-        }
-
+    public void delete(PostLike postLike){
+        entityManager.remove(postLike);
     }
 }

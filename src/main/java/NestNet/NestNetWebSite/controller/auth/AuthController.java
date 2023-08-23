@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
@@ -41,8 +42,6 @@ public class AuthController {
     @PostMapping("/auth/signup")
     public ApiResult<?> signUp(@Valid @RequestBody SignUpRequest signUpRequest, HttpServletResponse response){
 
-        log.info("회원가입 컨트롤러 동작");
-
         ApiResult<?> apiResult = authService.sendSignUpRequest(signUpRequest, response);
 
         return apiResult;
@@ -53,11 +52,13 @@ public class AuthController {
      */
     @Operation(summary = "로그인 요청", description = "access 토큰은 헤더에 Authorization에, refresh 토큰은 헤더에 쿠키로 반환")
     @PostMapping("/auth/login")
-    public ApiResult<?> login(@Valid @RequestBody LoginRequest loginRequest){
-
-        log.info("로그인 컨트롤러");
+    public ApiResult<?> login(@Valid @RequestBody LoginRequest loginRequest, HttpServletResponse response){
 
         TokenResponse tokenResponse = authService.login(loginRequest);
+
+        if(tokenResponse == null){
+            return ApiResult.error(response, HttpStatus.BAD_REQUEST, "아이디 / 비밀번호 불일치");
+        }
 
         // 현재 시간 + 만료 기간 == 만료 시간
         LocalDateTime expTime = Instant.now().plusMillis((long)refreshTokenExpTime).atZone(ZoneId.systemDefault()).toLocalDateTime();
@@ -70,8 +71,6 @@ public class AuthController {
         httpHeaders.set(CustomAuthorizationFilter.AUTHORIZATION_HEADER, "Bearer " + tokenResponse.getAccessToken());
         httpHeaders.set("refresh-token", tokenResponse.getRefreshToken());
         httpHeaders.set("refresh-token-exp-time", Integer.toString((int)refreshTokenExpTime / 1000));
-
-        System.out.println(" 로그인 완료 : " + tokenResponse.getRefreshToken());
 
         return ApiResult.success(httpHeaders);
     }

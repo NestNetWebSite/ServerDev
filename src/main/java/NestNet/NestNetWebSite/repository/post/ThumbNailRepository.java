@@ -22,7 +22,7 @@ public class ThumbNailRepository {
     private final EntityManager entityManager;
 
     // 저장
-    public void save(ThumbNail thumbNail, MultipartFile file){
+    public boolean save(ThumbNail thumbNail, MultipartFile file){
 
         entityManager.persist(thumbNail);
         Path savePath = Paths.get(thumbNail.getSaveFilePath()+ File.separator + thumbNail.getSaveFileName());
@@ -31,7 +31,9 @@ public class ThumbNailRepository {
             file.transferTo(savePath);      //파일 실제 위치에 저장
         } catch (Exception e){
             e.printStackTrace();
+            return false;
         }
+        return true;
     }
 
     //=========================================조회=========================================//
@@ -44,7 +46,7 @@ public class ThumbNailRepository {
     // 사진 게시판 썸네일 모두 조회 (페이징)
     public List<ThumbNail> findAllPhotoThumbNailByPaging(int offset, int limit){
 
-        return entityManager.createQuery("select t from ThumbNail t", ThumbNail.class)
+        return entityManager.createQuery("select t from ThumbNail t order by t.id desc", ThumbNail.class)
                 .setFirstResult(offset)
                 .setMaxResults(limit)
                 .getResultList();

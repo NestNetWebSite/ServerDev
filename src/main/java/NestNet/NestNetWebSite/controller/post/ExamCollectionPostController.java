@@ -1,6 +1,7 @@
 package NestNet.NestNetWebSite.controller.post;
 
 import NestNet.NestNetWebSite.api.ApiResult;
+import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.domain.post.exam.ExamType;
 import NestNet.NestNetWebSite.dto.request.ExamCollectionPostRequest;
 import NestNet.NestNetWebSite.dto.response.AttachedFileResponse;
@@ -10,6 +11,7 @@ import NestNet.NestNetWebSite.service.attachedfile.AttachedFileService;
 import NestNet.NestNetWebSite.service.comment.CommentService;
 import NestNet.NestNetWebSite.service.like.PostLikeService;
 import NestNet.NestNetWebSite.service.post.ExamCollectionPostService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -34,10 +36,10 @@ public class ExamCollectionPostController {
     족보 게시판 게시물 저장
      */
     @PostMapping("/exam-collection-post/post")
-    public void savePost(@RequestPart("data") @Valid ExamCollectionPostRequest examCollectionPostRequest, @RequestPart("file") List<MultipartFile> files,
-                         @AuthenticationPrincipal UserDetails userDetails){
+    public ApiResult<?> savePost(@RequestPart("data") @Valid ExamCollectionPostRequest examCollectionPostRequest, @RequestPart("file") List<MultipartFile> files,
+                                 @AuthenticationPrincipal UserDetails userDetails, HttpServletResponse response){
 
-        examCollectionPostService.savePost(examCollectionPostRequest, files, userDetails.getUsername());
+        return examCollectionPostService.savePost(examCollectionPostRequest, files, userDetails.getUsername(), response);
     }
 
     /*

@@ -28,12 +28,10 @@ public class UnifiedPostRepository {
 
         String viewRecordKey = memberLoginId + "_" + post.getId().toString();     //사용자아이디 + 게시물 id
 
-        //24시간 내에 조회하지 않았으면 레디스에 없음 -> 조회수 + 1
+        //24시간 내에 다시 조회해도 조회수 올라가지 않음 (조회하지 않았으면 레디스에 없음 -> 조회수 + 1)
         if(!redisUtil.hasKey(viewRecordKey)){
             post.addViewCount();        //변경 감지에 의해 update
             redisUtil.setData(viewRecordKey, "v", 24, TimeUnit.HOURS);      //24시간 유지 -> 자동 삭제
-//            redisUtil.setData(viewRecordKey, "v", 1000*8);      //8초 유지 -> 자동 삭제
-
         }
     }
 
@@ -60,8 +58,9 @@ public class UnifiedPostRepository {
                         "select * from Post inner join member" +
                                 " on Post.member_id = member.member_id" +
                                 " inner join unified_post" +
-                                " on on Post.Post_id = unified_Post.Post_id" +
-                                " where dtype = 'Free' and 'Dev' and 'Career';", Post.class)
+                                " on Post.Post_id = unified_Post.Post_id" +
+                                " where dtype = 'Free' and 'Dev' and 'Career'" +
+                                " order by Post.id desc;", Post.class)
                 .setFirstResult(offset)
                 .setMaxResults(limit)
                 .getResultList();
@@ -72,7 +71,8 @@ public class UnifiedPostRepository {
     // 통합 게시판 (자유 / 개발 / 진로) 조회
     public List<UnifiedPost> findUnifiedPostByType(int offset, int limit, UnifiedPostType unifiedPostType){
 
-        List<UnifiedPost> resultList = entityManager.createQuery("select up from UnifiedPost up where up.unifiedPostType =: unifiedPostType")
+        List<UnifiedPost> resultList = entityManager.createQuery(
+                "select up from UnifiedPost up where up.unifiedPostType =: unifiedPostType order by up.id desc")
                 .setParameter("unifiedPostType", unifiedPostType)
                 .setFirstResult(offset)
                 .setMaxResults(limit)
@@ -81,7 +81,7 @@ public class UnifiedPostRepository {
         return resultList;
     }
 
-    //=========================================조회=========================================//
+    //====================================================================================//
 
     // 통합 게시물 삭제
     public void deletePost(Long postId){
