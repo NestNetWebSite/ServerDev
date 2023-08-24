@@ -1,17 +1,35 @@
 package NestNet.NestNetWebSite.service.post;
 
 import NestNet.NestNetWebSite.api.ApiResult;
+import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.domain.post.photo.ThumbNail;
 import NestNet.NestNetWebSite.dto.response.ThumbNailResponse;
+import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import NestNet.NestNetWebSite.repository.post.ThumbNailRepository;
 import jakarta.persistence.EntityManager;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+
 
 @Service
 @Transactional(readOnly = true)

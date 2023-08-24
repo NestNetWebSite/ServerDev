@@ -2,6 +2,7 @@ package NestNet.NestNetWebSite.controller.post;
 
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.dto.request.PhotoPostRequest;
+import NestNet.NestNetWebSite.dto.request.PostLikeRequest;
 import NestNet.NestNetWebSite.dto.response.AttachedFileResponse;
 import NestNet.NestNetWebSite.dto.response.CommentResponse;
 import NestNet.NestNetWebSite.dto.response.PhotoPostResponse;
@@ -13,6 +14,9 @@ import NestNet.NestNetWebSite.service.post.ThumbNailService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -80,20 +84,20 @@ public class PhotoPostController {
     /*
     좋아요 누름
      */
-    @GetMapping("/photo-post/{post_id}/like")
-    public void like(@PathVariable("post_id") Long postId, @AuthenticationPrincipal UserDetails userDetails){
+    @PostMapping("/exam-collection-post/like")
+    public void like(@RequestBody PostLikeRequest request, @AuthenticationPrincipal UserDetails userDetails){
 
-        postLikeService.saveLike(postId, userDetails.getUsername());
-        photoPostService.like(postId);
+        postLikeService.saveLike(request.getPostId(), userDetails.getUsername());
+        photoPostService.like(request.getPostId());
     }
 
     /*
     좋아요 취소
      */
-    @GetMapping("/photo-post/{post_id}/cancel_like")
-    public void dislike(@PathVariable("post_id") Long postId, @AuthenticationPrincipal UserDetails userDetails){
+    @PostMapping("/exam-collection-post/cancel-like")
+    public void dislike(@RequestBody PostLikeRequest request, @AuthenticationPrincipal UserDetails userDetails){
 
-        postLikeService.cancelLike(postId, userDetails.getUsername());
-        photoPostService.cancelLike(postId);
+        postLikeService.cancelLike(request.getPostId(), userDetails.getUsername());
+        photoPostService.cancelLike(request.getPostId());
     }
 }

@@ -15,5 +15,6 @@ public class CommentResponse {
     String username;
     String content;
     LocalDateTime createdTime;
+    private LocalDateTime modifiedTime;
     boolean isMemberWritten;
 }

@@ -2,6 +2,7 @@ package NestNet.NestNetWebSite.controller.post;
 
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.post.unified.UnifiedPostType;
+import NestNet.NestNetWebSite.dto.request.PostLikeRequest;
 import NestNet.NestNetWebSite.dto.request.UnifiedPostRequest;
 import NestNet.NestNetWebSite.dto.response.AttachedFileResponse;
 import NestNet.NestNetWebSite.dto.response.CommentResponse;
@@ -79,21 +80,21 @@ public class UnifiedPostController {
     /*
     좋아요 누름
      */
-    @GetMapping("/unified-post/{post_id}/like")
-    public void like(@PathVariable("post_id") Long postId, @AuthenticationPrincipal UserDetails userDetails){
+    @PostMapping("/exam-collection-post/like")
+    public void like(@RequestBody PostLikeRequest request, @AuthenticationPrincipal UserDetails userDetails){
 
-        postLikeService.saveLike(postId, userDetails.getUsername());
-        unifiedPostService.like(postId);
+        postLikeService.saveLike(request.getPostId(), userDetails.getUsername());
+        unifiedPostService.like(request.getPostId());
     }
 
     /*
     좋아요 취소
      */
-    @GetMapping("/unified-post/{post_id}/cancel_like")
-    public void dislike(@PathVariable("post_id") Long postId, @AuthenticationPrincipal UserDetails userDetails){
+    @PostMapping("/exam-collection-post/cancel-like")
+    public void dislike(@RequestBody PostLikeRequest request, @AuthenticationPrincipal UserDetails userDetails){
 
-        postLikeService.cancelLike(postId, userDetails.getUsername());
-        unifiedPostService.cancelLike(postId);
+        postLikeService.cancelLike(request.getPostId(), userDetails.getUsername());
+        unifiedPostService.cancelLike(request.getPostId());
     }
 
 }

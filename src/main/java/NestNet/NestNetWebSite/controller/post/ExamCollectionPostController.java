@@ -4,6 +4,7 @@ import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.domain.post.exam.ExamType;
 import NestNet.NestNetWebSite.dto.request.ExamCollectionPostRequest;
+import NestNet.NestNetWebSite.dto.request.PostLikeRequest;
 import NestNet.NestNetWebSite.dto.response.AttachedFileResponse;
 import NestNet.NestNetWebSite.dto.response.CommentResponse;
 import NestNet.NestNetWebSite.dto.response.ExamCollectionPostResponse;
@@ -85,21 +86,21 @@ public class ExamCollectionPostController {
     /*
     좋아요 누름
      */
-    @GetMapping("/exam-collection-post/{post_id}/like")
-    public void like(@PathVariable("post_id") Long postId, @AuthenticationPrincipal UserDetails userDetails){
+    @PostMapping("/exam-collection-post/like")
+    public void like(@RequestBody PostLikeRequest request, @AuthenticationPrincipal UserDetails userDetails){
 
-        postLikeService.saveLike(postId, userDetails.getUsername());
-        examCollectionPostService.like(postId);
+        postLikeService.saveLike(request.getPostId(), userDetails.getUsername());
+        examCollectionPostService.like(request.getPostId());
     }
 
     /*
     좋아요 취소
      */
-    @GetMapping("/exam-collection-post/{post_id}/cancel-like")
-    public void dislike(@PathVariable("post_id") Long postId, @AuthenticationPrincipal UserDetails userDetails){
+    @PostMapping("/exam-collection-post/cancel-like")
+    public void dislike(@RequestBody PostLikeRequest request, @AuthenticationPrincipal UserDetails userDetails){
 
-        postLikeService.cancelLike(postId, userDetails.getUsername());
-        examCollectionPostService.cancelLike(postId);
+        postLikeService.cancelLike(request.getPostId(), userDetails.getUsername());
+        examCollectionPostService.cancelLike(request.getPostId());
     }
 
 }

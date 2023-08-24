@@ -70,6 +70,7 @@ public class CommentService {
                                 .username(comment.getMember().getName())
                                 .content(comment.getContent())
                                 .createdTime(comment.getCreatedTime())
+                                .modifiedTime(comment.getModifiedTime())
                                 .isMemberWritten(true)
                                 .build());
             }
@@ -80,6 +81,7 @@ public class CommentService {
                                 .username(comment.getMember().getName())
                                 .content(comment.getContent())
                                 .createdTime(comment.getCreatedTime())
+                                .modifiedTime(comment.getModifiedTime())
                                 .isMemberWritten(false)
                                 .build());
             }
