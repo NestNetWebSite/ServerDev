@@ -84,7 +84,7 @@ public class PhotoPostController {
     /*
     좋아요 누름
      */
-    @PostMapping("/exam-collection-post/like")
+    @PostMapping("/photo-post/like")
     public void like(@RequestBody PostLikeRequest request, @AuthenticationPrincipal UserDetails userDetails){
 
         postLikeService.saveLike(request.getPostId(), userDetails.getUsername());
@@ -94,7 +94,7 @@ public class PhotoPostController {
     /*
     좋아요 취소
      */
-    @PostMapping("/exam-collection-post/cancel-like")
+    @PostMapping("/photo-post/cancel-like")
     public void dislike(@RequestBody PostLikeRequest request, @AuthenticationPrincipal UserDetails userDetails){
 
         postLikeService.cancelLike(request.getPostId(), userDetails.getUsername());

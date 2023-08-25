@@ -11,6 +11,7 @@ import NestNet.NestNetWebSite.service.attachedfile.AttachedFileService;
 import NestNet.NestNetWebSite.service.comment.CommentService;
 import NestNet.NestNetWebSite.service.like.PostLikeService;
 import NestNet.NestNetWebSite.service.post.UnifiedPostService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -35,10 +36,10 @@ public class UnifiedPostController {
     통합 게시판 게시물 저장
      */
     @PostMapping("unified-post/post")
-    public void savePost(@RequestPart("data") @Valid UnifiedPostRequest unifiedPostRequest, @RequestPart("file") List<MultipartFile> files,
-                         @AuthenticationPrincipal UserDetails userDetails){
+    public ApiResult<?> savePost(@RequestPart("data") @Valid UnifiedPostRequest unifiedPostRequest, @RequestPart(value = "file", required = false) List<MultipartFile> files,
+                                 @AuthenticationPrincipal UserDetails userDetails, HttpServletResponse response){
 
-        unifiedPostService.savePost(unifiedPostRequest, files, userDetails.getUsername());
+        return unifiedPostService.savePost(unifiedPostRequest, files, userDetails.getUsername(), response);
     }
 
     /*
@@ -80,7 +81,7 @@ public class UnifiedPostController {
     /*
     좋아요 누름
      */
-    @PostMapping("/exam-collection-post/like")
+    @PostMapping("/unified-post/like")
     public void like(@RequestBody PostLikeRequest request, @AuthenticationPrincipal UserDetails userDetails){
 
         postLikeService.saveLike(request.getPostId(), userDetails.getUsername());
@@ -90,7 +91,7 @@ public class UnifiedPostController {
     /*
     좋아요 취소
      */
-    @PostMapping("/exam-collection-post/cancel-like")
+    @PostMapping("/unified-post/cancel-like")
     public void dislike(@RequestBody PostLikeRequest request, @AuthenticationPrincipal UserDetails userDetails){
 
         postLikeService.cancelLike(request.getPostId(), userDetails.getUsername());

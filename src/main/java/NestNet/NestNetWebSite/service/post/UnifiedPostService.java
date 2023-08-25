@@ -11,7 +11,9 @@ import NestNet.NestNetWebSite.dto.response.UnifiedPostListResponse;
 import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import NestNet.NestNetWebSite.repository.post.UnifiedPostRepository;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,21 +34,30 @@ public class UnifiedPostService {
     통합 게시판 게시물 저장
      */
     @Transactional
-    public void savePost(UnifiedPostRequest unifiedPostRequest, List<MultipartFile> files, String memberLoginId) {
+    public ApiResult<?> savePost(UnifiedPostRequest unifiedPostRequest, List<MultipartFile> files, String memberLoginId, HttpServletResponse response) {
 
         Member member = memberRepository.findByLoginId(memberLoginId);
 
         UnifiedPost post = unifiedPostRequest.toEntity(member);
 
-        List<AttachedFile> attachedFileList = new ArrayList<>();
-        for(MultipartFile file : files){
-            AttachedFile attachedFile = new AttachedFile(post, file);
-            attachedFileList.add(attachedFile);
-            post.addAttachedFiles(attachedFile);
+        if(files != null){
+            List<AttachedFile> attachedFileList = new ArrayList<>();
+
+            for(MultipartFile file : files){
+                AttachedFile attachedFile = new AttachedFile(post, file);
+                attachedFileList.add(attachedFile);
+                post.addAttachedFiles(attachedFile);
+            }
+            boolean isFileSaved = attachedFileRepository.saveAll(attachedFileList, files);
+
+            if(isFileSaved == false){
+                return ApiResult.error(response, HttpStatus.INTERNAL_SERVER_ERROR, "파일 저장 실패");
+            }
         }
 
         unifiedPostRepository.save(post);
-        attachedFileRepository.saveAll(attachedFileList, files);
+
+        return ApiResult.success("게시물 저장 성공");
     }
 
     /*

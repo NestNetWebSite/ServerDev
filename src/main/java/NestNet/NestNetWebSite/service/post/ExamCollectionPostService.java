@@ -41,19 +41,22 @@ public class ExamCollectionPostService {
 
         ExamCollectionPost post = examCollectionPostRequest.toEntity(member);
 
-        List<AttachedFile> attachedFileList = new ArrayList<>();
-        for(MultipartFile file : files){
-            AttachedFile attachedFile = new AttachedFile(post, file);
-            attachedFileList.add(attachedFile);
-            post.addAttachedFiles(attachedFile);
+        if(files != null){
+            List<AttachedFile> attachedFileList = new ArrayList<>();
+
+            for(MultipartFile file : files){
+                AttachedFile attachedFile = new AttachedFile(post, file);
+                attachedFileList.add(attachedFile);
+                post.addAttachedFiles(attachedFile);
+            }
+            boolean isFileSaved = attachedFileRepository.saveAll(attachedFileList, files);
+
+            if(isFileSaved == false){
+                return ApiResult.error(response, HttpStatus.INTERNAL_SERVER_ERROR, "파일 저장 실패");
+            }
         }
 
         examCollectionPostRepository.save(post);
-        boolean isFileSaved = attachedFileRepository.saveAll(attachedFileList, files);
-
-        if(isFileSaved == false){
-            return ApiResult.error(response, HttpStatus.INTERNAL_SERVER_ERROR, "파일 저장 실패");
-        }
 
         return ApiResult.success("게시물 저장 성공");
     }

@@ -37,7 +37,7 @@ public class ExamCollectionPostController {
     족보 게시판 게시물 저장
      */
     @PostMapping("/exam-collection-post/post")
-    public ApiResult<?> savePost(@RequestPart("data") @Valid ExamCollectionPostRequest examCollectionPostRequest, @RequestPart("file") List<MultipartFile> files,
+    public ApiResult<?> savePost(@RequestPart("data") @Valid ExamCollectionPostRequest examCollectionPostRequest, @RequestPart(value = "file", required = false) List<MultipartFile> files,
                                  @AuthenticationPrincipal UserDetails userDetails, HttpServletResponse response){
 
         return examCollectionPostService.savePost(examCollectionPostRequest, files, userDetails.getUsername(), response);
