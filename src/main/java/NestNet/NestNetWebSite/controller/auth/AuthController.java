@@ -3,11 +3,9 @@ package NestNet.NestNetWebSite.controller.auth;
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.config.auth.CustomAuthorizationFilter;
 import NestNet.NestNetWebSite.dto.request.LoginRequest;
-import NestNet.NestNetWebSite.dto.request.RefreshtokenRequest;
 import NestNet.NestNetWebSite.dto.request.SignUpRequest;
 import NestNet.NestNetWebSite.dto.response.TokenResponse;
 import NestNet.NestNetWebSite.service.auth.AuthService;
-import NestNet.NestNetWebSite.service.token.RefreshTokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,10 +17,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -30,10 +24,9 @@ import java.time.ZoneId;
 public class AuthController {
 
     private final AuthService authService;
-    private final RefreshTokenService refreshTokenService;
 
     @Value("#{environment['jwt.refresh-exp-time']}")
-    private long refreshTokenExpTime;              //리프레쉬 토큰 유효기간
+    private long refreshTokenExpTime;                           // refresh 토큰 유효 기간
 
     /*
     회원가입 post 요청
@@ -59,12 +52,6 @@ public class AuthController {
         if(tokenResponse == null){
             return ApiResult.error(response, HttpStatus.BAD_REQUEST, "아이디 / 비밀번호 불일치");
         }
-
-        // 현재 시간 + 만료 기간 == 만료 시간
-        LocalDateTime expTime = Instant.now().plusMillis((long)refreshTokenExpTime).atZone(ZoneId.systemDefault()).toLocalDateTime();
-
-        // 리프레시 토큰 저장
-        refreshTokenService.save(new RefreshtokenRequest(tokenResponse.getAccessToken(), tokenResponse.getRefreshToken(), expTime));
 
         HttpHeaders httpHeaders = new HttpHeaders();
 

@@ -6,19 +6,17 @@ import NestNet.NestNetWebSite.config.redis.RedisUtil;
 import NestNet.NestNetWebSite.domain.manager.MemberSignUpManagement;
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.member.MemberAuthority;
-import NestNet.NestNetWebSite.domain.token.RefreshToken;
 import NestNet.NestNetWebSite.dto.request.LoginRequest;
 import NestNet.NestNetWebSite.dto.request.SignUpRequest;
 import NestNet.NestNetWebSite.dto.response.TokenResponse;
-import NestNet.NestNetWebSite.exception.CustomException;
 import NestNet.NestNetWebSite.repository.manager.MemberSignUpManagementRepository;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
-import NestNet.NestNetWebSite.repository.token.RefreshTokenRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -40,8 +38,10 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final TokenProvider tokenProvider;
-    private final RefreshTokenRepository refreshTokenRepository;
     private final RedisUtil redisUtil;
+
+    @Value("#{environment['jwt.refresh-exp-time']}")
+    private long refreshTokenExpTime;              //리프레쉬 토큰 유효기간
 
     /*
     관리자에게 회원가입 요청을 보냄
@@ -86,12 +86,17 @@ public class AuthService {
             //authenticationManager가 UserDetailsService의 loadByUsername매서드를 호출하여 인증 수행
             Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
-            TokenResponse tokenResponse = new TokenResponse(tokenProvider.createAccessToken(authentication), tokenProvider.createRefreshToken(authentication));
+            String accessToken = tokenProvider.createAccessToken(authentication);
+            String refreshToken = tokenProvider.createRefreshToken(authentication);
+
+            //레디스에 리프레시 토큰 저장
+            redisUtil.setData(refreshToken, "refresh-token", refreshTokenExpTime);
+
+            TokenResponse tokenResponse = new TokenResponse(accessToken, refreshToken);
 
             return tokenResponse;
         } catch (Exception e){
             return null;
-//            throw new CustomException("로그인 아이디 / 비밀번호 불일치", HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -114,14 +119,16 @@ public class AuthService {
         //기간이 만료된 엑세스 토큰인 경우는 필터에서 걸러지기 때문에 없음.
 
         //리프레시 토큰 삭제
-        RefreshToken findRefreshToken = refreshTokenRepository.findByAccessToken(accessToken);
-        int rows = refreshTokenRepository.delete(findRefreshToken.getId());
+        String refreshToken = tokenProvider.getRefreshToken(request);
+        if(refreshToken != null){
+            redisUtil.deleteData(refreshToken);
+        }
 
         //레디스에 블랙리스트 등록
         redisUtil.setData(accessToken, "logout", remainTime);
 
         //블랙리스트(key : 엑세스 토큰 / value : logout)
-        if(redisUtil.hasKey(accessToken) && rows == 1){
+        if(redisUtil.hasKey(accessToken) && !redisUtil.hasKey(refreshToken)){
             return ApiResult.success("로그아웃 되었습니다");
         }
         return ApiResult.error(response, HttpStatus.INTERNAL_SERVER_ERROR, "서버 에러/ 관리자에게 문의하세요");
