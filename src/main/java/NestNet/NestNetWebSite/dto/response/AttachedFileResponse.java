@@ -11,5 +11,5 @@ public class AttachedFileResponse {
 
     private String originalFileName;
     private String saveFileName;
-    private String filePath;
+
 }

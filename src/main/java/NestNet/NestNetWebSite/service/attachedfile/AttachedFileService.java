@@ -6,11 +6,16 @@ import NestNet.NestNetWebSite.dto.response.AttachedFileResponse;
 import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional(readOnly = true)
@@ -30,17 +35,34 @@ public class AttachedFileService {
      */
 
     /*
-    게시물에 해당된 첨부파일 모두 조회
+    게시물에 해당된 첨부파일 이름 모두 조회
      */
     public List<AttachedFileResponse> findAllFilesByPost(Long postId){
 
         List<AttachedFile> files = attachedFileRepository.findByPost(findPost(postId));
 
-        List<AttachedFileResponse> fileDtos = new ArrayList<>();
+        List<AttachedFileResponse> fileResponseList = new ArrayList<>();
+
         for(AttachedFile file : files){
-            fileDtos.add(new AttachedFileResponse(file.getOriginalFileName(), file.getSaveFileName(), file.getSaveFilePath()));
+            fileResponseList.add(new AttachedFileResponse(file.getOriginalFileName(), file.getSaveFileName()));
         }
 
-        return fileDtos;
+        return fileResponseList;
     }
+
+    /*
+    postId와 saveFileName으로 실제 파일 조회
+     */
+    public FileSystemResource findFile(Long postId, String saveFileName){
+
+        AttachedFile file = attachedFileRepository.findByPostAndFileName(findPost(postId), saveFileName);
+
+        FileSystemResource resource = new FileSystemResource(file.getSaveFilePath() + File.separator + file.getSaveFileName());
+
+        System.out.println("파일명 : " + resource.getFilename());
+
+        return resource;
+    }
+
+
 }

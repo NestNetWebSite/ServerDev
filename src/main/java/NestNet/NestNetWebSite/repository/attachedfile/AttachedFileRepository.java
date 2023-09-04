@@ -56,5 +56,19 @@ public class AttachedFileRepository {
                 .getResultList();
     }
 
+    // 게시물 + 파일명으로 파일 단건 조회
+    public AttachedFile findByPostAndFileName(Post post, String saveFileName){
+
+        List<AttachedFile> attachedFileList =  entityManager.createQuery("select a from AttachedFile a where a.post =: post and a.saveFileName =: saveFileName")
+                .setParameter("post", post)
+                .setParameter("saveFileName", saveFileName)
+                .getResultList();
+
+        if(!attachedFileList.isEmpty()){
+            return attachedFileList.get(0);
+        }
+        return null;
+    }
+
     //====================================================================================//
 }
