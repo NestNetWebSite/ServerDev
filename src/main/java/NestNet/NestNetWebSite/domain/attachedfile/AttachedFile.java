@@ -26,7 +26,7 @@ public class AttachedFile {
     private Long id;                                            // PK
 
     @ManyToOne(fetch = FetchType.LAZY)  //양방향
-    @JoinColumn(name = "Post_id")
+    @JoinColumn(name = "post_id")
     private Post post;                                          // 첨부파일이 포함된 게시물
 
     private String originalFileName;                            // 사용자가 입력한 파일 이름

@@ -1,6 +1,7 @@
 package NestNet.NestNetWebSite.domain.post;
 
 import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
+import NestNet.NestNetWebSite.domain.comment.Comment;
 import NestNet.NestNetWebSite.domain.member.Member;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -46,6 +47,9 @@ public abstract class Post {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AttachedFile> attachedFileList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> commentList = new ArrayList<>();
 
     /*
     생성자
