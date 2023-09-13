@@ -54,6 +54,9 @@ public class UnifiedPostService {
                 return ApiResult.error(response, HttpStatus.INTERNAL_SERVER_ERROR, "파일 저장 실패");
             }
         }
+        else{
+            System.out.println("파일 없음 이새끼야");
+        }
 
         unifiedPostRepository.save(post);
 

@@ -7,11 +7,13 @@ import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,13 +55,27 @@ public class AttachedFileService {
     /*
     postId와 saveFileName으로 실제 파일 조회
      */
-    public FileSystemResource findFile(Long postId, String saveFileName){
+    public InputStreamResource findFile(Long postId, String saveFileName){
 
         AttachedFile file = attachedFileRepository.findByPostAndFileName(findPost(postId), saveFileName);
 
-        FileSystemResource resource = new FileSystemResource(file.getSaveFilePath() + File.separator + file.getSaveFileName());
+        InputStreamResource resource = null;
 
-        System.out.println("파일명 : " + resource.getFilename());
+        try{
+            File realFile = new File(file.getSaveFilePath() + File.separator + file.getSaveFileName());
+
+            // 파일 입력 스트림 생성
+            resource = new InputStreamResource(new FileInputStream(realFile));
+        } catch (FileNotFoundException e){
+            System.out.println("파일 찾을 수 없음");
+        }
+
+
+
+
+//        FileSystemResource resource = new FileSystemResource(file.getSaveFilePath() + File.separator + file.getSaveFileName());
+
+//        System.out.println("파일명 : " + resource.getFilename());
 
         return resource;
     }

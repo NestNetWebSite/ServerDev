@@ -39,6 +39,10 @@ public class UnifiedPostController {
     public ApiResult<?> savePost(@RequestPart("data") @Valid UnifiedPostRequest unifiedPostRequest, @RequestPart(value = "file", required = false) List<MultipartFile> files,
                                  @AuthenticationPrincipal UserDetails userDetails, HttpServletResponse response){
 
+        for(MultipartFile file : files){
+            System.out.println(file.getName());
+        }
+
         return unifiedPostService.savePost(unifiedPostRequest, files, userDetails.getUsername(), response);
     }
 

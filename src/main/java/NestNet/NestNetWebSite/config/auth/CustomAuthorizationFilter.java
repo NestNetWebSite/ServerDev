@@ -35,7 +35,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {       //ht
 
         //회원가입 or 로그인 or 리프레시 요청이면 토큰을 검사하지 않음
         if(servletPath.equals("/auth/signup") || servletPath.equals("/auth/login") ||
-                servletPath.equals("/auth/refresh") || servletPath.equals("/member/find-id") || servletPath.equals("/member/get-temp-pw") || servletPath.equals("/file")){
+                servletPath.equals("/auth/refresh") || servletPath.equals("/member/find-id") || servletPath.equals("/member/get-temp-pw") || servletPath.equals("/file/61/8a7a1c94-78c9-4815-9fa5-1d884a1b75e2_사진게시판샘플2.jpg")){
             log.info("CustomAuthorizationFilter.class / doFilterInternal :" + servletPath +  ": 엑세스 토큰을 검사하지 않음");
         }
         else{

@@ -48,8 +48,8 @@ jwt:
   secret : ${secret-key}
 #  access-exp-time: 7200000    # 2시간 7200000
 #  refresh-exp-time: 1209600000    # 14일
-  access-exp-time: 15000    # 2시간 7200000
-  refresh-exp-time: 50000    # 14일
+  access-exp-time: 7200000    # 2시간 7200000
+  refresh-exp-time: 1209600000    # 14일
 
 
 logging:

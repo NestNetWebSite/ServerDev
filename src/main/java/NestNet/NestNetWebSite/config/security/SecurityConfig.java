@@ -98,6 +98,7 @@ public class SecurityConfig {
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()        //html, css같은 정적 리소스에 대해 접근 허용
                         .requestMatchers( "/v3/**", "/swagger-ui/**").permitAll()
                         .requestMatchers("/auth/signup", "auth/login").permitAll()                      //로그인, 회원가입 접근 허용
+                                .requestMatchers("/file/**").permitAll()
                         // 관리자 패이지는 관리자만 접근 가능
                         .requestMatchers("/manager/**").hasAuthority("MANAGER")                  //manager하위 리소스는 MANAGER 권한으로 허용
                         // 통합 게시판은 모든 회원 접근 가능
@@ -112,7 +113,7 @@ public class SecurityConfig {
                         .requestMatchers("/member-profile/member-info").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER")
 //                        .requestMatchers("/member/**").permitAll()
                         .requestMatchers("/member/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER")
-                        .anyRequest().authenticated()       //나머지 요청은 모두 권한 필요함.
+//                        .anyRequest().authenticated()       //나머지 요청은 모두 권한 필요함.
 
                 )
 
