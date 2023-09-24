@@ -1,13 +1,16 @@
 package NestNet.NestNetWebSite.service.attachedfile;
 
+import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.dto.response.AttachedFileResponse;
 import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import jakarta.persistence.EntityManager;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,19 +66,11 @@ public class AttachedFileService {
 
         try{
             File realFile = new File(file.getSaveFilePath() + File.separator + file.getSaveFileName());
-
-            // 파일 입력 스트림 생성
             resource = new InputStreamResource(new FileInputStream(realFile));
-        } catch (FileNotFoundException e){
-            System.out.println("파일 찾을 수 없음");
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
         }
-
-
-
-
-//        FileSystemResource resource = new FileSystemResource(file.getSaveFilePath() + File.separator + file.getSaveFileName());
-
-//        System.out.println("파일명 : " + resource.getFilename());
 
         return resource;
     }

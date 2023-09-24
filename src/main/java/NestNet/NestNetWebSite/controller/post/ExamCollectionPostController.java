@@ -15,6 +15,11 @@ import NestNet.NestNetWebSite.service.post.ExamCollectionPostService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -60,7 +65,7 @@ public class ExamCollectionPostController {
     /*
     족보 게시판 게시물 단건 조회
      */
-    @GetMapping("exam-collection-post/{post_id}")
+    @GetMapping("/exam-collection-post/{post_id}")
     public ApiResult<?> showPost(@PathVariable("post_id") Long postId,
                                                         @AuthenticationPrincipal UserDetails userDetails){
 
@@ -77,6 +82,24 @@ public class ExamCollectionPostController {
         result.put("is-member-liked", isMemberLiked);
 
         return ApiResult.success(result);
+    }
+
+    /*
+    파일 다운로드
+     */
+    @GetMapping("/exam-collection-post/{postId}/{fileName}")
+    public ResponseEntity<InputStreamResource> downloadFile(@PathVariable(value = "postId") Long postId, @PathVariable(value = "fileName") String fileName){
+
+        InputStreamResource inputStreamResource = attachedFileService.findFile(postId, fileName);
+
+        HttpHeaders headers = new HttpHeaders();
+        //파일 다운로드 시 클라이언트에게 이진 파일임을 알림.
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
+
+        // 파일 스트림을 ResponseEntity로 감싸서 전송
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(inputStreamResource);
     }
 
     /*

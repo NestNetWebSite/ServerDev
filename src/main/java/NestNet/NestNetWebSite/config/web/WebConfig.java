@@ -1,4 +1,4 @@
-package NestNet.NestNetWebSite.config.security;
+package NestNet.NestNetWebSite.config.web;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -6,10 +6,15 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.io.File;
+
 @Configuration
-public class CorsConfig implements WebMvcConfigurer {
+@EnableWebMvc
+public class WebConfig implements WebMvcConfigurer {
 
     /*
    Cross-Origin Resource Sharing (CORS)
@@ -41,5 +46,12 @@ public class CorsConfig implements WebMvcConfigurer {
                 .allowedOrigins("http://192.168.45.150:3000")
                 .allowCredentials(true)
                 .allowedMethods("OPTIONS", "GET", "POST", "PUT", "DELETE");
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+//        WebMvcConfigurer.super.addResourceHandlers(registry);
+        registry.addResourceHandler("/image/**")
+                .addResourceLocations("file:///C:" + File.separator + "nestnetFile" + File.separator);
     }
 }

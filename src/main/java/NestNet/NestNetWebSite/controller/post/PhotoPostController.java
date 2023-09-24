@@ -6,6 +6,7 @@ import NestNet.NestNetWebSite.dto.request.PostLikeRequest;
 import NestNet.NestNetWebSite.dto.response.AttachedFileResponse;
 import NestNet.NestNetWebSite.dto.response.CommentResponse;
 import NestNet.NestNetWebSite.dto.response.PhotoPostResponse;
+import NestNet.NestNetWebSite.dto.response.ThumbNailResponse;
 import NestNet.NestNetWebSite.service.attachedfile.AttachedFileService;
 import NestNet.NestNetWebSite.service.comment.CommentService;
 import NestNet.NestNetWebSite.service.like.PostLikeService;
@@ -14,14 +15,23 @@ import NestNet.NestNetWebSite.service.post.ThumbNailService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,10 +59,24 @@ public class PhotoPostController {
     /*
     사진 게시판 목록(썸네일) 조회
      */
+//    @GetMapping("/photo-post")
+//    public ResponseEntity<ByteArrayResource> showThumbNail(@RequestParam("offset") int offset, @RequestParam("limit") int limit,
+//                                      HttpServletResponse response){
+//
+////        Map<InputStreamResource, Map<String, Object>> thumbNailInfo = thumbNailService.findAllThumbNail(offset, limit);
+//        ByteArrayResource resource = thumbNailService.findAllThumbNail(offset, limit);
+//
+//        return ResponseEntity.ok()
+//                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+//                .body(resource);
+//
+//    }
     @GetMapping("/photo-post")
-    public ApiResult<?> showThumbNail(@RequestParam("offset") int offset, @RequestParam("limit") int limit){
+    public void showThumbNail(@RequestParam("offset") int offset, @RequestParam("limit") int limit,
+                                                           HttpServletResponse response){
 
-        return thumbNailService.findAllThumbNail(offset, limit);
+        thumbNailService.findAllThumbNail(offset, limit, response);
+
     }
 
     /*
