@@ -59,25 +59,12 @@ public class PhotoPostController {
     /*
     사진 게시판 목록(썸네일) 조회
      */
-//    @GetMapping("/photo-post")
-//    public ResponseEntity<ByteArrayResource> showThumbNail(@RequestParam("offset") int offset, @RequestParam("limit") int limit,
-//                                      HttpServletResponse response){
-//
-////        Map<InputStreamResource, Map<String, Object>> thumbNailInfo = thumbNailService.findAllThumbNail(offset, limit);
-//        ByteArrayResource resource = thumbNailService.findAllThumbNail(offset, limit);
-//
-//        return ResponseEntity.ok()
-//                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-//                .body(resource);
-//
-//    }
     @GetMapping("/photo-post")
-    public void showThumbNail(@RequestParam("offset") int offset, @RequestParam("limit") int limit,
-                                                           HttpServletResponse response){
+    public ApiResult<?> showThumbNail(@RequestParam("offset") int offset, @RequestParam("limit") int limit){
 
-        thumbNailService.findAllThumbNail(offset, limit, response);
-
+        return photoPostService.findThumbNails(offset, limit);
     }
+
 
     /*
     사진 게시물 조회

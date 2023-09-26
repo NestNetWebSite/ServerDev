@@ -4,6 +4,7 @@ import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.domain.post.photo.PhotoPost;
 import NestNet.NestNetWebSite.domain.post.photo.ThumbNail;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.Transient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -20,12 +21,13 @@ import java.util.List;
 public class ThumbNailRepository {
 
     private final EntityManager entityManager;
+    private static String basePath = "C:" + File.separator + "nestnetFile" + File.separator;
 
     // 저장
     public boolean save(ThumbNail thumbNail, MultipartFile file){
 
         entityManager.persist(thumbNail);
-        Path savePath = Paths.get(thumbNail.getSaveFilePath()+ File.separator + thumbNail.getSaveFileName());
+        Path savePath = Paths.get(basePath + thumbNail.getSaveFilePath()+ File.separator + thumbNail.getSaveFileName());
         log.info("ThumbNailRepository / save : 저장 파일 : " + savePath);
         try {
             file.transferTo(savePath);      //파일 실제 위치에 저장

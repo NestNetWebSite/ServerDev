@@ -49,7 +49,7 @@ public class AttachedFileService {
         List<AttachedFileResponse> fileResponseList = new ArrayList<>();
 
         for(AttachedFile file : files){
-            fileResponseList.add(new AttachedFileResponse(file.getOriginalFileName(), file.getSaveFileName()));
+            fileResponseList.add(new AttachedFileResponse(file.getOriginalFileName(), file.getSaveFilePath(), file.getSaveFileName()));
         }
 
         return fileResponseList;

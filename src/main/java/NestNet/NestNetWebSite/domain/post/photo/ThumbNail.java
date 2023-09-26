@@ -27,7 +27,7 @@ public class ThumbNail {
     @JoinColumn(name = "post_id")
     private Post post;                                          // 썸네일이 해당되는 게시물
 
-    private String title;                                       // 게시물 제목
+//    private String title;                                       // 게시물 제목
     private String saveFileName;                                // 실제 저장된 파일 이름
     private String saveFilePath;                                // 파일 경로 (서버)
 
@@ -39,7 +39,6 @@ public class ThumbNail {
      */
     public ThumbNail(Post post, MultipartFile file){
         this.post = post;
-        this.title = post.getTitle();
         createFileName(file);
         createSavePath();
     }
@@ -59,9 +58,9 @@ public class ThumbNail {
      */
     public void createSavePath(){
 
-        String path = basePath + "PHOTO_POST_THUMBNAIL";      //파일 저장 경로 ( C:/nestnetFile/PHOTO_POST_THUMBNAIL)
+        String path = "PHOTO_POST_THUMBNAIL";
 
-        File folder = new File(path);               //해당 경로에 폴더 생성
+        File folder = new File(basePath + path);               //파일 저장 경로 ( C:/nestnetFile/PHOTO_POST_THUMBNAIL)
 
         if(!folder.exists()){       //해당 폴더가 존재하지 않을 경우 생성
             try {

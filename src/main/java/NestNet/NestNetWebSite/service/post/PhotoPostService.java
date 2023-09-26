@@ -7,6 +7,7 @@ import NestNet.NestNetWebSite.domain.post.photo.PhotoPost;
 import NestNet.NestNetWebSite.domain.post.photo.ThumbNail;
 import NestNet.NestNetWebSite.dto.request.PhotoPostRequest;
 import NestNet.NestNetWebSite.dto.response.PhotoPostResponse;
+import NestNet.NestNetWebSite.dto.response.ThumbNailResponse;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import NestNet.NestNetWebSite.repository.post.PhotoPostRepository;
@@ -63,6 +64,30 @@ public class PhotoPostService {
             return ApiResult.error(response, HttpStatus.INTERNAL_SERVER_ERROR, "파일 저장 실패");
         }
         return ApiResult.success("게시물 저장 성공");
+    }
+
+    /*
+    사진 게시판 썸네일 조회 (페이징)
+     */
+    public ApiResult<?> findThumbNails(int offset, int limit){
+
+        List<ThumbNail> thumbNailList = thumbNailRepository.findAllPhotoThumbNailByPaging(offset, limit);
+
+        List<ThumbNailResponse> thumbNailResponseList = new ArrayList<>();
+        for(ThumbNail thumbNail : thumbNailList){
+            thumbNailResponseList.add(
+                    ThumbNailResponse.builder()
+                            .postId(thumbNail.getPost().getId())
+                            .title(thumbNail.getPost().getTitle())
+                            .viewCount(thumbNail.getPost().getViewCount())
+                            .likeCount(thumbNail.getPost().getLikeCount())
+                            .saveFilePath(thumbNail.getSaveFilePath())
+                            .saveFileName(thumbNail.getSaveFileName())
+                            .build()
+            );
+        }
+
+        return ApiResult.success(thumbNailResponseList);
     }
 
     /*

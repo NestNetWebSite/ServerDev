@@ -66,9 +66,9 @@ public class AttachedFile {
      */
     public void createSavePath(){
 
-        String path = basePath + this.post.getPostCategory();      //파일 저장 경로 ( ex) C:/nestnetFile/EXAM)
+        String path = this.post.getPostCategory().toString();      //파일 저장 경로 ( ex) C:/nestnetFile/EXAM)
 
-        File folder = new File(path);               //해당 경로에 폴더 생성
+        File folder = new File(basePath + path);               //해당 경로에 폴더 생성
 
         if(!folder.exists()){       //해당 폴더가 존재하지 않을 경우 생성
             try {
@@ -82,7 +82,7 @@ public class AttachedFile {
             path += File.separator + this.post.getCreatedTime().getYear() + this.post.getCreatedTime().getMonth() +
                     this.post.getCreatedTime().getDayOfMonth() + "_" + this.post.getTitle();
 
-            File innerFolder = new File(path);               //해당 경로에 폴더 생성
+            File innerFolder = new File(basePath + path);               //해당 경로에 폴더 생성
 
             try {
                 innerFolder.mkdir();
@@ -90,6 +90,7 @@ public class AttachedFile {
                 e.printStackTrace();
             }
         }
+//        else if(this.post.getPostCategory().equals(Pos))
 
         this.saveFilePath = path;
     }

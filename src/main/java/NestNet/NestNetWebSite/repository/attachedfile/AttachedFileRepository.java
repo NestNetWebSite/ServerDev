@@ -21,19 +21,18 @@ import java.util.Optional;
 public class AttachedFileRepository {
 
     private final EntityManager entityManager;
+    private static String basePath = "C:" + File.separator + "nestnetFile" + File.separator;
 
     // 저장
     public boolean saveAll(List<AttachedFile> attachedFiles, List<MultipartFile> files){
 
-        for(AttachedFile attachedFile : attachedFiles){
-            entityManager.persist(attachedFile);
-        }
         for(int i = 0; i < attachedFiles.size(); i++){
-            entityManager.persist(attachedFiles.get(i));
-            Path savePath = Paths.get(attachedFiles.get(i).getSaveFilePath()+ File.separator + attachedFiles.get(i).getSaveFileName());
+            Path savePath = Paths.get(basePath + attachedFiles.get(i).getSaveFilePath()+ File.separator + attachedFiles.get(i).getSaveFileName());
             log.info("AttachedFileRepository / saveAll : 저장 파일 : " + savePath);
+
             try {
                 files.get(i).transferTo(savePath);          //파일 실제 위치에 저장
+                entityManager.persist(attachedFiles.get(i));
             } catch (Exception e){
                 e.printStackTrace();
                 return false;

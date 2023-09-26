@@ -10,6 +10,7 @@ import lombok.Getter;
 public class AttachedFileResponse {
 
     private String originalFileName;
+    private String saveFilePath;
     private String saveFileName;
 
 }
