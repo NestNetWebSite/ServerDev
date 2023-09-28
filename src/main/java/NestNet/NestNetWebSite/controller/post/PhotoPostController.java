@@ -51,10 +51,16 @@ public class PhotoPostController {
      */
     @PostMapping("/photo-post/post")
     public void savePost(@RequestPart("data") @Valid PhotoPostRequest photoPostRequest, @RequestPart("photo-file") List<MultipartFile> files,
-                         @AuthenticationPrincipal UserDetails userDetails, HttpServletResponse response){
+                         HttpServletResponse response){
 
-        photoPostService.savePost(photoPostRequest, files, userDetails.getUsername(), response);
+        photoPostService.savePost(photoPostRequest, files, "manager", response);
     }
+//    @PostMapping("/photo-post/post")
+//    public void savePost(@RequestPart("data") @Valid PhotoPostRequest photoPostRequest, @RequestPart("photo-file") List<MultipartFile> files,
+//                         @AuthenticationPrincipal UserDetails userDetails, HttpServletResponse response){
+//
+//        photoPostService.savePost(photoPostRequest, files, userDetails.getUsername(), response);
+//    }
 
     /*
     사진 게시판 목록(썸네일) 조회
@@ -67,18 +73,17 @@ public class PhotoPostController {
 
 
     /*
-    사진 게시물 조회
+    사진 게시물 단건 조회
      */
     @GetMapping("/photo-post/{post_id}")
-    public ApiResult<?> showPost(@PathVariable("post_id") Long postId,
-                              @AuthenticationPrincipal UserDetails userDetails){
+    public ApiResult<?> showPost(@PathVariable("post_id") Long postId){
 
         Map<String, Object> result = new HashMap<>();
 
-        PhotoPostResponse photoPostResponse = photoPostService.findPostById(postId, userDetails.getUsername());
+        PhotoPostResponse photoPostResponse = photoPostService.findPostById(postId, "manager");
         List<AttachedFileResponse> fileDtoList = attachedFileService.findAllFilesByPost(postId);
-        List<CommentResponse> commentResponseList = commentService.findCommentByPost(postId, userDetails.getUsername());
-        boolean isMemberLiked = postLikeService.isMemberLikedByPost(postId, userDetails.getUsername());
+        List<CommentResponse> commentResponseList = commentService.findCommentByPost(postId, "manager");
+        boolean isMemberLiked = postLikeService.isMemberLikedByPost(postId, "manager");
 
         result.put("post-data", photoPostResponse);
         result.put("file-data", fileDtoList);
@@ -87,6 +92,24 @@ public class PhotoPostController {
 
         return ApiResult.success(result);
     }
+//    @GetMapping("/photo-post/{post_id}")
+//    public ApiResult<?> showPost(@PathVariable("post_id") Long postId,
+//                              @AuthenticationPrincipal UserDetails userDetails){
+//
+//        Map<String, Object> result = new HashMap<>();
+//
+//        PhotoPostResponse photoPostResponse = photoPostService.findPostById(postId, userDetails.getUsername());
+//        List<AttachedFileResponse> fileDtoList = attachedFileService.findAllFilesByPost(postId);
+//        List<CommentResponse> commentResponseList = commentService.findCommentByPost(postId, userDetails.getUsername());
+//        boolean isMemberLiked = postLikeService.isMemberLikedByPost(postId, userDetails.getUsername());
+//
+//        result.put("post-data", photoPostResponse);
+//        result.put("file-data", fileDtoList);
+//        result.put("comment-data", commentResponseList);
+//        result.put("is-member-liked", isMemberLiked);
+//
+//        return ApiResult.success(result);
+//    }
 
     /*
     사진 게시물 수정
