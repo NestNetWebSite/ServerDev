@@ -34,9 +34,9 @@ public abstract class Post {
     @JoinColumn(name = "member_id")
     private Member member;                                          // 작성 멤버
 
-    private Long viewCount;                                          // 조회 수
+    private Long viewCount;                                         // 조회 수
 
-    private int likeCount;                                // 추천 수
+    private int likeCount;                                          // 추천 수
 
     @Enumerated(value = EnumType.STRING)
     private PostCategory PostCategory;                              // 게시판 분류

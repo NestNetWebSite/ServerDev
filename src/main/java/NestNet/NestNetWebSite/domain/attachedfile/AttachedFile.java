@@ -77,7 +77,7 @@ public class AttachedFile {
                 e.printStackTrace();
             }
         }
-        //사진 게시판의 경우 게시글마다 폴더를 생성 ex) C:/nestnetFile/PHOTO/230520_23년도 1학기 체육대회
+        // 사진 게시판의 경우 게시글마다 폴더를 생성 ex) C:/nestnetFile/PHOTO/230520_23년도 1학기 체육대회
         if(this.post.getPostCategory().equals(PostCategory.PHOTO)) {
             path += File.separator + this.post.getCreatedTime().getYear() + this.post.getCreatedTime().getMonth() +
                     this.post.getCreatedTime().getDayOfMonth() + "_" + this.post.getTitle();
@@ -89,8 +89,10 @@ public class AttachedFile {
             }catch (Exception e){
                 e.printStackTrace();
             }
-        }
-//        else if(this.post.getPostCategory().equals(Pos))
+        }   // 족보 게시판의 경우 과목/교수 마다 폴더를 생성
+//        else if(this.post.getPostCategory().equals(PostCategory.EXAM)){
+//            path += File.separator + this.post.
+//        }
 
         this.saveFilePath = path;
     }
