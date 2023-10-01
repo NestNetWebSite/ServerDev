@@ -50,10 +50,10 @@ public class PhotoPostController {
     사진 게시판 게시물 저장
      */
     @PostMapping("/photo-post/post")
-    public void savePost(@RequestPart("data") @Valid PhotoPostRequest photoPostRequest, @RequestPart("photo-file") List<MultipartFile> files,
+    public ApiResult<?> savePost(@RequestPart("data") @Valid PhotoPostRequest photoPostRequest, @RequestPart("photo-file") List<MultipartFile> files,
                          HttpServletResponse response){
 
-        photoPostService.savePost(photoPostRequest, files, "manager", response);
+        return photoPostService.savePost(photoPostRequest, files, "manager", response);
     }
 //    @PostMapping("/photo-post/post")
 //    public void savePost(@RequestPart("data") @Valid PhotoPostRequest photoPostRequest, @RequestPart("photo-file") List<MultipartFile> files,
