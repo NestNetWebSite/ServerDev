@@ -50,7 +50,6 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-//        WebMvcConfigurer.super.addResourceHandlers(registry);
         registry.addResourceHandler("/image/**")
                 .addResourceLocations("file:///C:" + File.separator + "nestnetFile" + File.separator);
     }

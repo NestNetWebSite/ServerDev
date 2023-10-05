@@ -84,6 +84,8 @@ public class AttachedFile {
 
             File innerFolder = new File(basePath + path);               //해당 경로에 폴더 생성
 
+            System.out.println("저장할때 : " + basePath + path);
+
             try {
                 innerFolder.mkdir();
             }catch (Exception e){
