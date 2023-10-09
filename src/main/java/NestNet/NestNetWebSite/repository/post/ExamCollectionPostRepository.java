@@ -98,10 +98,14 @@ public class ExamCollectionPostRepository {
 
     //=====================================================================================//
 
-    // 족보 게시물 삭제
-    public void deletePost(Long postId){
+    // 족보 게시물 수정
+    public void modifyPost(Long postId){
 
-        Post post = entityManager.find(Post.class, postId);
+    }
+
+    // 족보 게시물 삭제
+    public void deletePost(Post post){
+
         entityManager.remove(post);
     }
 }

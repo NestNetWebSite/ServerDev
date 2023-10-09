@@ -5,12 +5,14 @@ import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.repository.like.PostLikeRepository;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
+import NestNet.NestNetWebSite.repository.post.PostRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.swing.text.html.Option;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -20,12 +22,8 @@ public class PostLikeService {
 
     private final PostLikeRepository postLikeRepository;
     private final MemberRepository memberRepository;
+    private final PostRepository postRepository;
     private final EntityManager entityManager;
-
-    // Post 자식 객체를 가져오기 위한 간단한 로직 수행
-    public Post findPost(Long postId){
-        return entityManager.find(Post.class, postId);
-    }
 
     /*
     좋아요 저장
@@ -33,7 +31,7 @@ public class PostLikeService {
     @Transactional
     public void saveLike(Long postId, String memberLoginId){
 
-        Post post = findPost(postId);
+        Post post = postRepository.findById(postId);
         Member member = memberRepository.findByLoginId(memberLoginId);
         PostLike postLike = new PostLike(post, member);
 
@@ -54,7 +52,7 @@ public class PostLikeService {
      */
     public boolean isMemberLikedByPost(Long postId, String memberLoginId){
 
-        Post post = findPost(postId);
+        Post post = postRepository.findById(postId);
         Member member = memberRepository.findByLoginId(memberLoginId);
         return postLikeRepository.isMemberLiked(post, member);
     }
@@ -65,7 +63,7 @@ public class PostLikeService {
     @Transactional
     public void cancelLike(Long postId, String memberLoginId){
 
-        Post post = findPost(postId);
+        Post post = postRepository.findById(postId);
         Member member = memberRepository.findByLoginId(memberLoginId);
 
         Optional<PostLike> postLike = postLikeRepository.findByMemberAndPost(member, post);
@@ -73,5 +71,16 @@ public class PostLikeService {
         if(postLike.isPresent()){
             postLikeRepository.delete(postLike.get());
         }
+    }
+
+    /*
+    게시물 관련 좋아요 삭제
+     */
+    @Transactional
+    public void deleteLike(Long postId){
+
+        Post post = postRepository.findById(postId);
+        List<PostLike> postLikeList = postLikeRepository.findAllByPost(post);
+        postLikeRepository.deleteAll(postLikeList);
     }
 }

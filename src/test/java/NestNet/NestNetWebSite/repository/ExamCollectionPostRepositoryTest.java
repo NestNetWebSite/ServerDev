@@ -34,7 +34,7 @@ public class ExamCollectionPostRepositoryTest {
         List<ExamCollectionPost> resultListPrev = examCollectionPostRepository.findAllExamCollectionPost();
         examCollectionPostRepository.save(examCollectionPost);
         List<ExamCollectionPost> resultListAfter = examCollectionPostRepository.findAllExamCollectionPost();
-        examCollectionPostRepository.deletePost(examCollectionPost.getId());
+        examCollectionPostRepository.deletePost(examCollectionPost);
         List<ExamCollectionPost> resultListAfterDelete = examCollectionPostRepository.findAllExamCollectionPost();
 
         //then

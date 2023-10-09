@@ -3,8 +3,10 @@ package NestNet.NestNetWebSite.service.post;
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.member.Member;
+import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.domain.post.exam.ExamCollectionPost;
 import NestNet.NestNetWebSite.domain.post.exam.ExamType;
+import NestNet.NestNetWebSite.dto.request.ExamCollectionPostModifyRequest;
 import NestNet.NestNetWebSite.dto.request.ExamCollectionPostRequest;
 import NestNet.NestNetWebSite.dto.response.ExamCollectionPostResponse;
 import NestNet.NestNetWebSite.dto.response.ExamCollectionPostListResponse;
@@ -153,9 +155,26 @@ public class ExamCollectionPostService {
     }
 
     /*
+    족보 게시물 수정
+     */
+    @Transactional
+    public void modifyPost(ExamCollectionPostModifyRequest modifyRequest){
+
+        ExamCollectionPost post = examCollectionPostRepository.findById(modifyRequest.getId());
+
+        // 변경 감지 -> 자동 update
+        post.modifyPost(modifyRequest.getTitle(), modifyRequest.getBodyContent(), modifyRequest.getSubject(),
+                modifyRequest.getProfessor(), modifyRequest.getYear(), modifyRequest.getSemester(), modifyRequest.getExamType());
+    }
+
+    /*
     족보 게시물 삭제
      */
+    @Transactional
     public void deletePost(Long id){
-        examCollectionPostRepository.deletePost(id);
+
+        Post post = examCollectionPostRepository.findById(id);
+
+        examCollectionPostRepository.deletePost(post);
     }
 }

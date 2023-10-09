@@ -49,11 +49,16 @@ public class ExamCollectionPost extends Post {
     /*
     게시글 수정
      */
-    @Override
-    public void modifyPost(String title, String bodyContent) {
+    public void modifyPost(String title, String bodyContent, String subject, String professor, int year, int semester, ExamType examType) {
+
         super.setTitle(title);
         super.setBodyContent(bodyContent);
         super.setModifiedTime(LocalDateTime.now());
+        this.subject = subject;
+        this.professor = professor;
+        this.year = year;
+        this.semester = semester;
+        this.examType = examType;
     }
 
     public void setSubject(String subject) {

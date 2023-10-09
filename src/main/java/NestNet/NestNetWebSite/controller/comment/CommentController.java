@@ -48,6 +48,6 @@ public class CommentController {
 
         System.out.println("====================댓글 삭제 컨트롤러====================");
 
-        commentService.DeleteComment(commentId);
+        commentService.deleteComment(commentId);
     }
 }

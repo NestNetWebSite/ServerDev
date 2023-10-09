@@ -1,8 +1,8 @@
 package NestNet.NestNetWebSite.controller.post;
 
 import NestNet.NestNetWebSite.api.ApiResult;
-import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.domain.post.exam.ExamType;
+import NestNet.NestNetWebSite.dto.request.ExamCollectionPostModifyRequest;
 import NestNet.NestNetWebSite.dto.request.ExamCollectionPostRequest;
 import NestNet.NestNetWebSite.dto.request.PostLikeRequest;
 import NestNet.NestNetWebSite.dto.response.AttachedFileResponse;
@@ -15,9 +15,9 @@ import NestNet.NestNetWebSite.service.post.ExamCollectionPostService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -42,7 +42,8 @@ public class ExamCollectionPostController {
     족보 게시판 게시물 저장
      */
     @PostMapping("/exam-collection-post/post")
-    public ApiResult<?> savePost(@RequestPart("data") @Valid ExamCollectionPostRequest examCollectionPostRequest, @RequestPart(value = "file", required = false) List<MultipartFile> files,
+    public ApiResult<?> savePost(@RequestPart("data") @Valid ExamCollectionPostRequest examCollectionPostRequest,
+                                 @RequestPart(value = "file", required = false) List<MultipartFile> files,
                                  @AuthenticationPrincipal UserDetails userDetails, HttpServletResponse response){
 
         return examCollectionPostService.savePost(examCollectionPostRequest, files, userDetails.getUsername(), response);
@@ -105,10 +106,37 @@ public class ExamCollectionPostController {
     /*
     족보 게시물 수정
      */
+    @PostMapping("/exam-collection-post/modify")
+    public ApiResult<?> modifyPost(@RequestPart("data") ExamCollectionPostModifyRequest modifyRequest,
+                                   @RequestPart(value = "file-id", required = false) List<Long> fileIdList,
+                                   @RequestPart(value = "file", required = false) List<MultipartFile> files,
+                                   HttpServletResponse response){
+
+        examCollectionPostService.modifyPost(modifyRequest);
+        boolean isCompleted = attachedFileService.modifyFiles(fileIdList, files, modifyRequest.getId());
+
+        if(isCompleted) return ApiResult.success("게시물 수정 완료");
+        else return ApiResult.error(response, HttpStatus.INTERNAL_SERVER_ERROR, "파일 수정 에러");
+    }
 
     /*
-    족보 게시물 삭제
+    족보 게시물 삭제 -> 게시물, 첨부파일, 댓글, 좋아요 모두 삭제
      */
+    @DeleteMapping("/exam-collection-post/delete")
+    public ApiResult<?> deletePost(@RequestParam(value = "postId") Long postId, HttpServletResponse response){
+
+        boolean isComplete = attachedFileService.deleteFiles(postId);
+        examCollectionPostService.deletePost(postId);
+        commentService.deleteAllComments(postId);
+        postLikeService.deleteLike(postId);
+
+        if(isComplete){
+            return ApiResult.success("게시물 삭제 완료");
+        }
+        else{
+            return ApiResult.error(response, HttpStatus.INTERNAL_SERVER_ERROR, "게시물 삭제 실패. 서버 에러");
+        }
+    }
 
 
     /*

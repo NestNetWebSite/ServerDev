@@ -48,4 +48,12 @@ public class CommentRepository {
     public void delete(Comment comment){
         entityManager.remove(comment);
     }
+
+    // 댓글 여러개 삭제
+    public void deleteAll(List<Comment> commentList){
+
+        for(Comment comment : commentList){
+            entityManager.remove(comment);
+        }
+    }
 }

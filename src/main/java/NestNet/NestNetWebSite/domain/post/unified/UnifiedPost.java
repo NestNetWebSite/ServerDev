@@ -37,10 +37,10 @@ public class UnifiedPost extends Post {
     }
 
     //== 비지니스 로직 ==//
+
     /*
     게시글 수정
      */
-    @Override
     public void modifyPost(String title, String bodyContent) {
         super.setTitle(title);
         super.setBodyContent(bodyContent);

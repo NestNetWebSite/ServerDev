@@ -70,4 +70,26 @@ public class AttachedFileRepository {
     }
 
     //====================================================================================//
+
+    // 파일 삭제
+    public boolean deleteFiles(List<AttachedFile> attachedFiles){
+
+        for(int i = 0; i <attachedFiles.size(); i++){
+            Path delPath = Paths.get(basePath + attachedFiles.get(i).getSaveFilePath()+ File.separator + attachedFiles.get(i).getSaveFileName());
+            log.info("AttachedFileRepository / deleteFiles : 삭제 파일 : " + delPath);
+
+            try {
+                File delFile = new File(delPath.toString());
+
+                if(delFile.exists()){
+                    delFile.delete();
+                    entityManager.remove(attachedFiles.get(i));
+                }
+            } catch (Exception e){
+                log.info(e.getMessage());
+                return false;
+            }
+        }
+        return true;
+    }
 }

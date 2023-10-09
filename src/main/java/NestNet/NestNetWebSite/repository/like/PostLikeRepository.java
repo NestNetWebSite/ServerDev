@@ -8,6 +8,7 @@ import jakarta.persistence.NoResultException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -22,6 +23,14 @@ public class PostLikeRepository {
     }
 
     //=========================================조회=========================================//
+
+    // 게시물로 조회
+    public List<PostLike> findAllByPost(Post post){
+
+        return entityManager.createQuery("select p from PostLike p where p.post =: post", PostLike.class)
+                .setParameter("post", post)
+                .getResultList();
+    }
 
     // 회원, 게시물로 조회
     public Optional<PostLike> findByMemberAndPost(Member member, Post post){
@@ -58,5 +67,13 @@ public class PostLikeRepository {
     // 삭제
     public void delete(PostLike postLike){
         entityManager.remove(postLike);
+    }
+
+    // 여러개 삭제
+    public void deleteAll(List<PostLike> postLikeList){
+
+        for(PostLike postLike : postLikeList){
+            entityManager.remove(postLike);
+        }
     }
 }

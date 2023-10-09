@@ -7,6 +7,7 @@ import NestNet.NestNetWebSite.dto.request.CommentRequest;
 import NestNet.NestNetWebSite.dto.response.CommentResponse;
 import NestNet.NestNetWebSite.repository.comment.CommentRepository;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
+import NestNet.NestNetWebSite.repository.post.PostRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final MemberRepository memberRepository;
+    private final PostRepository postRepository;
     private final EntityManager entityManager;
 
     // Post 자식 객체를 가져오기 위한 간단한 로직 수행
@@ -91,10 +93,21 @@ public class CommentService {
     }
 
     /*
-    댓글 삭제
+    게시물에 관련된 댓글 삭제
      */
     @Transactional
-    public void DeleteComment(Long commentId){
+    public void deleteAllComments(Long postId){
+
+        Post post = postRepository.findById(postId);
+        List<Comment> commentList = commentRepository.findCommentsByPost(post);
+        commentRepository.deleteAll(commentList);
+    }
+
+    /*
+    댓글 단건 삭제
+     */
+    @Transactional
+    public void deleteComment(Long commentId){
 
         Comment comment = commentRepository.findById(commentId);
         commentRepository.delete(comment);

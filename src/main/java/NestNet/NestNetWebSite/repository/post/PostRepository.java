@@ -16,6 +16,11 @@ public class PostRepository {
 
     private final EntityManager entityManager;
 
+    // PK(id)로 조회
+    public Post findById(Long postId){
+        return entityManager.find(Post.class, postId);
+    }
+
     // 사용자가 쓴 글 조회 (족보, 통합 게시판 / 사진 게시판은 제외)
     public List<Post> findAllPostByMember(Member member){
 

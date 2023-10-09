@@ -71,10 +71,6 @@ public abstract class Post {
     }
 
     //== 비지니스 로직 ==//
-    /*
-    게시글 수정
-     */
-    public abstract void modifyPost(String title, String bodyContent);
 
     /*
     조회수 count

@@ -1,26 +1,21 @@
 package NestNet.NestNetWebSite.service.attachedfile;
 
-import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.dto.response.AttachedFileResponse;
 import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
+import NestNet.NestNetWebSite.repository.post.PostRepository;
 import jakarta.persistence.EntityManager;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @Transactional(readOnly = true)
@@ -28,6 +23,7 @@ import java.util.Map;
 public class AttachedFileService {
 
     private final AttachedFileRepository attachedFileRepository;
+    private final PostRepository postRepository;
     private final EntityManager entityManager;
 
     // Post 자식 객체를 가져오기 위한 간단한 로직 수행
@@ -49,7 +45,7 @@ public class AttachedFileService {
         List<AttachedFileResponse> fileResponseList = new ArrayList<>();
 
         for(AttachedFile file : files){
-            fileResponseList.add(new AttachedFileResponse(file.getOriginalFileName(), file.getSaveFilePath(), file.getSaveFileName()));
+            fileResponseList.add(new AttachedFileResponse(file.getId(), file.getOriginalFileName(), file.getSaveFilePath(), file.getSaveFileName()));
         }
 
         return fileResponseList;
@@ -75,5 +71,50 @@ public class AttachedFileService {
         return resource;
     }
 
+    /*
+    첨부파일 수정
+     */
+    @Transactional
+    public boolean modifyFiles(List<Long> fileIdList, List<MultipartFile> fileList, Long postId){
 
+        Post post = postRepository.findById(postId);
+
+        List<AttachedFile> originalAttachedFileList = attachedFileRepository.findByPost(post);      //삭제할 파일
+
+        System.out.println("오리지널파일사이즈 : " + originalAttachedFileList.size());
+        System.out.println("파일 사이즈 : " + fileList.size());
+
+        List<AttachedFile> attachedFileList = new ArrayList<>();
+
+        for(int i = 0; i < fileIdList.size(); i++){
+            System.out.println("ㅠㅏ일 아이디 :: " + fileIdList.get(i));
+            if(fileIdList.get(i) == 0){              //null이면 새로 들어온 파일이므로 넣어줘야 함.
+                attachedFileList.add(new AttachedFile(post, fileList.get(i)));
+            }
+            else{
+                for(AttachedFile originalAttachedFile : originalAttachedFileList){
+                    if(fileIdList.get(i) == originalAttachedFile.getId()){              //이미 저장된 것과 같은 파일이면
+                        originalAttachedFileList.remove(originalAttachedFile);
+                    }
+                }
+            }
+        }
+        boolean isSaved = attachedFileRepository.saveAll(attachedFileList, fileList);         //새로운 파일 저장
+        boolean isDeleted = attachedFileRepository.deleteFiles(originalAttachedFileList);       //기존 파일 중 삭제된 파일 삭제
+
+        if(isSaved && isDeleted) return true;
+        else return false;
+    }
+
+    /*
+    첨부파일 삭제
+     */
+    @Transactional
+    public boolean deleteFiles(Long postId){
+
+        Post post = postRepository.findById(postId);
+        List<AttachedFile> files = attachedFileRepository.findByPost(post);
+
+        return attachedFileRepository.deleteFiles(files);
+    }
 }
