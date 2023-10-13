@@ -77,27 +77,13 @@ public class PhotoPostController {
 
         return ApiResult.success(result);
     }
-//    @GetMapping("/photo-post/{post_id}")
-//    public ApiResult<?> showPost(@PathVariable("post_id") Long postId,
-//                              @AuthenticationPrincipal UserDetails userDetails){
-//
-//        Map<String, Object> result = new HashMap<>();
-//
-//        PhotoPostResponse photoPostResponse = photoPostService.findPostById(postId, userDetails.getUsername());
-//        List<AttachedFileResponse> fileDtoList = attachedFileService.findAllFilesByPost(postId);
-//        List<CommentResponse> commentResponseList = commentService.findCommentByPost(postId, userDetails.getUsername());
-//        boolean isMemberLiked = postLikeService.isMemberLikedByPost(postId, userDetails.getUsername());
-//
-//        result.put("post-data", photoPostResponse);
-//        result.put("file-data", fileDtoList);
-//        result.put("comment-data", commentResponseList);
-//        result.put("is-member-liked", isMemberLiked);
-//
-//        return ApiResult.success(result);
-//    }
 
     /*
     사진 게시물 수정
+     */
+
+    /*
+    사진 게시물 삭제
      */
 
     /*

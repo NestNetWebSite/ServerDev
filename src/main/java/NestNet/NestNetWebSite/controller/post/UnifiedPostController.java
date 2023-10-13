@@ -83,6 +83,10 @@ public class UnifiedPostController {
      */
 
     /*
+    통합 게시물 삭제
+     */
+
+    /*
     좋아요 누름
      */
     @PostMapping("/unified-post/like")
