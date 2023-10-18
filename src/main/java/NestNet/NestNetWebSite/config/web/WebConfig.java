@@ -30,7 +30,8 @@ public class WebConfig implements WebMvcConfigurer {
         CorsConfiguration configuration = new CorsConfiguration();      //CORS 관련 설정 정의할 객체
 
         configuration.setAllowCredentials(true);         //자격 증명 허용 여부 설정. Authorization을 이용해 인증 서비스를 할 때 true로 세팅
-        configuration.addAllowedOriginPattern("http://172.20.10.6:3000");      //모든 ip에 대해 응답을 허용
+        configuration.addAllowedOriginPattern("http://172.20.10.3:3000");      //모든 ip에 대해 응답을 허용
+        configuration.addAllowedOriginPattern("http://172.20.10.4:3000");      //모든 ip에 대해 응답을 허용
         configuration.addAllowedHeader("*");             //모든 header에 대해 응답을 허용
         configuration.addAllowedMethod("*");             //모든 매서드(get, post, put, delete..)에 대해 응답을 허용
 
@@ -43,7 +44,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
 //                .allowedOrigins("/**")
-                .allowedOrigins("http://172.20.10.6:3000")
+                .allowedOrigins("http://172.20.10.3:3000", "http://172.20.10.4:3000")
                 .allowCredentials(true)
                 .allowedMethods("OPTIONS", "GET", "POST", "PUT", "DELETE");
     }

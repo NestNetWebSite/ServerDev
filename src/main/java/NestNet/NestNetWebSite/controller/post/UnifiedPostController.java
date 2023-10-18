@@ -21,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -89,6 +90,13 @@ public class UnifiedPostController {
                                    @RequestPart(value = "file", required = false) List<MultipartFile> files,
                                    HttpServletResponse response){
 
+        if(fileIdList == null){
+            fileIdList = new ArrayList<>();
+        }
+        if(files == null){
+            files = new ArrayList<>();
+        }
+
         unifiedPostService.modifyPost(unifiedPostModifyRequest);
         boolean isCompleted = attachedFileService.modifyFiles(fileIdList, files, unifiedPostModifyRequest.getId());
 
@@ -99,7 +107,7 @@ public class UnifiedPostController {
     /*
     통합 게시물 삭제 -> 게시물, 첨부파일, 댓글, 좋아요 모두 삭제
      */
-    @DeleteMapping("/photo-post/delete")
+    @DeleteMapping("/unified-post/delete")
     public ApiResult<?> deletePost(@RequestParam(value = "postId") Long postId, HttpServletResponse response){
 
         boolean isComplete = attachedFileService.deleteFiles(postId);

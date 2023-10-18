@@ -109,6 +109,7 @@ public class SecurityConfig {
                         .requestMatchers("/photo-post").permitAll()
                         .requestMatchers("/photo-post/post").permitAll()
                         .requestMatchers("/photo-post/**").permitAll()
+                                .requestMatchers("/file/**").permitAll()
 //                        .requestMatchers("/photo-post/post").hasAnyAuthority("PRESIDENT", "VICE_PRESIDENT", "MANAGER")
 //                        .requestMatchers("/photo-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER")
                         // 인생네컷

@@ -21,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,18 +38,18 @@ public class PhotoPostController {
     /*
     사진 게시판 게시물 저장
      */
-//    @PostMapping("/photo-post/post")
-//    public ApiResult<?> savePost(@RequestPart("data") @Valid PhotoPostRequest photoPostRequest, @RequestPart("photo-file") List<MultipartFile> files,
-//                         HttpServletResponse response){
-//
-//        return photoPostService.savePost(photoPostRequest, files, "manager", response);
-//    }
     @PostMapping("/photo-post/post")
-    public void savePost(@RequestPart("data") @Valid PhotoPostRequest photoPostRequest, @RequestPart("photo-file") List<MultipartFile> files,
-                         @AuthenticationPrincipal UserDetails userDetails, HttpServletResponse response){
+    public ApiResult<?> savePost(@RequestPart("data") @Valid PhotoPostRequest photoPostRequest, @RequestPart("photo-file") List<MultipartFile> files,
+                         HttpServletResponse response){
 
-        photoPostService.savePost(photoPostRequest, files, userDetails.getUsername(), response);
+        return photoPostService.savePost(photoPostRequest, files, "manager", response);
     }
+//    @PostMapping("/photo-post/post")
+//    public void savePost(@RequestPart("data") @Valid PhotoPostRequest photoPostRequest, @RequestPart("photo-file") List<MultipartFile> files,
+//                         @AuthenticationPrincipal UserDetails userDetails, HttpServletResponse response){
+//
+//        photoPostService.savePost(photoPostRequest, files, userDetails.getUsername(), response);
+//    }
 
     /*
     사진 게시판 목록(썸네일) 조회
@@ -89,6 +90,13 @@ public class PhotoPostController {
                                    @RequestPart(value = "file-id", required = false) List<Long> fileIdList,
                                    @RequestPart(value = "file", required = false) List<MultipartFile> files,
                                    HttpServletResponse response){
+
+        if(fileIdList == null){
+            fileIdList = new ArrayList<>();
+        }
+        if(files == null){
+            files = new ArrayList<>();
+        }
 
         photoPostService.modifyPost(photoPostModifyRequest);
         boolean isCompleted = attachedFileService.modifyFiles(fileIdList, files, photoPostModifyRequest.getId());

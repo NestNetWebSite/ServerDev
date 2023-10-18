@@ -25,9 +25,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -111,6 +109,13 @@ public class ExamCollectionPostController {
                                    @RequestPart(value = "file-id", required = false) List<Long> fileIdList,
                                    @RequestPart(value = "file", required = false) List<MultipartFile> files,
                                    HttpServletResponse response){
+
+        if(fileIdList == null){
+            fileIdList = new ArrayList<>();
+        }
+        if(files == null){
+            files = new ArrayList<>();
+        }
 
         examCollectionPostService.modifyPost(modifyRequest);
         boolean isCompleted = attachedFileService.modifyFiles(fileIdList, files, modifyRequest.getId());

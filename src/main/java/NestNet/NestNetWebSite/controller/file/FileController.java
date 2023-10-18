@@ -25,6 +25,8 @@ public class FileController {
     @GetMapping("/file/{postId}/{fileName}")
     public ResponseEntity<InputStreamResource> showFile(@PathVariable(value = "postId") Long postId, @PathVariable(value = "fileName") String fileName){
 
+        System.out.println("여기 들어오냐");
+
         InputStreamResource inputStreamResource = attachedFileService.findFile(postId, fileName);
 
         HttpHeaders headers = new HttpHeaders();

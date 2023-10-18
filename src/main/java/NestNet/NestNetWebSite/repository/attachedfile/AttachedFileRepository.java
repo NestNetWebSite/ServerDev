@@ -99,12 +99,13 @@ public class AttachedFileRepository {
             Path delPath = Paths.get(basePath + attachedFiles.get(i).getSaveFilePath()+ File.separator + attachedFiles.get(i).getSaveFileName());
             log.info("AttachedFileRepository / deleteFiles : 삭제 파일 : " + delPath);
 
+            entityManager.remove(attachedFiles.get(i));
+
             try {
                 File delFile = new File(delPath.toString());
 
                 if(delFile.exists()){
                     delFile.delete();
-                    entityManager.remove(attachedFiles.get(i));
                 }
             } catch (Exception e){
                 log.info(e.getMessage());

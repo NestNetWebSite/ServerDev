@@ -26,6 +26,8 @@ public class AttachedFileService {
     private final PostRepository postRepository;
     private final EntityManager entityManager;
 
+    private static String basePath = "C:" + File.separator + "nestnetFile" + File.separator;
+
     // Post 자식 객체를 가져오기 위한 간단한 로직 수행
     public Post findPost(Long postId){
         return entityManager.find(Post.class, postId);
@@ -61,7 +63,7 @@ public class AttachedFileService {
         InputStreamResource resource = null;
 
         try{
-            File realFile = new File(file.getSaveFilePath() + File.separator + file.getSaveFileName());
+            File realFile = new File(basePath + file.getSaveFilePath() + File.separator + file.getSaveFileName());
             resource = new InputStreamResource(new FileInputStream(realFile));
         } catch (Exception e){
             e.printStackTrace();
@@ -82,13 +84,14 @@ public class AttachedFileService {
         List<AttachedFile> deleteFileList = attachedFileRepository.findByPost(post);      //이전에 있던 파일 중 삭제할 파일
 
         // 이전에 있던 파일 중, 삭제될 것만 남김
-        for(AttachedFile file : deleteFileList){
+        for(int i = 0; i < deleteFileList.size(); i++){
             for(Long existFileId : existFileIdList){
-                if(file.getId() == existFileId){
-                    deleteFileList.remove(file);
+                if(deleteFileList.get(i).getId() == existFileId){
+                    deleteFileList.remove(deleteFileList.get(i));
                 }
             }
         }
+
         boolean isDeleted = attachedFileRepository.deleteFiles(deleteFileList);       // 기존 파일 중 삭제된 파일 삭제
 
         List<AttachedFile> newAttachedFileList = new ArrayList<>();     // 새로 입력된 파일
