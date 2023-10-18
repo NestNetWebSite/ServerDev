@@ -66,7 +66,19 @@ public class AttachedFile {
      */
     public void createSavePath(){
 
-        String path = this.post.getPostCategory().toString();      //파일 저장 경로 ( ex) C:/nestnetFile/EXAM)
+        StringBuilder folderNameBuilder = new StringBuilder();
+        folderNameBuilder.append(this.post.getPostCategory().toString());
+        folderNameBuilder.append(File.separator);
+        folderNameBuilder.append(this.post.getCreatedTime().getYear());
+
+        if(this.post.getCreatedTime().getMonth().getValue() <= 6){      //상반기 작성된 글
+           folderNameBuilder.append("_first_half");
+        }
+        else{
+            folderNameBuilder.append("_second_half");
+        }
+
+        String path = folderNameBuilder.toString();    //파일 저장 경로 ( ex) C:/nestnetFile/EXAM/)
 
         File folder = new File(basePath + path);               //해당 경로에 폴더 생성
 
@@ -77,25 +89,8 @@ public class AttachedFile {
                 e.printStackTrace();
             }
         }
-        // 사진 게시판의 경우 게시글마다 폴더를 생성 ex) C:/nestnetFile/PHOTO/230520_23년도 1학기 체육대회
-        if(this.post.getPostCategory().equals(PostCategory.PHOTO)) {
-            path += File.separator + this.post.getCreatedTime().getYear() + this.post.getCreatedTime().getMonth() +
-                    this.post.getCreatedTime().getDayOfMonth() + "_" + this.post.getTitle();
-
-            File innerFolder = new File(basePath + path);               //해당 경로에 폴더 생성
-
-            System.out.println("저장할때 : " + basePath + path);
-
-            try {
-                innerFolder.mkdir();
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-        }   // 족보 게시판의 경우 과목/교수 마다 폴더를 생성
-//        else if(this.post.getPostCategory().equals(PostCategory.EXAM)){
-//            path += File.separator + this.post.
-//        }
 
         this.saveFilePath = path;
     }
+
 }

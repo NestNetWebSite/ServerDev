@@ -41,9 +41,11 @@ public class UnifiedPost extends Post {
     /*
     게시글 수정
      */
-    public void modifyPost(String title, String bodyContent) {
+    public void modifyPost(String title, String bodyContent, UnifiedPostType unifiedPostType) {
+
         super.setTitle(title);
         super.setBodyContent(bodyContent);
+        this.unifiedPostType = unifiedPostType;
         super.setModifiedTime(LocalDateTime.now());
     }
 

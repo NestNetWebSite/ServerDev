@@ -84,9 +84,8 @@ public class UnifiedPostRepository {
     //====================================================================================//
 
     // 통합 게시물 삭제
-    public void deletePost(Long postId){
+    public void deletePost(Post post){
 
-        Post post = entityManager.find(Post.class, postId);
         entityManager.remove(post);
     }
 }

@@ -3,8 +3,10 @@ package NestNet.NestNetWebSite.service.post;
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.member.Member;
+import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.domain.post.unified.UnifiedPost;
 import NestNet.NestNetWebSite.domain.post.unified.UnifiedPostType;
+import NestNet.NestNetWebSite.dto.request.UnifiedPostModifyRequest;
 import NestNet.NestNetWebSite.dto.request.UnifiedPostRequest;
 import NestNet.NestNetWebSite.dto.response.UnifiedPostResponse;
 import NestNet.NestNetWebSite.dto.response.UnifiedPostListResponse;
@@ -140,9 +142,25 @@ public class UnifiedPostService {
     }
 
     /*
-    족보 게시물 삭제
+    통합 게시물 수정
      */
-    public void deletePost(Long id){
-        unifiedPostRepository.deletePost(id);
+    @Transactional
+    public void modifyPost(UnifiedPostModifyRequest request){
+
+        UnifiedPost post = unifiedPostRepository.findById(request.getId());
+
+        // 변경 감지 -> 자동 update
+        post.modifyPost(request.getTitle(), request.getBodyContent(), request.getUnifiedPostType());
+    }
+
+    /*
+    통합 게시물 삭제
+     */
+    @Transactional
+    public void deletePost(Long postId){
+
+        Post post = unifiedPostRepository.findById(postId);
+
+        unifiedPostRepository.deletePost(post);
     }
 }

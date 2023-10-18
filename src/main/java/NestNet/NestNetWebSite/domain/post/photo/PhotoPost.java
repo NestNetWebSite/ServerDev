@@ -30,7 +30,14 @@ public class PhotoPost extends Post {
         super(title, bodyContent, member, viewCount, recommendationCount, PostCategory.PHOTO, createdTime);
     }
 
+    //== 비지니스 로직 ==//
+    /*
+    게시글 수정
+     */
     public void modifyPost(String title, String bodyContent) {
-        // 사진 넣었다가 빼는 경우는 어떻게 처리??
+
+        super.setTitle(title);
+        super.setBodyContent(bodyContent);
+        super.setModifiedTime(LocalDateTime.now());
     }
 }

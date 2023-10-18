@@ -1,6 +1,8 @@
 package NestNet.NestNetWebSite.controller.post;
 
 import NestNet.NestNetWebSite.api.ApiResult;
+import NestNet.NestNetWebSite.dto.request.ExamCollectionPostModifyRequest;
+import NestNet.NestNetWebSite.dto.request.PhotoPostModifyRequest;
 import NestNet.NestNetWebSite.dto.request.PhotoPostRequest;
 import NestNet.NestNetWebSite.dto.request.PostLikeRequest;
 import NestNet.NestNetWebSite.dto.response.AttachedFileResponse;
@@ -13,6 +15,7 @@ import NestNet.NestNetWebSite.service.post.PhotoPostService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -34,18 +37,18 @@ public class PhotoPostController {
     /*
     사진 게시판 게시물 저장
      */
-    @PostMapping("/photo-post/post")
-    public ApiResult<?> savePost(@RequestPart("data") @Valid PhotoPostRequest photoPostRequest, @RequestPart("photo-file") List<MultipartFile> files,
-                         HttpServletResponse response){
-
-        return photoPostService.savePost(photoPostRequest, files, "manager", response);
-    }
 //    @PostMapping("/photo-post/post")
-//    public void savePost(@RequestPart("data") @Valid PhotoPostRequest photoPostRequest, @RequestPart("photo-file") List<MultipartFile> files,
-//                         @AuthenticationPrincipal UserDetails userDetails, HttpServletResponse response){
+//    public ApiResult<?> savePost(@RequestPart("data") @Valid PhotoPostRequest photoPostRequest, @RequestPart("photo-file") List<MultipartFile> files,
+//                         HttpServletResponse response){
 //
-//        photoPostService.savePost(photoPostRequest, files, userDetails.getUsername(), response);
+//        return photoPostService.savePost(photoPostRequest, files, "manager", response);
 //    }
+    @PostMapping("/photo-post/post")
+    public void savePost(@RequestPart("data") @Valid PhotoPostRequest photoPostRequest, @RequestPart("photo-file") List<MultipartFile> files,
+                         @AuthenticationPrincipal UserDetails userDetails, HttpServletResponse response){
+
+        photoPostService.savePost(photoPostRequest, files, userDetails.getUsername(), response);
+    }
 
     /*
     사진 게시판 목록(썸네일) 조회
@@ -81,10 +84,37 @@ public class PhotoPostController {
     /*
     사진 게시물 수정
      */
+    @PostMapping("/photo-post/modify")
+    public ApiResult<?> modifyPost(@RequestPart("data") PhotoPostModifyRequest photoPostModifyRequest,
+                                   @RequestPart(value = "file-id", required = false) List<Long> fileIdList,
+                                   @RequestPart(value = "file", required = false) List<MultipartFile> files,
+                                   HttpServletResponse response){
+
+        photoPostService.modifyPost(photoPostModifyRequest);
+        boolean isCompleted = attachedFileService.modifyFiles(fileIdList, files, photoPostModifyRequest.getId());
+
+        if(isCompleted) return ApiResult.success("게시물 수정 완료");
+        else return ApiResult.error(response, HttpStatus.INTERNAL_SERVER_ERROR, "파일 수정 에러");
+    }
 
     /*
-    사진 게시물 삭제
+    사진 게시물 삭제 -> 게시물, 첨부파일, 댓글, 좋아요 모두 삭제
      */
+    @DeleteMapping("/photo-post/delete")
+    public ApiResult<?> deletePost(@RequestParam(value = "postId") Long postId, HttpServletResponse response){
+
+        boolean isComplete = attachedFileService.deleteFiles(postId);
+        photoPostService.deletePost(postId);
+        commentService.deleteAllComments(postId);
+        postLikeService.deleteLike(postId);
+
+        if(isComplete){
+            return ApiResult.success("게시물 삭제 완료");
+        }
+        else{
+            return ApiResult.error(response, HttpStatus.INTERNAL_SERVER_ERROR, "게시물 삭제 실패. 서버 에러");
+        }
+    }
 
     /*
     좋아요 누름

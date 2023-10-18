@@ -3,8 +3,10 @@ package NestNet.NestNetWebSite.service.post;
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.member.Member;
+import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.domain.post.photo.PhotoPost;
 import NestNet.NestNetWebSite.domain.post.photo.ThumbNail;
+import NestNet.NestNetWebSite.dto.request.PhotoPostModifyRequest;
 import NestNet.NestNetWebSite.dto.request.PhotoPostRequest;
 import NestNet.NestNetWebSite.dto.response.PhotoPostResponse;
 import NestNet.NestNetWebSite.dto.response.ThumbNailResponse;
@@ -148,9 +150,25 @@ public class PhotoPostService {
     }
 
     /*
-    족보 게시물 삭제
+    사진 게시물 수정
      */
-    public void deletePost(Long id){
-        photoPostRepository.deletePost(id);
+    @Transactional
+    public void modifyPost(PhotoPostModifyRequest photoPostModifyRequest){
+
+        PhotoPost post = photoPostRepository.findById(photoPostModifyRequest.getId());
+
+        // 변경 감지 -> 자동 update
+        post.modifyPost(photoPostModifyRequest.getTitle(), photoPostModifyRequest.getBodyContent());
+    }
+
+    /*
+    사진 게시물 삭제
+     */
+    @Transactional
+    public void deletePost(Long postId){
+
+        Post post = photoPostRepository.findById(postId);
+
+        photoPostRepository.deletePost(post);
     }
 }

@@ -41,6 +41,27 @@ public class AttachedFileRepository {
         return true;
     }
 
+    // 수정
+//    public boolean modifyAll(List<AttachedFile> attachedFiles, List<MultipartFile> files){
+//
+//        for(int i = 0; i < attachedFiles.size(); i++){
+//
+//            Path savePath = Paths.get(folder.getAbsolutePath() + File.separator + attachedFiles.get(i).getSaveFileName());
+//
+//            log.info("AttachedFileRepository / saveAll : 저장 파일 : " + savePath);
+//
+//            try {
+//                files.get(i).transferTo(savePath);          //파일 실제 위치에 저장
+//                entityManager.persist(attachedFiles.get(i));
+//            } catch (Exception e){
+//                e.printStackTrace();
+//                return false;
+//            }
+//        }
+//        return true;
+//    }
+
+
     //=========================================조회=========================================//
 
     // id(PK)로 단건 조회

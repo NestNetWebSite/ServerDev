@@ -75,32 +75,29 @@ public class AttachedFileService {
     첨부파일 수정
      */
     @Transactional
-    public boolean modifyFiles(List<Long> fileIdList, List<MultipartFile> fileList, Long postId){
+    public boolean modifyFiles(List<Long> existFileIdList, List<MultipartFile> fileList, Long postId){
 
         Post post = postRepository.findById(postId);
 
-        List<AttachedFile> originalAttachedFileList = attachedFileRepository.findByPost(post);      //삭제할 파일
+        List<AttachedFile> deleteFileList = attachedFileRepository.findByPost(post);      //이전에 있던 파일 중 삭제할 파일
 
-        System.out.println("오리지널파일사이즈 : " + originalAttachedFileList.size());
-        System.out.println("파일 사이즈 : " + fileList.size());
-
-        List<AttachedFile> attachedFileList = new ArrayList<>();
-
-        for(int i = 0; i < fileIdList.size(); i++){
-            System.out.println("ㅠㅏ일 아이디 :: " + fileIdList.get(i));
-            if(fileIdList.get(i) == 0){              //null이면 새로 들어온 파일이므로 넣어줘야 함.
-                attachedFileList.add(new AttachedFile(post, fileList.get(i)));
-            }
-            else{
-                for(AttachedFile originalAttachedFile : originalAttachedFileList){
-                    if(fileIdList.get(i) == originalAttachedFile.getId()){              //이미 저장된 것과 같은 파일이면
-                        originalAttachedFileList.remove(originalAttachedFile);
-                    }
+        // 이전에 있던 파일 중, 삭제될 것만 남김
+        for(AttachedFile file : deleteFileList){
+            for(Long existFileId : existFileIdList){
+                if(file.getId() == existFileId){
+                    deleteFileList.remove(file);
                 }
             }
         }
-        boolean isSaved = attachedFileRepository.saveAll(attachedFileList, fileList);         //새로운 파일 저장
-        boolean isDeleted = attachedFileRepository.deleteFiles(originalAttachedFileList);       //기존 파일 중 삭제된 파일 삭제
+        boolean isDeleted = attachedFileRepository.deleteFiles(deleteFileList);       // 기존 파일 중 삭제된 파일 삭제
+
+        List<AttachedFile> newAttachedFileList = new ArrayList<>();     // 새로 입력된 파일
+
+        for(MultipartFile file : fileList){
+            newAttachedFileList.add(new AttachedFile(post, file));
+        }
+
+        boolean isSaved = attachedFileRepository.saveAll(newAttachedFileList, fileList);
 
         if(isSaved && isDeleted) return true;
         else return false;

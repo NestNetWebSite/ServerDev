@@ -43,6 +43,8 @@ public class ExamCollectionPostService {
 
         ExamCollectionPost post = examCollectionPostRequest.toEntity(member);
 
+        examCollectionPostRepository.save(post);
+
         if(files != null){
             List<AttachedFile> attachedFileList = new ArrayList<>();
 
@@ -57,8 +59,6 @@ public class ExamCollectionPostService {
                 return ApiResult.error(response, HttpStatus.INTERNAL_SERVER_ERROR, "파일 저장 실패");
             }
         }
-
-        examCollectionPostRepository.save(post);
 
         return ApiResult.success("게시물 저장 성공");
     }

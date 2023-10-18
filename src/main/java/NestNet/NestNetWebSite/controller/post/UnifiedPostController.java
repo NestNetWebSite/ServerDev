@@ -3,6 +3,7 @@ package NestNet.NestNetWebSite.controller.post;
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.post.unified.UnifiedPostType;
 import NestNet.NestNetWebSite.dto.request.PostLikeRequest;
+import NestNet.NestNetWebSite.dto.request.UnifiedPostModifyRequest;
 import NestNet.NestNetWebSite.dto.request.UnifiedPostRequest;
 import NestNet.NestNetWebSite.dto.response.AttachedFileResponse;
 import NestNet.NestNetWebSite.dto.response.CommentResponse;
@@ -14,6 +15,7 @@ import NestNet.NestNetWebSite.service.post.UnifiedPostService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -81,10 +83,37 @@ public class UnifiedPostController {
     /*
     통합 게시물 수정
      */
+    @PostMapping("unified-post/modify")
+    public ApiResult<?> modifyPost(@RequestPart("data") UnifiedPostModifyRequest unifiedPostModifyRequest,
+                                   @RequestPart(value = "file-id", required = false) List<Long> fileIdList,
+                                   @RequestPart(value = "file", required = false) List<MultipartFile> files,
+                                   HttpServletResponse response){
+
+        unifiedPostService.modifyPost(unifiedPostModifyRequest);
+        boolean isCompleted = attachedFileService.modifyFiles(fileIdList, files, unifiedPostModifyRequest.getId());
+
+        if(isCompleted) return ApiResult.success("게시물 수정 완료");
+        else return ApiResult.error(response, HttpStatus.INTERNAL_SERVER_ERROR, "파일 수정 에러");
+    }
 
     /*
-    통합 게시물 삭제
+    통합 게시물 삭제 -> 게시물, 첨부파일, 댓글, 좋아요 모두 삭제
      */
+    @DeleteMapping("/photo-post/delete")
+    public ApiResult<?> deletePost(@RequestParam(value = "postId") Long postId, HttpServletResponse response){
+
+        boolean isComplete = attachedFileService.deleteFiles(postId);
+        unifiedPostService.deletePost(postId);
+        commentService.deleteAllComments(postId);
+        postLikeService.deleteLike(postId);
+
+        if(isComplete){
+            return ApiResult.success("게시물 삭제 완료");
+        }
+        else{
+            return ApiResult.error(response, HttpStatus.INTERNAL_SERVER_ERROR, "게시물 삭제 실패. 서버 에러");
+        }
+    }
 
     /*
     좋아요 누름
