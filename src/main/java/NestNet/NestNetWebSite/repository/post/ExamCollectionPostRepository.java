@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Repository
@@ -50,6 +51,14 @@ public class ExamCollectionPostRepository {
     // Id(PK)로 단건 조회
     public ExamCollectionPost findById(Long id){
         return entityManager.find(ExamCollectionPost.class, id);
+    }
+
+    // 족보 게시물 총 갯수 조회
+    public Long findTotalSize(){
+
+        Object size = entityManager.createQuery("select count(p) from ExamCollectionPost p").getResultList().get(0);
+
+        return Long.valueOf(String.valueOf(size));
     }
 
     // 족보 게시물 조건에 따른 리스트 조회

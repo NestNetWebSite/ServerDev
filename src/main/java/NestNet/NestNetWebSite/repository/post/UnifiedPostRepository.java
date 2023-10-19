@@ -51,28 +51,24 @@ public class UnifiedPostRepository {
         return entityManager.find(UnifiedPost.class, id);
     }
 
-    // 통합 게시판(자유 + 개발 + 진로) 모두 조회
-    public List<UnifiedPost> findAllUnifiedPost(int offset, int limit){
+    // 통합 게시판 게시물 총 갯수 조회
+    public Long findTotalSize(UnifiedPostType unifiedPostType){
 
-        List<UnifiedPost> resultList = entityManager.createNativeQuery(
-                        "select * from Post inner join member" +
-                                " on Post.member_id = member.member_id" +
-                                " inner join unified_post" +
-                                " on Post.Post_id = unified_Post.Post_id" +
-                                " where dtype = 'Free' and 'Dev' and 'Career'" +
-                                " order by Post.id desc;", Post.class)
-                .setFirstResult(offset)
-                .setMaxResults(limit)
-                .getResultList();
+        Object size = entityManager.createQuery("select count(u) from UnifiedPost u where " +
+                        "(:unifiedPostType is null or u.unifiedPostType =: unifiedPostType)")
+                .setParameter("unifiedPostType", unifiedPostType)
+                .getResultList().get(0);
 
-        return resultList;
+        return Long.valueOf(String.valueOf(size));
     }
 
     // 통합 게시판 (자유 / 개발 / 진로) 조회
     public List<UnifiedPost> findUnifiedPostByType(int offset, int limit, UnifiedPostType unifiedPostType){
 
         List<UnifiedPost> resultList = entityManager.createQuery(
-                "select up from UnifiedPost up where up.unifiedPostType =: unifiedPostType order by up.id desc")
+                "select u from UnifiedPost u where " +
+                        "(:unifiedPostType is null or u.unifiedPostType =: unifiedPostType) " +
+                        "order by u.id desc")
                 .setParameter("unifiedPostType", unifiedPostType)
                 .setFirstResult(offset)
                 .setMaxResults(limit)

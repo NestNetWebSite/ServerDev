@@ -21,7 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional(readOnly = true)
@@ -71,15 +73,20 @@ public class UnifiedPostService {
     public ApiResult<?> findPostList(UnifiedPostType unifiedPostType, int offset, int limit){
 
         List<UnifiedPost> postList = unifiedPostRepository.findUnifiedPostByType(offset, limit, unifiedPostType);
+        Long size = unifiedPostRepository.findTotalSize(unifiedPostType);
+
+        Map<Object, Object> result = new HashMap<>();
 
         List<UnifiedPostListResponse> resultList = new ArrayList<>();
-
         for(UnifiedPost post : postList){
             resultList.add(new UnifiedPostListResponse(post.getMember().getName(), post.getTitle(),
                     post.getCreatedTime(), post.getViewCount(), post.getLikeCount()));
         }
 
-        return ApiResult.success(resultList);
+        result.put("totalSize", size);
+        result.put("posts", resultList);
+
+        return ApiResult.success(result);
     }
 
     /*

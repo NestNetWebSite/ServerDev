@@ -53,7 +53,7 @@ public class UnifiedPostController {
     통합 게시판 Type에 따른 목록 조회 (FREE, DEV, CAREER)
      */
     @GetMapping("unified-post")
-    public ApiResult<?> showPostListByType(@RequestParam(value = "post-type") UnifiedPostType unifiedPostType,
+    public ApiResult<?> showPostListByType(@RequestParam(value = "post-type", required = false) UnifiedPostType unifiedPostType,
                                         @RequestParam("offset") int offset, @RequestParam("limit") int limit){
 
         return unifiedPostService.findPostList(unifiedPostType, offset, limit);

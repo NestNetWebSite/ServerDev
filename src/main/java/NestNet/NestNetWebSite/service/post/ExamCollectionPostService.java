@@ -21,7 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional(readOnly = true)
@@ -69,6 +71,9 @@ public class ExamCollectionPostService {
     public ApiResult<?> findPostByFilter(String subject, String professor, Integer year, Integer semester, ExamType examType, int offset, int limit){
 
         List<ExamCollectionPost> posts = examCollectionPostRepository.findAllExamCollectionPostByFilter(subject, professor, year, semester, examType, offset, limit);
+        Long size = examCollectionPostRepository.findTotalSize();       //전체 족보 게시물 갯수
+
+        Map<Object, Object> result = new HashMap<>();
 
         List<ExamCollectionPostListResponse> resultList = new ArrayList<>();
         for(ExamCollectionPost post : posts){
@@ -84,7 +89,10 @@ public class ExamCollectionPostService {
                             .build());
         }
 
-        return ApiResult.success(resultList);
+        result.put("totalSize", size);
+        result.put("posts", resultList);
+
+        return ApiResult.success(result);
     }
 
     /*
