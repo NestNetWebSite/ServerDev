@@ -54,7 +54,7 @@ public class AttachedFileService {
     }
 
     /*
-    postId와 saveFileName으로 실제 파일 조회
+    실제 파일 조회
      */
     public InputStreamResource findFile(Long postId, String saveFileName){
 

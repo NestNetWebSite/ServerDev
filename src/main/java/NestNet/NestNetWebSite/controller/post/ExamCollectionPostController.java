@@ -5,13 +5,17 @@ import NestNet.NestNetWebSite.domain.post.exam.ExamType;
 import NestNet.NestNetWebSite.dto.request.ExamCollectionPostModifyRequest;
 import NestNet.NestNetWebSite.dto.request.ExamCollectionPostRequest;
 import NestNet.NestNetWebSite.dto.request.PostLikeRequest;
-import NestNet.NestNetWebSite.dto.response.AttachedFileResponse;
-import NestNet.NestNetWebSite.dto.response.CommentResponse;
-import NestNet.NestNetWebSite.dto.response.ExamCollectionPostResponse;
+import NestNet.NestNetWebSite.dto.response.*;
 import NestNet.NestNetWebSite.service.attachedfile.AttachedFileService;
 import NestNet.NestNetWebSite.service.comment.CommentService;
 import NestNet.NestNetWebSite.service.like.PostLikeService;
 import NestNet.NestNetWebSite.service.post.ExamCollectionPostService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +33,7 @@ import java.util.*;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "시험 기출 게시글 API")
 public class ExamCollectionPostController {
 
     private final ExamCollectionPostService examCollectionPostService;
@@ -37,9 +42,10 @@ public class ExamCollectionPostController {
     private final PostLikeService postLikeService;
 
     /*
-    족보 게시판 게시물 저장
+    시험 기출 게시판 게시물 저장
      */
     @PostMapping("/exam-collection-post/post")
+    @Operation(summary = "시험 기출 게시물 단건 저장", description = "")
     public ApiResult<?> savePost(@RequestPart("data") @Valid ExamCollectionPostRequest examCollectionPostRequest,
                                  @RequestPart(value = "file", required = false) List<MultipartFile> files,
                                  @AuthenticationPrincipal UserDetails userDetails, HttpServletResponse response){
@@ -48,7 +54,7 @@ public class ExamCollectionPostController {
     }
 
     /*
-    족보 게시판 목록 조희
+    시험 기출 게시판 목록 조희
      */
     @GetMapping("/exam-collection-post")
     public ApiResult<?> showPostListByFilter(@RequestParam(value = "subject", required = false) String subject,
@@ -62,7 +68,7 @@ public class ExamCollectionPostController {
     }
 
     /*
-    족보 게시판 게시물 단건 조회
+    시험 기출 게시판 게시물 단건 조회
      */
     @GetMapping("/exam-collection-post/{post_id}")
     public ApiResult<?> showPost(@PathVariable("post_id") Long postId,

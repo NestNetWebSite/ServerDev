@@ -34,14 +34,13 @@ spring:
       mail.smtp.ssl.enable: true  # SSL 보안연결(필수)
 
 springdoc:
-#  packages-to-scan: NestNet.NestNetWebSite.NestNet-WebSite
-#  packages-to-scan: NestNet.NestNetWebSite.controller
-  default-consumes-media-type: application/json;charset=UTF-8
-  default-produces-media-type: application/json;charset=UTF-8
+  api-docs:
+    enabled: true
   swagger-ui:
-    disable-swagger-default-url: false
+    enabled: true
+    tagsSorter: alpha
+    operations-sorter: alpha
     display-request-duration: true
-    operations-sorter: method
 
 jwt:
   header: Authorization
@@ -55,4 +54,4 @@ jwt:
 logging:
   level:
     org.hibernate.SQL: debug    # 하이버네이트가 생성하는 sql 로그로 출력
-    org.hibernate.orm.jdbc.bind: trace    # 쿼리 파라미터 로그 남김
+    org.hibernate.orm.jdbc.bind: debug    # 쿼리 파라미터 로그 남김

@@ -27,7 +27,6 @@ public class ThumbNail {
     @JoinColumn(name = "post_id")
     private Post post;                                          // 썸네일이 해당되는 게시물
 
-//    private String title;                                       // 게시물 제목
     private String saveFileName;                                // 실제 저장된 파일 이름
     private String saveFilePath;                                // 파일 경로 (서버)
 

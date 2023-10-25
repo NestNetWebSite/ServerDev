@@ -41,9 +41,9 @@ public class Life4CutService {
     /*
     인생네컷 조회 (랜덤)
      */
-    public ApiResult<?> findFileByRandom(int limit){
+    public ApiResult<?> findFileByRandom(int size){
 
-        List<Life4Cut> life4CutList = life4CutRepository.findAllByPaging(limit);
+        List<Life4Cut> life4CutList = life4CutRepository.findAllByPaging(size);
         List<Life4CutResponse> responseList = new ArrayList<>();
 
         for(Life4Cut life4Cut : life4CutList){

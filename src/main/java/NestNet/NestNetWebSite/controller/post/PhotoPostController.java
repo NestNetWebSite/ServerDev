@@ -85,8 +85,9 @@ public class PhotoPostController {
     /*
     사진 게시물 수정
      */
-    @PostMapping("/photo-post/modify")
-    public ApiResult<?> modifyPost(@RequestPart("data") PhotoPostModifyRequest photoPostModifyRequest,
+    @PostMapping("/photo-post/modify/{post_id}")
+    public ApiResult<?> modifyPost(@PathVariable("post_id") Long postId,
+                                   @RequestPart("data") PhotoPostModifyRequest photoPostModifyRequest,
                                    @RequestPart(value = "file-id", required = false) List<Long> fileIdList,
                                    @RequestPart(value = "file", required = false) List<MultipartFile> files,
                                    HttpServletResponse response){
@@ -98,8 +99,8 @@ public class PhotoPostController {
             files = new ArrayList<>();
         }
 
-        photoPostService.modifyPost(photoPostModifyRequest);
-        boolean isCompleted = attachedFileService.modifyFiles(fileIdList, files, photoPostModifyRequest.getId());
+        photoPostService.modifyPost(photoPostModifyRequest, postId);
+        boolean isCompleted = attachedFileService.modifyFiles(fileIdList, files, postId);
 
         if(isCompleted) return ApiResult.success("게시물 수정 완료");
         else return ApiResult.error(response, HttpStatus.INTERNAL_SERVER_ERROR, "파일 수정 에러");

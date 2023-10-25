@@ -153,9 +153,9 @@ public class PhotoPostService {
     사진 게시물 수정
      */
     @Transactional
-    public void modifyPost(PhotoPostModifyRequest photoPostModifyRequest){
+    public void modifyPost(PhotoPostModifyRequest photoPostModifyRequest, Long postId){
 
-        PhotoPost post = photoPostRepository.findById(photoPostModifyRequest.getId());
+        PhotoPost post = photoPostRepository.findById(postId);
 
         // 변경 감지 -> 자동 update
         post.modifyPost(photoPostModifyRequest.getTitle(), photoPostModifyRequest.getBodyContent());

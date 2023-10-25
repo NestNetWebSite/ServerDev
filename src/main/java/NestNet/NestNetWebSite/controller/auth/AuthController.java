@@ -7,6 +7,7 @@ import NestNet.NestNetWebSite.dto.request.SignUpRequest;
 import NestNet.NestNetWebSite.dto.response.TokenResponse;
 import NestNet.NestNetWebSite.service.auth.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-//@RequestMapping("/auth")
+@Tag(name = "인증 API")
 public class AuthController {
 
     private final AuthService authService;
@@ -31,20 +32,19 @@ public class AuthController {
     /*
     회원가입 post 요청
      */
-    @Operation(summary = "회원가입 요청", description = "파라미터로 회원가입 폼 받음")
     @PostMapping("/auth/signup")
+    @Operation(summary = "회원가입", description = "")
     public ApiResult<?> signUp(@Valid @RequestBody SignUpRequest signUpRequest, HttpServletResponse response){
 
-        ApiResult<?> apiResult = authService.sendSignUpRequest(signUpRequest, response);
-
-        return apiResult;
+        return authService.sendSignUpRequest(signUpRequest, response);
     }
 
     /*
     로그인 post 요청
      */
-    @Operation(summary = "로그인 요청", description = "access 토큰은 헤더에 Authorization에, refresh 토큰은 헤더에 쿠키로 반환")
     @PostMapping("/auth/login")
+    @Operation(summary = "로그인", description = "Http 응답 헤더에 " +
+            "(Authorization : 엑세스 토큰 / refresh-token : 리프레시 토큰 / refresh-token-exp-time : 리프레시 토큰 만료시간) 삽입")
     public ApiResult<?> login(@Valid @RequestBody LoginRequest loginRequest, HttpServletResponse response){
 
         TokenResponse tokenResponse = authService.login(loginRequest);
@@ -66,6 +66,7 @@ public class AuthController {
     로그아웃
      */
     @GetMapping("/auth/logout")
+    @Operation(summary = "로그아웃", description = "")
     public ApiResult<?> logout(HttpServletRequest request, HttpServletResponse response){
 
         return authService.logout(request, response);

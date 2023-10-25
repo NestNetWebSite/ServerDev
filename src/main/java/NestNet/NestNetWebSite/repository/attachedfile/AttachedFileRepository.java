@@ -41,27 +41,6 @@ public class AttachedFileRepository {
         return true;
     }
 
-    // 수정
-//    public boolean modifyAll(List<AttachedFile> attachedFiles, List<MultipartFile> files){
-//
-//        for(int i = 0; i < attachedFiles.size(); i++){
-//
-//            Path savePath = Paths.get(folder.getAbsolutePath() + File.separator + attachedFiles.get(i).getSaveFileName());
-//
-//            log.info("AttachedFileRepository / saveAll : 저장 파일 : " + savePath);
-//
-//            try {
-//                files.get(i).transferTo(savePath);          //파일 실제 위치에 저장
-//                entityManager.persist(attachedFiles.get(i));
-//            } catch (Exception e){
-//                e.printStackTrace();
-//                return false;
-//            }
-//        }
-//        return true;
-//    }
-
-
     //=========================================조회=========================================//
 
     // id(PK)로 단건 조회
@@ -99,8 +78,6 @@ public class AttachedFileRepository {
             Path delPath = Paths.get(basePath + attachedFiles.get(i).getSaveFilePath()+ File.separator + attachedFiles.get(i).getSaveFileName());
             log.info("AttachedFileRepository / deleteFiles : 삭제 파일 : " + delPath);
 
-            entityManager.remove(attachedFiles.get(i));
-
             try {
                 File delFile = new File(delPath.toString());
 
@@ -111,6 +88,7 @@ public class AttachedFileRepository {
                 log.info(e.getMessage());
                 return false;
             }
+            entityManager.remove(attachedFiles.get(i));
         }
         return true;
     }
