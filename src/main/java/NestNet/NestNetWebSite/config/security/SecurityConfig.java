@@ -78,6 +78,7 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer(){
         return web -> web
                 .ignoring()
+                .requestMatchers("/auth/signup", "/auth/login")
                 .requestMatchers("/swagger-ui/index.html", "/swagger-ui/**", "/v3/api-docs/**")
                 .requestMatchers("/photo-post/**", "/photo-post")
                 .requestMatchers("/image/**");

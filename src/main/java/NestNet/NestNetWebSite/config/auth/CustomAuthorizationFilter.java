@@ -34,11 +34,11 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {       //ht
         String requestURI = request.getRequestURI();
 
         //회원가입 or 로그인 or 리프레시 요청이면 토큰을 검사하지 않음
-        if(servletPath.equals("/auth/signup") || servletPath.equals("/auth/login") ||
-                servletPath.equals("/auth/refresh") || servletPath.equals("/member/find-id") || servletPath.equals("/member/get-temp-pw") || servletPath.equals("/image/EXAM/ec2da99b-8c7b-4ebe-a600-ea9f0300d0b1_샘플.jpg")){
-            log.info("CustomAuthorizationFilter.class / doFilterInternal :" + servletPath +  ": 엑세스 토큰을 검사하지 않음");
-        }
-        else{
+//        if(servletPath.equals("/auth/signup") || servletPath.equals("/auth/login") ||
+//                servletPath.equals("/auth/refresh") || servletPath.equals("/member/find-id") || servletPath.equals("/member/get-temp-pw")){
+//            log.info("CustomAuthorizationFilter.class / doFilterInternal :" + servletPath +  ": 엑세스 토큰을 검사하지 않음");
+//        }
+//        else{
             log.info("CustomAuthorizationFilter.class / doFilterInternal :" + servletPath +  ": 엑세스 토큰을 검사");
 
             String accessToken = tokenProvider.resolveToken(request);
@@ -81,7 +81,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {       //ht
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
                 return;
             }
-        }
+//        }
         filterChain.doFilter(request, response);        //다음 필터 실행
     }
 }
