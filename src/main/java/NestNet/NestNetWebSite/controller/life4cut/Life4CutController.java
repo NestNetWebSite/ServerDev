@@ -24,7 +24,7 @@ public class Life4CutController {
     인생네컷 저장
      */
     @PostMapping( "/life4cut/save")
-    @Operation(summary = "인생네컷 사진 단건 저장", description = "회장, 부회장, 매니저만 접근 가능하다.")
+    @Operation(summary = "인생네컷 사진 단건 저장", description = "인생네컷 저장은 회장, 부회장, 매니저만 접근 가능하다. 저장 실패 시 500 에러를 반환한다.")
     public ApiResult<?> save(@RequestPart("file") MultipartFile file, HttpServletResponse response){
 
         return life4CutService.saveFile(file, response);

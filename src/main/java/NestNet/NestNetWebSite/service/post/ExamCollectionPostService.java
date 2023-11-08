@@ -8,8 +8,10 @@ import NestNet.NestNetWebSite.domain.post.exam.ExamCollectionPost;
 import NestNet.NestNetWebSite.domain.post.exam.ExamType;
 import NestNet.NestNetWebSite.dto.request.ExamCollectionPostModifyRequest;
 import NestNet.NestNetWebSite.dto.request.ExamCollectionPostRequest;
-import NestNet.NestNetWebSite.dto.response.ExamCollectionPostResponse;
-import NestNet.NestNetWebSite.dto.response.ExamCollectionPostListResponse;
+import NestNet.NestNetWebSite.dto.response.examcollectionpost.ExamCollectionPostDto;
+import NestNet.NestNetWebSite.dto.response.examcollectionpost.ExamCollectionPostListDto;
+import NestNet.NestNetWebSite.dto.response.examcollectionpost.ExamCollectionPostResponse;
+import NestNet.NestNetWebSite.dto.response.examcollectionpost.ExamCollectionPostListResponse;
 import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import NestNet.NestNetWebSite.repository.post.ExamCollectionPostRepository;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
@@ -73,12 +75,10 @@ public class ExamCollectionPostService {
         List<ExamCollectionPost> posts = examCollectionPostRepository.findAllExamCollectionPostByFilter(subject, professor, year, semester, examType, offset, limit);
         Long size = examCollectionPostRepository.findTotalSize();       //전체 족보 게시물 갯수
 
-        Map<Object, Object> result = new HashMap<>();
-
-        List<ExamCollectionPostListResponse> resultList = new ArrayList<>();
+        List<ExamCollectionPostListDto> dtoList = new ArrayList<>();
         for(ExamCollectionPost post : posts){
-            resultList.add(
-                    ExamCollectionPostListResponse.builder()
+            dtoList.add(
+                    ExamCollectionPostListDto.builder()
                             .id(post.getId())
                             .subject(post.getSubject())
                             .professor(post.getProfessor())
@@ -89,8 +89,7 @@ public class ExamCollectionPostService {
                             .build());
         }
 
-        result.put("totalSize", size);
-        result.put("posts", resultList);
+        ExamCollectionPostListResponse result = new ExamCollectionPostListResponse(size, dtoList);
 
         return ApiResult.success(result);
     }
@@ -99,13 +98,13 @@ public class ExamCollectionPostService {
     족보 게시물 단건 상세 조회
      */
     @Transactional
-    public ExamCollectionPostResponse findPostById(Long id, String memberLoginId){
+    public ExamCollectionPostDto findPostById(Long id, String memberLoginId){
 
         ExamCollectionPost post = examCollectionPostRepository.findById(id);
         examCollectionPostRepository.addViewCount(post, memberLoginId);
 
         if(memberLoginId.equals(post.getMember().getLoginId())){
-            return ExamCollectionPostResponse.builder()
+            return ExamCollectionPostDto.builder()
                     .id(post.getId())
                     .title(post.getTitle())
                     .bodyContent(post.getBodyContent())
@@ -123,7 +122,7 @@ public class ExamCollectionPostService {
                     .build();
         }
         else{
-            return ExamCollectionPostResponse.builder()
+            return ExamCollectionPostDto.builder()
                     .id(post.getId())
                     .title(post.getTitle())
                     .bodyContent(post.getBodyContent())

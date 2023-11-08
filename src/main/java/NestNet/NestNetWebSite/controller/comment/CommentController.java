@@ -31,7 +31,7 @@ public class CommentController {
     댓글 수정
      */
     @PostMapping("/comment/modify/{comment_id}")
-    @Operation(summary = "댓글 수정", description = "")
+    @Operation(summary = "댓글 수정", description = "로그인한 사용자가 자신이 작성한 댓글을 수정할 수 있다.")
     public void modifyComment(@PathVariable("comment_id") Long commentId, @RequestBody CommentRequest commentRequest,
                               @AuthenticationPrincipal UserDetails userDetails){
 
@@ -42,9 +42,8 @@ public class CommentController {
     댓글 삭제
      */
     @DeleteMapping("/comment/delete/{comment_id}")
-    @Operation(summary = "댓글 삭제", description = "")
-    public void deleteComment(@PathVariable("comment_id") Long commentId,
-                              @AuthenticationPrincipal UserDetails userDetails){
+    @Operation(summary = "댓글 삭제", description = "로그인한 사용자가 자신이 작성한 댓글을 삭제할 수 있다.")
+    public void deleteComment(@PathVariable("comment_id") Long commentId, @AuthenticationPrincipal UserDetails userDetails){
 
         commentService.deleteComment(commentId);
     }

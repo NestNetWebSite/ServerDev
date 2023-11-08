@@ -26,7 +26,7 @@ public class FileController {
     파일 다운로드
      */
     @GetMapping("/file/{postId}/{fileName}")
-    @Operation(summary = "파일 다운로드", description = "모든 게시판의 파일 다운로드 요청에 응답하여 인코딩된 파일을 전송한다.", responses = {
+    @Operation(summary = "파일 다운로드", description = "파일 다운로드 요청에 응답하여 인코딩된 파일을 전송한다.", responses = {
                     @ApiResponse(responseCode = "200", description = "파일 다운로드 성공", content = @Content(schema = @Schema(implementation = InputStreamResource.class)))
             })
     public ResponseEntity<InputStreamResource> showFile(@PathVariable(value = "postId") Long postId, @PathVariable(value = "fileName") String fileName){

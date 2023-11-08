@@ -8,8 +8,10 @@ import NestNet.NestNetWebSite.domain.post.unified.UnifiedPost;
 import NestNet.NestNetWebSite.domain.post.unified.UnifiedPostType;
 import NestNet.NestNetWebSite.dto.request.UnifiedPostModifyRequest;
 import NestNet.NestNetWebSite.dto.request.UnifiedPostRequest;
-import NestNet.NestNetWebSite.dto.response.UnifiedPostResponse;
-import NestNet.NestNetWebSite.dto.response.UnifiedPostListResponse;
+import NestNet.NestNetWebSite.dto.response.unified.UnifiedPostDto;
+import NestNet.NestNetWebSite.dto.response.unified.UnifiedPostListDto;
+import NestNet.NestNetWebSite.dto.response.unified.UnifiedPostResponse;
+import NestNet.NestNetWebSite.dto.response.unified.UnifiedPostListResponse;
 import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import NestNet.NestNetWebSite.repository.post.UnifiedPostRepository;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
@@ -58,9 +60,6 @@ public class UnifiedPostService {
                 return ApiResult.error(response, HttpStatus.INTERNAL_SERVER_ERROR, "파일 저장 실패");
             }
         }
-        else{
-            System.out.println("파일 없음 이새끼야");
-        }
 
         unifiedPostRepository.save(post);
 
@@ -75,16 +74,13 @@ public class UnifiedPostService {
         List<UnifiedPost> postList = unifiedPostRepository.findUnifiedPostByType(offset, limit, unifiedPostType);
         Long size = unifiedPostRepository.findTotalSize(unifiedPostType);
 
-        Map<Object, Object> result = new HashMap<>();
-
-        List<UnifiedPostListResponse> resultList = new ArrayList<>();
+        List<UnifiedPostListDto> dtoList = new ArrayList<>();
         for(UnifiedPost post : postList){
-            resultList.add(new UnifiedPostListResponse(post.getMember().getName(), post.getTitle(),
+            dtoList.add(new UnifiedPostListDto(post.getMember().getName(), post.getTitle(),
                     post.getCreatedTime(), post.getViewCount(), post.getLikeCount()));
         }
 
-        result.put("totalSize", size);
-        result.put("posts", resultList);
+        UnifiedPostListResponse result = new UnifiedPostListResponse(size, dtoList);
 
         return ApiResult.success(result);
     }
@@ -93,13 +89,13 @@ public class UnifiedPostService {
     통합 게시판 게시물 단건 조회
      */
     @Transactional
-    public UnifiedPostResponse findPostById(Long id, String memberLoginId){
+    public UnifiedPostDto findPostById(Long id, String memberLoginId){
 
         UnifiedPost post = unifiedPostRepository.findById(id);
         unifiedPostRepository.addViewCount(post, memberLoginId);
 
         if(memberLoginId.equals(post.getMember().getLoginId())){
-            return UnifiedPostResponse.builder()
+            return UnifiedPostDto.builder()
                     .id(post.getId())
                     .title(post.getTitle())
                     .bodyContent(post.getBodyContent())
@@ -113,7 +109,7 @@ public class UnifiedPostService {
                     .build();
         }
         else{
-            return UnifiedPostResponse.builder()
+            return UnifiedPostDto.builder()
                     .id(post.getId())
                     .title(post.getTitle())
                     .bodyContent(post.getBodyContent())

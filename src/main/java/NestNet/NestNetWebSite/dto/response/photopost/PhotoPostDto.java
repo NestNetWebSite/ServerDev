@@ -1,4 +1,4 @@
-package NestNet.NestNetWebSite.dto.response;
+package NestNet.NestNetWebSite.dto.response.photopost;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 @Builder
-public class PhotoPostResponse {
+public class PhotoPostDto {
 
     private Long id;
     private String title;

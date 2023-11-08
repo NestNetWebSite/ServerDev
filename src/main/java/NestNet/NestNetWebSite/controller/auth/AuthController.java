@@ -33,7 +33,7 @@ public class AuthController {
     회원가입 post 요청
      */
     @PostMapping("/auth/signup")
-    @Operation(summary = "회원가입", description = "")
+    @Operation(summary = "회원가입", description = "아이디 중복 요청의 경우 409 에러를 반환한다.")
     public ApiResult<?> signUp(@Valid @RequestBody SignUpRequest signUpRequest, HttpServletResponse response){
 
         return authService.sendSignUpRequest(signUpRequest, response);
@@ -66,7 +66,7 @@ public class AuthController {
     로그아웃
      */
     @GetMapping("/auth/logout")
-    @Operation(summary = "로그아웃", description = "")
+    @Operation(summary = "로그아웃", description = "로그아웃이 정상적으로 작동하지 않은 경우 500 에러를 반환한다.")
     public ApiResult<?> logout(HttpServletRequest request, HttpServletResponse response){
 
         return authService.logout(request, response);

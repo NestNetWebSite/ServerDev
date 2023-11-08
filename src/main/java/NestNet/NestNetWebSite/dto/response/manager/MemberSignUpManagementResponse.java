@@ -1,19 +1,17 @@
-package NestNet.NestNetWebSite.dto.response;
+package NestNet.NestNetWebSite.dto.response.manager;
 
 import NestNet.NestNetWebSite.domain.member.MemberAuthority;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @AllArgsConstructor
 @Builder
 public class MemberSignUpManagementResponse {
 
-    private String name;
-    private String loginId;
-    private String studentId;
-    private int grade;
-    private int graduateYear;
-    private MemberAuthority memberAuthority;
+    List<MemberSignUpManagementDto> dtoList = new ArrayList<>();
 }

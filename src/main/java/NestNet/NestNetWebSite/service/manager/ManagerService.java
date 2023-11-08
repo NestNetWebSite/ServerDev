@@ -6,7 +6,8 @@ import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.member.MemberAuthority;
 import NestNet.NestNetWebSite.dto.request.MemberSignUpManagementRequest;
 import NestNet.NestNetWebSite.dto.response.MemberInfoResponse;
-import NestNet.NestNetWebSite.dto.response.MemberSignUpManagementResponse;
+import NestNet.NestNetWebSite.dto.response.manager.MemberSignUpManagementDto;
+import NestNet.NestNetWebSite.dto.response.manager.MemberSignUpManagementResponse;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import NestNet.NestNetWebSite.repository.manager.MemberSignUpManagementRepository;
 import jakarta.servlet.http.HttpServletResponse;
@@ -33,14 +34,16 @@ public class ManagerService {
     public ApiResult<?> findAllRequests(){
 
         List<MemberSignUpManagement> list = memberSignUpManagementRepository.findAll();
+        List<MemberSignUpManagementDto> dtoList = new ArrayList<>();
 
-        List<MemberSignUpManagementResponse> resultList = new ArrayList<>();
         for(MemberSignUpManagement request : list){
-            resultList.add(new MemberSignUpManagementResponse(request.getMember().getName(), request.getMember().getLoginId(), request.getMember().getStudentId(),
+            dtoList.add(new MemberSignUpManagementDto(request.getMember().getName(), request.getMember().getLoginId(), request.getMember().getStudentId(),
                     request.getMember().getGrade(), request.getMember().getGraduateYear(), request.getRequestMemberAuthority()));
         }
 
-        return ApiResult.success(resultList);
+        MemberSignUpManagementResponse memberSignUpManagementResponse = new MemberSignUpManagementResponse(dtoList);
+
+        return ApiResult.success(memberSignUpManagementResponse);
     }
 
     /*

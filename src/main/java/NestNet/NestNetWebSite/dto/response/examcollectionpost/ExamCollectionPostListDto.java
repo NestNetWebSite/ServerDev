@@ -1,17 +1,14 @@
-package NestNet.NestNetWebSite.dto.response;
+package NestNet.NestNetWebSite.dto.response.examcollectionpost;
 
 import NestNet.NestNetWebSite.domain.post.exam.ExamType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-/**
- * 족보 리스트에 들어가는 데이터
- */
 @Getter
 @AllArgsConstructor
 @Builder
-public class ExamCollectionPostListResponse {
+public class ExamCollectionPostListDto {
 
     private Long id;
     private String subject;

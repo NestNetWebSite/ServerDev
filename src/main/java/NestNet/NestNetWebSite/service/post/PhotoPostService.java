@@ -8,8 +8,10 @@ import NestNet.NestNetWebSite.domain.post.photo.PhotoPost;
 import NestNet.NestNetWebSite.domain.post.photo.ThumbNail;
 import NestNet.NestNetWebSite.dto.request.PhotoPostModifyRequest;
 import NestNet.NestNetWebSite.dto.request.PhotoPostRequest;
-import NestNet.NestNetWebSite.dto.response.PhotoPostResponse;
-import NestNet.NestNetWebSite.dto.response.ThumbNailResponse;
+import NestNet.NestNetWebSite.dto.response.photopost.PhotoPostDto;
+import NestNet.NestNetWebSite.dto.response.photopost.PhotoPostResponse;
+import NestNet.NestNetWebSite.dto.response.photopost.ThumbNailDto;
+import NestNet.NestNetWebSite.dto.response.photopost.ThumbNailResponse;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import NestNet.NestNetWebSite.repository.post.PhotoPostRepository;
@@ -75,10 +77,10 @@ public class PhotoPostService {
 
         List<ThumbNail> thumbNailList = thumbNailRepository.findAllPhotoThumbNailByPaging(offset, limit);
 
-        List<ThumbNailResponse> thumbNailResponseList = new ArrayList<>();
+        List<ThumbNailDto> thumbNailDtoList = new ArrayList<>();
         for(ThumbNail thumbNail : thumbNailList){
-            thumbNailResponseList.add(
-                    ThumbNailResponse.builder()
+            thumbNailDtoList.add(
+                    ThumbNailDto.builder()
                             .postId(thumbNail.getPost().getId())
                             .title(thumbNail.getPost().getTitle())
                             .viewCount(thumbNail.getPost().getViewCount())
@@ -89,20 +91,22 @@ public class PhotoPostService {
             );
         }
 
-        return ApiResult.success(thumbNailResponseList);
+        ThumbNailResponse result = new ThumbNailResponse(thumbNailDtoList);
+
+        return ApiResult.success(result);
     }
 
     /*
     사진 게시물 단건 조회
      */
     @Transactional
-    public PhotoPostResponse findPostById(Long id, String memberLoginId){
+    public PhotoPostDto findPostById(Long id, String memberLoginId){
 
         PhotoPost post = photoPostRepository.findById(id);
         photoPostRepository.addViewCount(post, memberLoginId);
 
         if(memberLoginId.equals(post.getMember().getLoginId())){
-            return PhotoPostResponse.builder()
+            return PhotoPostDto.builder()
                     .id(post.getId())
                     .title(post.getTitle())
                     .bodyContent(post.getBodyContent())
@@ -115,7 +119,7 @@ public class PhotoPostService {
                     .build();
         }
         else{
-            return PhotoPostResponse.builder()
+            return PhotoPostDto.builder()
                     .id(post.getId())
                     .title(post.getTitle())
                     .bodyContent(post.getBodyContent())

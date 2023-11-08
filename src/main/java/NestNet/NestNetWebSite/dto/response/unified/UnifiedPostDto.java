@@ -1,31 +1,23 @@
-package NestNet.NestNetWebSite.dto.response;
+package NestNet.NestNetWebSite.dto.response.unified;
 
-import NestNet.NestNetWebSite.domain.post.exam.ExamType;
+import NestNet.NestNetWebSite.domain.post.unified.UnifiedPostType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
 
-/**
- * 족보 게시물 하나에 들어가는 데이터
- */
 @Getter
 @AllArgsConstructor
 @Builder
-public class ExamCollectionPostResponse {
+public class UnifiedPostDto {
 
     private Long id;
     private String title;
     private String bodyContent;
     private Long viewCount;
     private int likeCount;
-    private String subject;
-    private String professor;
-    private int year;
-    private int semester;
-    private ExamType examType;
+    private UnifiedPostType unifiedPostType;
     private String userName;
     private LocalDateTime createdTime;
     private LocalDateTime modifiedTime;

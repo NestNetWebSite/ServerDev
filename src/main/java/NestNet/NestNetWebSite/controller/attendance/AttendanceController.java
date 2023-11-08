@@ -2,6 +2,7 @@ package NestNet.NestNetWebSite.controller.attendance;
 
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.service.attendance.AttendanceService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ public class AttendanceController {
     출석
      */
     @GetMapping("/attendance")
+    @Operation(summary = "출석", description = "로그인한 사용자가 출석 버튼을 눌렀을 때 동작한다.")
     public ApiResult<?> memberAttendance(@AuthenticationPrincipal UserDetails userDetails, HttpServletResponse response){
 
         return attendanceService.saveAttendance(userDetails.getUsername(), response);

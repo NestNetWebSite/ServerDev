@@ -4,7 +4,8 @@ import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.dto.response.MemberProfileMemberInfoResponse;
-import NestNet.NestNetWebSite.dto.response.PostTitleResponse;
+import NestNet.NestNetWebSite.dto.response.memberprofile.PostInfoDto;
+import NestNet.NestNetWebSite.dto.response.memberprofile.PostInfoResponse;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import NestNet.NestNetWebSite.repository.post.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,12 +26,12 @@ public class MemberProfileService {
     /*
     회원 프로필 조회
      */
-    public ApiResult<?> findMemberInfoById(String loginId){
+    public ApiResult<?> findMemberInfoById(Long id){
 
-        Member member = memberRepository.findByLoginId(loginId);
+        Member member = memberRepository.findById(id);
 
-        MemberProfileMemberInfoResponse memberInfoDto = new MemberProfileMemberInfoResponse(member.getLoginId(), member.getName(),
-                member.getEmailAddress(), member.getMemberAuthority(), member.getGrade(), member.getGraduateYear());
+        MemberProfileMemberInfoResponse memberInfoDto = new MemberProfileMemberInfoResponse(member.getName(), member.getEmailAddress(),
+                member.getMemberAuthority(), member.getGrade(), member.getGraduateYear());
 
         return ApiResult.success(memberInfoDto);
     }
@@ -43,12 +44,14 @@ public class MemberProfileService {
         Member member = memberRepository.findByLoginId(loginId);
 
         List<Post> postList = postRepository.findAllPostByMember(member);
-        List<PostTitleResponse> result = new ArrayList<>();
+        List<PostInfoDto> dtoList = new ArrayList<>();
         for(Post post : postList){
-            result.add(new PostTitleResponse(post.getId(), post.getTitle(), post.getPostCategory()));
+            dtoList.add(new PostInfoDto(post.getId(), post.getTitle(), post.getPostCategory()));
         }
 
-        return ApiResult.success(result);
+        PostInfoResponse postInfoResponse = new PostInfoResponse(dtoList);
+
+        return ApiResult.success(postInfoResponse);
     }
 
 }
