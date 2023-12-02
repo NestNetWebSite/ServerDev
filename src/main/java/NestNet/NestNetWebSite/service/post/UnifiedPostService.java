@@ -8,10 +8,11 @@ import NestNet.NestNetWebSite.domain.post.unified.UnifiedPost;
 import NestNet.NestNetWebSite.domain.post.unified.UnifiedPostType;
 import NestNet.NestNetWebSite.dto.request.UnifiedPostModifyRequest;
 import NestNet.NestNetWebSite.dto.request.UnifiedPostRequest;
-import NestNet.NestNetWebSite.dto.response.unified.UnifiedPostDto;
-import NestNet.NestNetWebSite.dto.response.unified.UnifiedPostListDto;
-import NestNet.NestNetWebSite.dto.response.unified.UnifiedPostResponse;
-import NestNet.NestNetWebSite.dto.response.unified.UnifiedPostListResponse;
+import NestNet.NestNetWebSite.dto.response.unifiedpost.UnifiedPostDto;
+import NestNet.NestNetWebSite.dto.response.unifiedpost.UnifiedPostListDto;
+import NestNet.NestNetWebSite.dto.response.unifiedpost.UnifiedPostListResponse;
+import NestNet.NestNetWebSite.exception.CustomException;
+import NestNet.NestNetWebSite.exception.ErrorCode;
 import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import NestNet.NestNetWebSite.repository.post.UnifiedPostRepository;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
@@ -23,9 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @Transactional(readOnly = true)
@@ -42,7 +41,8 @@ public class UnifiedPostService {
     @Transactional
     public ApiResult<?> savePost(UnifiedPostRequest unifiedPostRequest, List<MultipartFile> files, String memberLoginId, HttpServletResponse response) {
 
-        Member member = memberRepository.findByLoginId(memberLoginId);
+        Member member = memberRepository.findByLoginId(memberLoginId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
 
         UnifiedPost post = unifiedPostRequest.toEntity(member);
 
@@ -124,25 +124,25 @@ public class UnifiedPostService {
         }
     }
 
-    /*
-    좋아요
-     */
-    @Transactional
-    public void like(Long id){
-
-        UnifiedPost post = unifiedPostRepository.findById(id);
-        unifiedPostRepository.like(post);
-    }
-
-    /*
-    좋아요 취소
-     */
-    @Transactional
-    public void cancelLike(Long id){
-
-        UnifiedPost post = unifiedPostRepository.findById(id);
-        unifiedPostRepository.cancelLike(post);
-    }
+//    /*
+//    좋아요
+//     */
+//    @Transactional
+//    public void like(Long id){
+//
+//        UnifiedPost post = unifiedPostRepository.findById(id);
+//        unifiedPostRepository.like(post);
+//    }
+//
+//    /*
+//    좋아요 취소
+//     */
+//    @Transactional
+//    public void cancelLike(Long id){
+//
+//        UnifiedPost post = unifiedPostRepository.findById(id);
+//        unifiedPostRepository.cancelLike(post);
+//    }
 
     /*
     통합 게시물 수정

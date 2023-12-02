@@ -5,6 +5,8 @@ import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.dto.request.CommentRequest;
 import NestNet.NestNetWebSite.dto.response.CommentResponse;
+import NestNet.NestNetWebSite.exception.CustomException;
+import NestNet.NestNetWebSite.exception.ErrorCode;
 import NestNet.NestNetWebSite.repository.comment.CommentRepository;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import NestNet.NestNetWebSite.repository.post.PostRepository;
@@ -24,12 +26,6 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
-    private final EntityManager entityManager;
-
-    // Post 자식 객체를 가져오기 위한 간단한 로직 수행
-    public Post findPost(Long postId){
-        return entityManager.find(Post.class, postId);
-    }
 
     /*
     댓글 저장
@@ -37,8 +33,12 @@ public class CommentService {
     @Transactional
     public void saveComment(CommentRequest commentRequest, Long postId, String memberLoginId){
 
-        Post post = findPost(postId);
-        Member member = memberRepository.findByLoginId(memberLoginId);
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+
+        Member member = memberRepository.findByLoginId(memberLoginId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
+
         Comment comment = commentRequest.toEntity(post, member);
 
         commentRepository.save(comment);
@@ -50,9 +50,10 @@ public class CommentService {
     @Transactional
     public void modifyComment(CommentRequest commentRequest, Long commentId){
 
-        Comment comment = commentRepository.findById(commentId);
+        Comment comment = commentRepository.findById(commentId)
+                        .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
 
-        commentRepository.modify(comment, commentRequest.getContent());
+        comment.modifyContent(commentRequest.getContent());
     }
 
     /*
@@ -60,8 +61,10 @@ public class CommentService {
      */
     public List<CommentResponse> findCommentByPost(Long postId, String memberLoginId){
 
-        Post post = findPost(postId);
-        List<Comment> commentList = commentRepository.findCommentsByPost(post);
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+
+        List<Comment> commentList = commentRepository.findAllByPost(post);
 
         List<CommentResponse> resultList = new ArrayList<>();
         for(Comment comment : commentList){
@@ -93,23 +96,28 @@ public class CommentService {
     }
 
     /*
-    게시물에 관련된 댓글 삭제
-     */
-    @Transactional
-    public void deleteAllComments(Long postId){
-
-        Post post = postRepository.findById(postId);
-        List<Comment> commentList = commentRepository.findCommentsByPost(post);
-        commentRepository.deleteAll(commentList);
-    }
-
-    /*
     댓글 단건 삭제
      */
     @Transactional
     public void deleteComment(Long commentId){
 
-        Comment comment = commentRepository.findById(commentId);
+        Comment comment = commentRepository.findById(commentId)
+                        .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
+
         commentRepository.delete(comment);
+    }
+
+    /*
+    게시물에 관련된 댓글 모두 삭제
+     */
+    @Transactional
+    public void deleteAllComments(Long postId){
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+
+        List<Comment> commentList = commentRepository.findAllByPost(post);
+
+        commentRepository.deleteAllInBatch(commentList);
     }
 }

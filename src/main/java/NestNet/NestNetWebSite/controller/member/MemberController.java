@@ -2,6 +2,7 @@ package NestNet.NestNetWebSite.controller.member;
 
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.dto.request.*;
+import NestNet.NestNetWebSite.dto.response.member.TemporaryInfoDto;
 import NestNet.NestNetWebSite.service.mail.MailService;
 import NestNet.NestNetWebSite.service.member.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -47,15 +48,11 @@ public class MemberController {
             @ApiResponse(responseCode = "404", description = "일치하는 회원이 없습니다."),
             @ApiResponse(responseCode = "500", description = "서버에서 이메일 전송을 실패하였습니다. 관리자에게 문의하세요")
     })
-    public ApiResult<?> findMemberId(@Valid @RequestBody MemberFindIdRequest memberFindIdRequest, HttpServletResponse response){
+    public ApiResult<?> findMemberId(@Valid @RequestBody MemberFindIdRequest memberFindIdRequest){
 
         String memberLoginId = memberService.findMemberId(memberFindIdRequest.getName(), memberFindIdRequest.getEmailAddress());
 
-        if(memberLoginId == null){
-            return ApiResult.error(response, HttpStatus.NOT_FOUND, "일치하는 회원이 없습니다.");
-        }
-
-        return mailService.sendEmailLoginId(response, memberFindIdRequest.getEmailAddress(), memberLoginId);
+        return mailService.sendEmailLoginId(memberFindIdRequest.getEmailAddress(), memberLoginId);
     }
 
     /*
@@ -69,15 +66,11 @@ public class MemberController {
     })
     public ApiResult<?> getTemporaryPassword(@Valid @RequestBody MemberGetTemporaryPwRequest dto, HttpServletResponse response){
 
-        Map<String, String> emailAndPw = memberService.createTemporaryPassword(dto.getLoginId());
+        TemporaryInfoDto emailAndPw = memberService.createTemporaryPassword(dto.getLoginId());
 
-        if(emailAndPw == null){
-            ApiResult.error(response, HttpStatus.NOT_FOUND, "회원 아이디가 틀렸습니다.");
-        }
+        memberService.changeMemberPassword(dto.getLoginId(), emailAndPw.getPassword());
 
-        memberService.changeMemberPassword(emailAndPw.get("tempPassword"), dto.getLoginId());
-
-        return mailService.sendEmailTemporaryPassword(response, emailAndPw.get("email"), emailAndPw.get("tempPassword"));
+        return mailService.sendEmailTemporaryPassword(emailAndPw.getEmail(), emailAndPw.getPassword());
     }
 
     /*

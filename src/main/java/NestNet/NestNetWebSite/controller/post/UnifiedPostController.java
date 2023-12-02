@@ -7,14 +7,13 @@ import NestNet.NestNetWebSite.dto.request.UnifiedPostModifyRequest;
 import NestNet.NestNetWebSite.dto.request.UnifiedPostRequest;
 import NestNet.NestNetWebSite.dto.response.AttachedFileResponse;
 import NestNet.NestNetWebSite.dto.response.CommentResponse;
-import NestNet.NestNetWebSite.dto.response.examcollectionpost.ExamCollectionPostResponse;
-import NestNet.NestNetWebSite.dto.response.unified.UnifiedPostDto;
-import NestNet.NestNetWebSite.dto.response.unified.UnifiedPostListResponse;
-import NestNet.NestNetWebSite.dto.response.unified.UnifiedPostResponse;
-import NestNet.NestNetWebSite.dto.response.examcollectionpost.ExamCollectionPostListResponse;
+import NestNet.NestNetWebSite.dto.response.unifiedpost.UnifiedPostDto;
+import NestNet.NestNetWebSite.dto.response.unifiedpost.UnifiedPostListResponse;
+import NestNet.NestNetWebSite.dto.response.unifiedpost.UnifiedPostResponse;
 import NestNet.NestNetWebSite.service.attachedfile.AttachedFileService;
 import NestNet.NestNetWebSite.service.comment.CommentService;
 import NestNet.NestNetWebSite.service.like.PostLikeService;
+import NestNet.NestNetWebSite.service.post.PostService;
 import NestNet.NestNetWebSite.service.post.UnifiedPostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -24,15 +23,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -43,6 +39,7 @@ public class UnifiedPostController {
     private final AttachedFileService attachedFileService;
     private final CommentService commentService;
     private final PostLikeService postLikeService;
+    private final PostService postService;
 
     /*
     통합 게시판 게시물 저장
@@ -110,10 +107,9 @@ public class UnifiedPostController {
         }
 
         unifiedPostService.modifyPost(unifiedPostModifyRequest);
-        boolean isCompleted = attachedFileService.modifyFiles(fileIdList, files, unifiedPostModifyRequest.getId());
+        attachedFileService.modifyFiles(fileIdList, files, unifiedPostModifyRequest.getId());
 
-        if(isCompleted) return ApiResult.success("게시물 수정 완료");
-        else return ApiResult.error(response, HttpStatus.INTERNAL_SERVER_ERROR, "파일 수정 에러");
+        return ApiResult.success("게시물 수정 완료");
     }
 
     /*
@@ -123,17 +119,11 @@ public class UnifiedPostController {
     @Operation(summary = "사진 게시판 게시물 삭제", description = "파일 삭제에 문제가 생기는 경우 500 에러를 반환한다.")
     public ApiResult<?> deletePost(@RequestParam(value = "postId") Long postId, HttpServletResponse response){
 
-        boolean isComplete = attachedFileService.deleteFiles(postId);
         unifiedPostService.deletePost(postId);
         commentService.deleteAllComments(postId);
         postLikeService.deleteLike(postId);
 
-        if(isComplete){
-            return ApiResult.success("게시물 삭제 완료");
-        }
-        else{
-            return ApiResult.error(response, HttpStatus.INTERNAL_SERVER_ERROR, "게시물 삭제 실패. 서버 에러");
-        }
+        return ApiResult.success("게시물 삭제 완료");
     }
 
     /*
@@ -144,7 +134,7 @@ public class UnifiedPostController {
     public void like(@RequestBody PostLikeRequest request, @AuthenticationPrincipal UserDetails userDetails){
 
         postLikeService.saveLike(request.getPostId(), userDetails.getUsername());
-        unifiedPostService.like(request.getPostId());
+        postService.like(request.getPostId());
     }
 
     /*
@@ -155,7 +145,7 @@ public class UnifiedPostController {
     public void dislike(@RequestBody PostLikeRequest request, @AuthenticationPrincipal UserDetails userDetails){
 
         postLikeService.cancelLike(request.getPostId(), userDetails.getUsername());
-        unifiedPostService.cancelLike(request.getPostId());
+        postService.cancelLike(request.getPostId());
     }
 
 }

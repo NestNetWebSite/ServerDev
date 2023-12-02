@@ -3,6 +3,8 @@ package NestNet.NestNetWebSite.service.like;
 import NestNet.NestNetWebSite.domain.like.PostLike;
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.post.Post;
+import NestNet.NestNetWebSite.exception.CustomException;
+import NestNet.NestNetWebSite.exception.ErrorCode;
 import NestNet.NestNetWebSite.repository.like.PostLikeRepository;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import NestNet.NestNetWebSite.repository.post.PostRepository;
@@ -23,7 +25,6 @@ public class PostLikeService {
     private final PostLikeRepository postLikeRepository;
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
-    private final EntityManager entityManager;
 
     /*
     좋아요 저장
@@ -31,30 +32,15 @@ public class PostLikeService {
     @Transactional
     public void saveLike(Long postId, String memberLoginId){
 
-        Post post = postRepository.findById(postId);
-        Member member = memberRepository.findByLoginId(memberLoginId);
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+
+        Member member = memberRepository.findByLoginId(memberLoginId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
+
         PostLike postLike = new PostLike(post, member);
 
         postLikeRepository.save(postLike);
-    }
-
-    /*
-    게시물 좋아요 수 조회
-     */
-//    public Long findLikeCountByPost(Long postId){
-//
-//        Post post = findPost(postId);
-//        return postLikeRepository.likeCount(post);
-//    }
-
-    /*
-    로그인한 회원의 좋아요 여부 조회
-     */
-    public boolean isMemberLikedByPost(Long postId, String memberLoginId){
-
-        Post post = postRepository.findById(postId);
-        Member member = memberRepository.findByLoginId(memberLoginId);
-        return postLikeRepository.isMemberLiked(post, member);
     }
 
     /*
@@ -63,8 +49,11 @@ public class PostLikeService {
     @Transactional
     public void cancelLike(Long postId, String memberLoginId){
 
-        Post post = postRepository.findById(postId);
-        Member member = memberRepository.findByLoginId(memberLoginId);
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+
+        Member member = memberRepository.findByLoginId(memberLoginId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
 
         Optional<PostLike> postLike = postLikeRepository.findByMemberAndPost(member, post);
 
@@ -74,12 +63,32 @@ public class PostLikeService {
     }
 
     /*
+    로그인한 회원의 좋아요 여부 조회
+     */
+    public boolean isMemberLikedByPost(Long postId, String memberLoginId){
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+
+        Member member = memberRepository.findByLoginId(memberLoginId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
+
+        Optional<PostLike> like = postLikeRepository.findByMemberAndPost(member, post);
+
+        if(!like.isPresent()) return false;
+
+        return true;
+    }
+
+    /*
     게시물 관련 좋아요 삭제
      */
     @Transactional
     public void deleteLike(Long postId){
 
-        Post post = postRepository.findById(postId);
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+
         List<PostLike> postLikeList = postLikeRepository.findAllByPost(post);
         postLikeRepository.deleteAll(postLikeList);
     }

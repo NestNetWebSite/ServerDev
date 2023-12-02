@@ -1,4 +1,4 @@
-package NestNet.NestNetWebSite.dto.response.unified;
+package NestNet.NestNetWebSite.dto.response.unifiedpost;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

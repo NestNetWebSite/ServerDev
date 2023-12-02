@@ -7,23 +7,17 @@ import NestNet.NestNetWebSite.domain.post.exam.ExamCollectionPost;
 import NestNet.NestNetWebSite.domain.post.exam.ExamType;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-@Repository
-@RequiredArgsConstructor
-public class ExamCollectionPostRepository {
+public interface ExamCollectionPostRepository extends JpaRepository<ExamCollectionPost, Long> {
 
-    private final EntityManager entityManager;
+
     private final RedisUtil redisUtil;
-
-    // 저장
-    public void save(Post post){
-        entityManager.persist(post);
-    }
 
     // 조회수 update
     public void addViewCount(Post post, String memberLoginId){
@@ -37,14 +31,14 @@ public class ExamCollectionPostRepository {
         }
     }
 
-    // 좋아요
-    public void like(Post post){
-        post.like();
-    }
-    // 좋아요 취소
-    public void cancelLike(Post post){
-        post.cancelLike();
-    }
+//    // 좋아요
+//    public void like(Post post){
+//        post.like();
+//    }
+//    // 좋아요 취소
+//    public void cancelLike(Post post){
+//        post.cancelLike();
+//    }
 
     //=========================================조회=========================================//
 

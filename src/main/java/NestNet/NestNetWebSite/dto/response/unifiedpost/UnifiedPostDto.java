@@ -1,4 +1,4 @@
-package NestNet.NestNetWebSite.dto.response.unified;
+package NestNet.NestNetWebSite.dto.response.unifiedpost;
 
 import NestNet.NestNetWebSite.domain.post.unified.UnifiedPostType;
 import lombok.AllArgsConstructor;

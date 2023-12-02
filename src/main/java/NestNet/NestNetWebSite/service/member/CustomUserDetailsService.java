@@ -1,6 +1,8 @@
 package NestNet.NestNetWebSite.service.member;
 
 import NestNet.NestNetWebSite.domain.member.Member;
+import NestNet.NestNetWebSite.exception.CustomException;
+import NestNet.NestNetWebSite.exception.ErrorCode;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,19 +30,16 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
 
-        Member member = memberRepository.findByLoginId(loginId);
+        Member member = memberRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new UsernameNotFoundException(loginId + " : 해당 유저를 데이터베이스에서 찾을 수 없습니다."));
 
         log.info("CustomUserDetailsService.class / loadUserByUsername 매서드 : " + member.getLoginId() + " 유저 찾음");
 
-        if (member == null) {
-            throw new UsernameNotFoundException(loginId + " : 해당 유저를 데이터베이스에서 찾을 수 없습니다.");
-        } else {
-            return createUser(member);
-        }
+        return createUser(member);
     }
 
     /*
-    로그인 아이디와 member 객체를 이용해 UserDetails 인터페이스의 구현체인 User 객체를 생성하여 반환한다.
+    로그인 아이디와 member 객체를 이용해 UserDetails 인터페이스의 구현체인 User 객체를 생성하여 반환
      */
     private User createUser(Member member){
 

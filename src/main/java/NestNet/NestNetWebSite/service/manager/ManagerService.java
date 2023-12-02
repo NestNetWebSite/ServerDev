@@ -4,10 +4,13 @@ import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.manager.MemberSignUpManagement;
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.member.MemberAuthority;
+import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.dto.request.MemberSignUpManagementRequest;
 import NestNet.NestNetWebSite.dto.response.MemberInfoResponse;
 import NestNet.NestNetWebSite.dto.response.manager.MemberSignUpManagementDto;
 import NestNet.NestNetWebSite.dto.response.manager.MemberSignUpManagementResponse;
+import NestNet.NestNetWebSite.exception.CustomException;
+import NestNet.NestNetWebSite.exception.ErrorCode;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import NestNet.NestNetWebSite.repository.manager.MemberSignUpManagementRepository;
 import jakarta.servlet.http.HttpServletResponse;
@@ -52,7 +55,10 @@ public class ManagerService {
     @Transactional
     public ApiResult<?> approveSignUp(MemberSignUpManagementRequest dto, HttpServletResponse response){
 
-        Member member = memberRepository.findByLoginId(dto.getLoginId());
+
+        Member member = memberRepository.findByLoginId(dto.getLoginId())
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
+
         member.changeAuthority(dto.getMemberAuthority());         //권한 설정
         Optional<MemberSignUpManagement> memberSignUpManagement = memberSignUpManagementRepository.findByMember(member);
 
@@ -74,7 +80,9 @@ public class ManagerService {
     @Transactional
     public ApiResult<?> changeAuthorityGraduate(Long id){
 
-        Member member = memberRepository.findById(id);
+        Member member = memberRepository.findById(id)
+                        .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
         member.changeMemberToGraduate();
 
         return ApiResult.success(member.getName() + "님의 권한이 졸업생으로 변경되었습니다.");
@@ -86,7 +94,9 @@ public class ManagerService {
     @Transactional
     public ApiResult<?> changeAuthority(Long id, MemberAuthority authority){
 
-        Member member = memberRepository.findById(id);
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
         member.changeAuthority(authority);
 
         return ApiResult.success(member.getName() + "님의 권한이 " + member.getMemberAuthority().toString() + "(으)로 변경되었습니다.");
@@ -97,7 +107,8 @@ public class ManagerService {
      */
     public ApiResult<?> findAllMemberInfo(String name, MemberAuthority memberAuthority){
 
-        List<Member> memberList = memberRepository.findAllMember(name, memberAuthority);
+        List<Member> memberList = memberRepository.findAllByNameAndMemberAuthority(name, memberAuthority);
+
         List<MemberInfoResponse> memberInfoResponseList = new ArrayList<>();
         for(Member member : memberList){
             memberInfoResponseList.add(new MemberInfoResponse(member.getMemberAuthority(), member.getName(), member.getLoginId(), member.getEmailAddress(),
@@ -113,7 +124,9 @@ public class ManagerService {
     @Transactional
     public ApiResult<?> withDrawMember(Long id){
 
-        Member member = memberRepository.findById(id);
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
         String memberName = member.getName();
         String memberLoginId = member.getLoginId();
 

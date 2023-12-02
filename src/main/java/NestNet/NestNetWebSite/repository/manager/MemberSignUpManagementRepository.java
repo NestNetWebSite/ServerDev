@@ -5,55 +5,24 @@ import NestNet.NestNetWebSite.domain.member.Member;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
-@Repository
-@RequiredArgsConstructor
-public class MemberSignUpManagementRepository {
-
-    private final EntityManager entityManager;
-
-    // 저장
-    public void save(MemberSignUpManagement memberSignUpManagement){
-        entityManager.persist(memberSignUpManagement);
-    }
-
-    //=========================================조회=========================================//
-
-    // 회원가입 요청 모두 조회
-    public List<MemberSignUpManagement> findAll(){
-
-        List<MemberSignUpManagement> resultList = entityManager.createQuery(
-                "select mr from  MemberSignUpManagement mr where mr.isComplete = false",
-                        MemberSignUpManagement.class)
-                .getResultList();
-
-        return resultList;
-    }
+public interface MemberSignUpManagementRepository extends JpaRepository<MemberSignUpManagement, Long> {
 
     // 회원가입 요청 단건 조회
-    public MemberSignUpManagement findById(Long id){
-        return entityManager.find(MemberSignUpManagement.class, id);
-    }
+    Optional<MemberSignUpManagement> findById(Long id);
 
-    // 회원가입 요청 Member로 조회
-    public Optional<MemberSignUpManagement> findByMember(Member member){
+    // 회원가입 요청 모두 조회
+    List<MemberSignUpManagement> findAll();
 
-        try {
-            MemberSignUpManagement memberSignUpManagement =  entityManager.createQuery(
-                            "select mr from MemberSignUpManagement mr where mr.member =: member and mr.isComplete = false ",
-                            MemberSignUpManagement.class)
-                    .setParameter("member", member)
-                    .getSingleResult();
+    // 미승인된 회원가입 요청 Member로 조회
+    @Query("select msm from MemberSignUpManagement msm where msm.member =: member and msm.isComplete = false")
+    Optional<MemberSignUpManagement> findByMember(@Param("member") Member member);
 
-            return Optional.ofNullable(memberSignUpManagement);
-        } catch (NoResultException e) {
-            return Optional.empty();
-        }
-    }
-
-    //====================================================================================//
 }

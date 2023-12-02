@@ -12,6 +12,8 @@ import NestNet.NestNetWebSite.dto.response.examcollectionpost.ExamCollectionPost
 import NestNet.NestNetWebSite.dto.response.examcollectionpost.ExamCollectionPostListDto;
 import NestNet.NestNetWebSite.dto.response.examcollectionpost.ExamCollectionPostResponse;
 import NestNet.NestNetWebSite.dto.response.examcollectionpost.ExamCollectionPostListResponse;
+import NestNet.NestNetWebSite.exception.CustomException;
+import NestNet.NestNetWebSite.exception.ErrorCode;
 import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import NestNet.NestNetWebSite.repository.post.ExamCollectionPostRepository;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
@@ -43,13 +45,14 @@ public class ExamCollectionPostService {
     public ApiResult<?> savePost(ExamCollectionPostRequest examCollectionPostRequest, List<MultipartFile> files,
                          String memberLoginId, HttpServletResponse response){
 
-        Member member = memberRepository.findByLoginId(memberLoginId);
+        Member member = memberRepository.findByLoginId(memberLoginId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
 
         ExamCollectionPost post = examCollectionPostRequest.toEntity(member);
 
         examCollectionPostRepository.save(post);
 
-        if(files != null){
+        if(!files.isEmpty()){
             List<AttachedFile> attachedFileList = new ArrayList<>();
 
             for(MultipartFile file : files){
@@ -141,25 +144,25 @@ public class ExamCollectionPostService {
         }
     }
 
-    /*
-    좋아요
-     */
-    @Transactional
-    public void like(Long id){
-
-        ExamCollectionPost post = examCollectionPostRepository.findById(id);
-        examCollectionPostRepository.like(post);
-    }
-
-    /*
-    좋아요 취소
-     */
-    @Transactional
-    public void cancelLike(Long id){
-
-        ExamCollectionPost post = examCollectionPostRepository.findById(id);
-        examCollectionPostRepository.cancelLike(post);
-    }
+//    /*
+//    좋아요
+//     */
+//    @Transactional
+//    public void like(Long id){
+//
+//        ExamCollectionPost post = examCollectionPostRepository.findById(id);
+//        examCollectionPostRepository.like(post);
+//    }
+//
+//    /*
+//    좋아요 취소
+//     */
+//    @Transactional
+//    public void cancelLike(Long id){
+//
+//        ExamCollectionPost post = examCollectionPostRepository.findById(id);
+//        examCollectionPostRepository.cancelLike(post);
+//    }
 
     /*
     족보 게시물 수정

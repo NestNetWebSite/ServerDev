@@ -14,6 +14,7 @@ import NestNet.NestNetWebSite.service.attachedfile.AttachedFileService;
 import NestNet.NestNetWebSite.service.comment.CommentService;
 import NestNet.NestNetWebSite.service.like.PostLikeService;
 import NestNet.NestNetWebSite.service.post.PhotoPostService;
+import NestNet.NestNetWebSite.service.post.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -42,6 +43,7 @@ public class PhotoPostController {
     private final AttachedFileService attachedFileService;
     private final CommentService commentService;
     private final PostLikeService postLikeService;
+    private final PostService postService;
 
     /*
     사진 게시판 게시물 저장
@@ -105,10 +107,9 @@ public class PhotoPostController {
         }
 
         photoPostService.modifyPost(photoPostModifyRequest, postId);
-        boolean isCompleted = attachedFileService.modifyFiles(fileIdList, files, postId);
+        attachedFileService.modifyFiles(fileIdList, files, postId);
 
-        if(isCompleted) return ApiResult.success("게시물 수정 완료");
-        else return ApiResult.error(response, HttpStatus.INTERNAL_SERVER_ERROR, "파일 수정 에러");
+        return ApiResult.success("게시물 수정 완료");
     }
 
     /*
@@ -118,17 +119,12 @@ public class PhotoPostController {
     @Operation(summary = "사진 게시판 게시물 삭제", description = "파일 삭제에 문제가 생기는 경우 500 에러를 반환한다.")
     public ApiResult<?> deletePost(@RequestParam(value = "postId") Long postId, HttpServletResponse response){
 
-        boolean isComplete = attachedFileService.deleteFiles(postId);
+        attachedFileService.deleteFiles(postId);
         photoPostService.deletePost(postId);
         commentService.deleteAllComments(postId);
         postLikeService.deleteLike(postId);
 
-        if(isComplete){
-            return ApiResult.success("게시물 삭제 완료");
-        }
-        else{
-            return ApiResult.error(response, HttpStatus.INTERNAL_SERVER_ERROR, "게시물 삭제 실패. 서버 에러");
-        }
+        return ApiResult.success("게시물 삭제 완료");
     }
 
     /*
@@ -139,7 +135,7 @@ public class PhotoPostController {
     public void like(@RequestBody PostLikeRequest request, @AuthenticationPrincipal UserDetails userDetails){
 
         postLikeService.saveLike(request.getPostId(), userDetails.getUsername());
-        photoPostService.like(request.getPostId());
+        postService.like(request.getPostId());
     }
 
     /*
@@ -150,6 +146,6 @@ public class PhotoPostController {
     public void dislike(@RequestBody PostLikeRequest request, @AuthenticationPrincipal UserDetails userDetails){
 
         postLikeService.cancelLike(request.getPostId(), userDetails.getUsername());
-        photoPostService.cancelLike(request.getPostId());
+        postService.cancelLike(request.getPostId());
     }
 }

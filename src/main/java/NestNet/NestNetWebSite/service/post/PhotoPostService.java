@@ -12,6 +12,8 @@ import NestNet.NestNetWebSite.dto.response.photopost.PhotoPostDto;
 import NestNet.NestNetWebSite.dto.response.photopost.PhotoPostResponse;
 import NestNet.NestNetWebSite.dto.response.photopost.ThumbNailDto;
 import NestNet.NestNetWebSite.dto.response.photopost.ThumbNailResponse;
+import NestNet.NestNetWebSite.exception.CustomException;
+import NestNet.NestNetWebSite.exception.ErrorCode;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import NestNet.NestNetWebSite.repository.post.PhotoPostRepository;
@@ -43,7 +45,8 @@ public class PhotoPostService {
     public ApiResult<?> savePost(PhotoPostRequest photoPostRequest, List<MultipartFile> files,
                                  String memberLoginId, HttpServletResponse response){
 
-        Member member = memberRepository.findByLoginId(memberLoginId);
+        Member member = memberRepository.findByLoginId(memberLoginId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
 
         PhotoPost post = photoPostRequest.toEntity(member);
 
@@ -133,25 +136,25 @@ public class PhotoPostService {
         }
     }
 
-    /*
-    좋아요
-     */
-    @Transactional
-    public void like(Long id){
-
-        PhotoPost post = photoPostRepository.findById(id);
-        photoPostRepository.like(post);
-    }
-
-    /*
-    좋아요 취소
-     */
-    @Transactional
-    public void cancelLike(Long id){
-
-        PhotoPost post = photoPostRepository.findById(id);
-        photoPostRepository.cancelLike(post);
-    }
+//    /*
+//    좋아요
+//     */
+//    @Transactional
+//    public void like(Long id){
+//
+//        PhotoPost post = photoPostRepository.findById(id);
+//        photoPostRepository.like(post);
+//    }
+//
+//    /*
+//    좋아요 취소
+//     */
+//    @Transactional
+//    public void cancelLike(Long id){
+//
+//        PhotoPost post = photoPostRepository.findById(id);
+//        photoPostRepository.cancelLike(post);
+//    }
 
     /*
     사진 게시물 수정

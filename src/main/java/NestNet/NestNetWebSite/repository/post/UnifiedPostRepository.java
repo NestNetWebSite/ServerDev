@@ -35,14 +35,14 @@ public class UnifiedPostRepository {
         }
     }
 
-    // 좋아요
-    public void like(Post post){
-        post.like();
-    }
-    // 좋아요 취소
-    public void cancelLike(Post post){
-        post.cancelLike();
-    }
+//    // 좋아요
+//    public void like(Post post){
+//        post.like();
+//    }
+//    // 좋아요 취소
+//    public void cancelLike(Post post){
+//        post.cancelLike();
+//    }
 
     //=========================================조회=========================================//
 

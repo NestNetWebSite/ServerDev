@@ -3,6 +3,9 @@ package NestNet.NestNetWebSite.service.member;
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.dto.request.MemberModifyInfoRequest;
+import NestNet.NestNetWebSite.dto.response.member.TemporaryInfoDto;
+import NestNet.NestNetWebSite.exception.CustomException;
+import NestNet.NestNetWebSite.exception.ErrorCode;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +30,9 @@ public class MemberService {
     @Transactional
     public ApiResult<?> modifyMemberInfo(MemberModifyInfoRequest dto, String loginId){
 
-        Member member = memberRepository.findByLoginId(loginId);
+        Member member = memberRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
+
         member.modifyInfo(dto.getLoginId(), dto.getName(), dto.getStudentId(), dto.getGrade(), dto.getEmailAddress());
 
         return ApiResult.success("회원 정보가 수정되었습니다.");
@@ -38,44 +43,35 @@ public class MemberService {
      */
     public String findMemberId(String name, String email){
 
-        Optional<Member> member = memberRepository.findByNameAndEmail(name, email);
+        Member member = memberRepository.findByNameAndEmail(name, email)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
-        if(member != null){
-            return member.get().getLoginId();
-        }
-
-        return null;
+        return member.getLoginId();
     }
 
     /*
     임시 비밀번호 발급
      */
-    public Map<String, String> createTemporaryPassword(String logindId){
+    public TemporaryInfoDto createTemporaryPassword(String loginId){
 
-        Map<String, String> result = new HashMap<>();
-
-//        Optional<Member> member = memberRepository.findByLoginId(logindId);       //나중에 이렇게 고치기
-        Member member = memberRepository.findByLoginId(logindId);
-        if(member == null){
-            return null;
-        }
+        Member member = memberRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
 
         String tempPassword = UUID.randomUUID().toString().replace("-", "");
         tempPassword = tempPassword.substring(0,15);
 
-        result.put("email", member.getEmailAddress());
-        result.put("tempPassword", tempPassword);
-
-        return result;
+        return new TemporaryInfoDto(member.getEmailAddress(), tempPassword);
     }
 
     /*
     회원 비밀번호 변경
      */
     @Transactional
-    public ApiResult<?> changeMemberPassword(String password, String loginId){
+    public ApiResult<?> changeMemberPassword(String loginId, String password){
 
-        Member member = memberRepository.findByLoginId(loginId);
+        Member member = memberRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
+
         member.changePassword(password, passwordEncoder);
 
         return ApiResult.success("비밀번호가 변경되었습니다.");
@@ -87,7 +83,9 @@ public class MemberService {
     @Transactional
     public ApiResult<?> withDrawMember(String loginId){
 
-        Member member = memberRepository.findByLoginId(loginId);
+        Member member = memberRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
+
         String memberName = member.getName();
 
         member.withdraw();
