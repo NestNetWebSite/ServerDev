@@ -18,8 +18,10 @@ import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import NestNet.NestNetWebSite.repository.post.PhotoPostRepository;
 import NestNet.NestNetWebSite.repository.post.ThumbNailRepository;
+import NestNet.NestNetWebSite.service.attachedfile.AttachedFileService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,8 +37,9 @@ public class PhotoPostService {
 
     private final PhotoPostRepository photoPostRepository;
     private final MemberRepository memberRepository;
-    private final AttachedFileRepository attachedFileRepository;
-    private final ThumbNailRepository thumbNailRepository;
+    private final AttachedFileService attachedFileService;
+    private final PostService postService;
+    private final ThumbNailService thumbNailService;
 
     /*
     사진 게시판에 게시물 저장
@@ -50,53 +53,15 @@ public class PhotoPostService {
 
         PhotoPost post = photoPostRequest.toEntity(member);
 
-        List<AttachedFile> attachedFileList = new ArrayList<>();
-
-        MultipartFile thumbNailFile = null;         //썸네일 사진
-        int curr = 0;
-        for(MultipartFile file : files){
-            if(curr++ == 0){
-                thumbNailFile = file;               //첫번째 사진을 썸네일 사진으로 저장
-            }
-            AttachedFile attachedFile = new AttachedFile(post, file);
-            attachedFileList.add(attachedFile);
-            post.addAttachedFiles(attachedFile);
-        }
-
         photoPostRepository.save(post);
-        boolean isthumbNailSaved = thumbNailRepository.save(new ThumbNail(post, thumbNailFile), thumbNailFile);
-        boolean isFileSaved = attachedFileRepository.saveAll(attachedFileList, files);
 
-        if(isthumbNailSaved == false || isFileSaved == false){
-            return ApiResult.error(response, HttpStatus.INTERNAL_SERVER_ERROR, "파일 저장 실패");
-        }
+        attachedFileService.save(post, files);
+
+        MultipartFile thumbNailFile = files.get(0);         //썸네일 사진
+
+        thumbNailService.saveThumbNail(post, thumbNailFile);
+
         return ApiResult.success("게시물 저장 성공");
-    }
-
-    /*
-    사진 게시판 썸네일 조회 (페이징)
-     */
-    public ApiResult<?> findThumbNails(int offset, int limit){
-
-        List<ThumbNail> thumbNailList = thumbNailRepository.findAllPhotoThumbNailByPaging(offset, limit);
-
-        List<ThumbNailDto> thumbNailDtoList = new ArrayList<>();
-        for(ThumbNail thumbNail : thumbNailList){
-            thumbNailDtoList.add(
-                    ThumbNailDto.builder()
-                            .postId(thumbNail.getPost().getId())
-                            .title(thumbNail.getPost().getTitle())
-                            .viewCount(thumbNail.getPost().getViewCount())
-                            .likeCount(thumbNail.getPost().getLikeCount())
-                            .saveFilePath(thumbNail.getSaveFilePath())
-                            .saveFileName(thumbNail.getSaveFileName())
-                            .build()
-            );
-        }
-
-        ThumbNailResponse result = new ThumbNailResponse(thumbNailDtoList);
-
-        return ApiResult.success(result);
     }
 
     /*
@@ -105,8 +70,10 @@ public class PhotoPostService {
     @Transactional
     public PhotoPostDto findPostById(Long id, String memberLoginId){
 
-        PhotoPost post = photoPostRepository.findById(id);
-        photoPostRepository.addViewCount(post, memberLoginId);
+        PhotoPost post = photoPostRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+
+        postService.addViewCount(post, memberLoginId);
 
         if(memberLoginId.equals(post.getMember().getLoginId())){
             return PhotoPostDto.builder()
@@ -136,46 +103,16 @@ public class PhotoPostService {
         }
     }
 
-//    /*
-//    좋아요
-//     */
-//    @Transactional
-//    public void like(Long id){
-//
-//        PhotoPost post = photoPostRepository.findById(id);
-//        photoPostRepository.like(post);
-//    }
-//
-//    /*
-//    좋아요 취소
-//     */
-//    @Transactional
-//    public void cancelLike(Long id){
-//
-//        PhotoPost post = photoPostRepository.findById(id);
-//        photoPostRepository.cancelLike(post);
-//    }
-
     /*
     사진 게시물 수정
      */
     @Transactional
     public void modifyPost(PhotoPostModifyRequest photoPostModifyRequest, Long postId){
 
-        PhotoPost post = photoPostRepository.findById(postId);
+        PhotoPost post = photoPostRepository.findById(postId)
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
         // 변경 감지 -> 자동 update
         post.modifyPost(photoPostModifyRequest.getTitle(), photoPostModifyRequest.getBodyContent());
-    }
-
-    /*
-    사진 게시물 삭제
-     */
-    @Transactional
-    public void deletePost(Long postId){
-
-        Post post = photoPostRepository.findById(postId);
-
-        photoPostRepository.deletePost(post);
     }
 }

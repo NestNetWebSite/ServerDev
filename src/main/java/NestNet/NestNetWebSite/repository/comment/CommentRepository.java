@@ -2,11 +2,8 @@ package NestNet.NestNetWebSite.repository.comment;
 
 import NestNet.NestNetWebSite.domain.comment.Comment;
 import NestNet.NestNetWebSite.domain.post.Post;
-import jakarta.persistence.EntityManager;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,4 +23,5 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     // 여러개 삭제 -> deleteAllInBatch
     @Modifying
     void deleteAllInBatch(List<Comment> commentList);
+
 }

@@ -3,14 +3,9 @@ package NestNet.NestNetWebSite.repository.like;
 import NestNet.NestNetWebSite.domain.like.PostLike;
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.post.Post;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.NoResultException;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.stereotype.Repository;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,4 +24,5 @@ public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
     // 여러개 삭제
     @Modifying
     void deleteAll(List<PostLike> postLikeList);
+
 }

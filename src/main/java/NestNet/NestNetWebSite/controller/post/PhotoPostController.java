@@ -15,6 +15,7 @@ import NestNet.NestNetWebSite.service.comment.CommentService;
 import NestNet.NestNetWebSite.service.like.PostLikeService;
 import NestNet.NestNetWebSite.service.post.PhotoPostService;
 import NestNet.NestNetWebSite.service.post.PostService;
+import NestNet.NestNetWebSite.service.post.ThumbNailService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -44,6 +45,7 @@ public class PhotoPostController {
     private final CommentService commentService;
     private final PostLikeService postLikeService;
     private final PostService postService;
+    private final ThumbNailService thumbNailService;
 
     /*
     사진 게시판 게시물 저장
@@ -65,7 +67,7 @@ public class PhotoPostController {
     })
     public ApiResult<?> showThumbNail(@RequestParam("offset") int offset, @RequestParam("limit") int limit){
 
-        return photoPostService.findThumbNails(offset, limit);
+        return thumbNailService.findThumbNails(offset, limit);
     }
 
 
@@ -120,7 +122,7 @@ public class PhotoPostController {
     public ApiResult<?> deletePost(@RequestParam(value = "postId") Long postId, HttpServletResponse response){
 
         attachedFileService.deleteFiles(postId);
-        photoPostService.deletePost(postId);
+        postService.deletePost(postId);
         commentService.deleteAllComments(postId);
         postLikeService.deleteLike(postId);
 

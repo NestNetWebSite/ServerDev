@@ -1,114 +1,39 @@
 package NestNet.NestNetWebSite.repository.post;
 
-import NestNet.NestNetWebSite.config.redis.RedisUtil;
-import NestNet.NestNetWebSite.domain.member.Member;
-import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.domain.post.exam.ExamCollectionPost;
 import NestNet.NestNetWebSite.domain.post.exam.ExamType;
-import jakarta.persistence.EntityManager;
-import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
+import java.util.Optional;
 
 public interface ExamCollectionPostRepository extends JpaRepository<ExamCollectionPost, Long> {
 
-
-    private final RedisUtil redisUtil;
-
-    // 조회수 update
-    public void addViewCount(Post post, String memberLoginId){
-
-        String viewRecordKey = memberLoginId + "_" +  post.getId().toString();     //사용자아이디 + 게시물 id
-
-        //24시간 내에 다시 조회해도 조회수 올라가지 않음 (조회하지 않았으면 레디스에 없음 -> 조회수 + 1)
-        if(!redisUtil.hasKey(viewRecordKey)){
-            post.addViewCount();        //변경 감지에 의해 update
-            redisUtil.setData(viewRecordKey, "v", 24, TimeUnit.HOURS);      //24시간 유지 -> 자동 삭제
-        }
-    }
-
-//    // 좋아요
-//    public void like(Post post){
-//        post.like();
-//    }
-//    // 좋아요 취소
-//    public void cancelLike(Post post){
-//        post.cancelLike();
-//    }
-
-    //=========================================조회=========================================//
-
     // Id(PK)로 단건 조회
-    public ExamCollectionPost findById(Long id){
-        return entityManager.find(ExamCollectionPost.class, id);
-    }
+    Optional<ExamCollectionPost> findById(Long id);
 
-    // 족보 게시물 총 갯수 조회
-    public Long findTotalSize(){
-
-        Object size = entityManager.createQuery("select count(p) from ExamCollectionPost p").getResultList().get(0);
-
-        return Long.valueOf(String.valueOf(size));
-    }
-
-    // 족보 게시물 조건에 따른 리스트 조회
-    public List<ExamCollectionPost> findAllExamCollectionPostByFilter(String subject, String professor, Integer year, Integer semester, ExamType examType,
-                                                                      int offset, int limit){
-
-        List<ExamCollectionPost> resultList = entityManager.createQuery(
-                "select p from ExamCollectionPost p where" +
-                        "(:subject is null or p.subject =: subject )" + " and " +
-                        "(:professor is null or p.professor =: professor )" + " and " +
-                        "(:year is null or p.year =: year )" + " and " +
-                        "(:semester is null or p.semester =: semester )" + " and " +
-                        "(:examType is null or p.examType =: examType )" +
-                        "order by p.id desc", ExamCollectionPost.class)
-                .setParameter("subject", subject)
-                .setParameter("professor", professor)
-                .setParameter("year", year)
-                .setParameter("semester", semester)
-                .setParameter("examType", examType)
-                .setFirstResult(offset)
-                .setMaxResults(limit)
-                .getResultList();
-
-        return resultList;
-    }
+    // 족보 게시물 조건에 따른 리스트 조회 (페이징)
+    @Query("select p from ExamCollectionPost p where" +
+            "(:subject is null or p.subject =: subject )" + " and " +
+            "(:professor is null or p.professor =: professor )" + " and " +
+            "(:year is null or p.year =: year )" + " and " +
+            "(:semester is null or p.semester =: semester )" + " and " +
+            "(:examType is null or p.examType =: examType )" +
+            "order by p.id desc")
+    Page<ExamCollectionPost> findAllByFilter(@Param("subject") String subject, @Param("professor") String professor,
+                                             @Param("year") int year, @Param("semester") int semester, @Param("examType") ExamType examType,
+                                             Pageable pageable);
 
     // 족보 게시물 모두 조회
-    public List<ExamCollectionPost> findAllExamCollectionPost(){
-
-        List<ExamCollectionPost> resultList = entityManager.createQuery("select p from ExamCollectionPost p order by p.id desc", ExamCollectionPost.class)
-                .getResultList();
-
-        return resultList;
-    }
+    @Query("select p from ExamCollectionPost p order by p.id desc")
+    List<ExamCollectionPost> findAll();
 
     // 족보 게시물 개수 제한에 따른 리스트 조회
-    public List<ExamCollectionPost> findExamCollectionPostLimit(int offset, int limit){
+    @Query("select p from ExamCollectionPost p order by p.id desc")
+    Page<ExamCollectionPost> findAll(Pageable pageable);
 
-        List<ExamCollectionPost> resultList = entityManager.createQuery("select p from ExamCollectionPost p order by p.id desc", ExamCollectionPost.class)
-                .setFirstResult(offset)
-                .setMaxResults(limit)
-                .getResultList();
-
-        return resultList;
-    }
-
-    //=====================================================================================//
-
-    // 족보 게시물 수정
-    public void modifyPost(Long postId){
-
-    }
-
-    // 족보 게시물 삭제
-    public void deletePost(Post post){
-
-        entityManager.remove(post);
-    }
 }

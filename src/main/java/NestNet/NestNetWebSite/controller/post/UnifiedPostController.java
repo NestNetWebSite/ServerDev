@@ -53,7 +53,7 @@ public class UnifiedPostController {
             System.out.println(file.getName());
         }
 
-        return unifiedPostService.savePost(unifiedPostRequest, files, userDetails.getUsername(), response);
+        return unifiedPostService.savePost(unifiedPostRequest, files, userDetails.getUsername());
     }
 
     /*
@@ -119,7 +119,7 @@ public class UnifiedPostController {
     @Operation(summary = "사진 게시판 게시물 삭제", description = "파일 삭제에 문제가 생기는 경우 500 에러를 반환한다.")
     public ApiResult<?> deletePost(@RequestParam(value = "postId") Long postId, HttpServletResponse response){
 
-        unifiedPostService.deletePost(postId);
+        postService.deletePost(postId);
         commentService.deleteAllComments(postId);
         postLikeService.deleteLike(postId);
 

@@ -1,5 +1,6 @@
 package NestNet.NestNetWebSite.service.attachedfile;
 
+import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.dto.response.AttachedFileResponse;
@@ -11,6 +12,7 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,13 +35,26 @@ public class AttachedFileService {
 
     private final AttachedFileRepository attachedFileRepository;
     private final PostRepository postRepository;
-    private final EntityManager entityManager;
 
     private static String basePath = "C:" + File.separator + "nestnetFile" + File.separator;
 
     /*
     첨부파일 저장 -> 저장 로직은 게시물에 종속적. 게시물 저장하는 서비스 로직에서 수행
      */
+    public void save(Post post, List<MultipartFile> files){
+
+        if(!files.isEmpty()){
+            List<AttachedFile> attachedFileList = new ArrayList<>();
+
+            for(MultipartFile file : files){
+                AttachedFile attachedFile = new AttachedFile(post, file);
+                attachedFileList.add(attachedFile);
+                post.addAttachedFiles(attachedFile);
+            }
+            attachedFileRepository.saveAll(attachedFileList);
+            saveRealFile(attachedFileList, files);
+        }
+    }
 
     /*
     게시물에 해당된 첨부파일 모두 조회

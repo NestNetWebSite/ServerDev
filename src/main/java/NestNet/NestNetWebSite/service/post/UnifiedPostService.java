@@ -16,8 +16,12 @@ import NestNet.NestNetWebSite.exception.ErrorCode;
 import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import NestNet.NestNetWebSite.repository.post.UnifiedPostRepository;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
+import NestNet.NestNetWebSite.service.attachedfile.AttachedFileService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,35 +37,23 @@ public class UnifiedPostService {
 
     private final UnifiedPostRepository unifiedPostRepository;
     private final MemberRepository memberRepository;
-    private final AttachedFileRepository attachedFileRepository;
+    private final AttachedFileService attachedFileService;
+    private final PostService postService;
 
     /*
     통합 게시판 게시물 저장
      */
     @Transactional
-    public ApiResult<?> savePost(UnifiedPostRequest unifiedPostRequest, List<MultipartFile> files, String memberLoginId, HttpServletResponse response) {
+    public ApiResult<?> savePost(UnifiedPostRequest unifiedPostRequest, List<MultipartFile> files, String memberLoginId) {
 
         Member member = memberRepository.findByLoginId(memberLoginId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
 
         UnifiedPost post = unifiedPostRequest.toEntity(member);
 
-        if(files != null){
-            List<AttachedFile> attachedFileList = new ArrayList<>();
-
-            for(MultipartFile file : files){
-                AttachedFile attachedFile = new AttachedFile(post, file);
-                attachedFileList.add(attachedFile);
-                post.addAttachedFiles(attachedFile);
-            }
-            boolean isFileSaved = attachedFileRepository.saveAll(attachedFileList, files);
-
-            if(isFileSaved == false){
-                return ApiResult.error(response, HttpStatus.INTERNAL_SERVER_ERROR, "파일 저장 실패");
-            }
-        }
-
         unifiedPostRepository.save(post);
+
+        attachedFileService.save(post, files);
 
         return ApiResult.success("게시물 저장 성공");
     }
@@ -69,10 +61,13 @@ public class UnifiedPostService {
     /*
     통합 게시판 목록 조회
      */
-    public ApiResult<?> findPostList(UnifiedPostType unifiedPostType, int offset, int limit){
+    public ApiResult<?> findPostList(UnifiedPostType unifiedPostType, int page, int size){
 
-        List<UnifiedPost> postList = unifiedPostRepository.findUnifiedPostByType(offset, limit, unifiedPostType);
-        Long size = unifiedPostRepository.findTotalSize(unifiedPostType);
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+
+        Page<UnifiedPost> unifiedPostPage = unifiedPostRepository.findByUnifiedPostTypeByPaging(unifiedPostType, pageRequest);
+
+        List<UnifiedPost> postList = unifiedPostPage.getContent();
 
         List<UnifiedPostListDto> dtoList = new ArrayList<>();
         for(UnifiedPost post : postList){
@@ -80,7 +75,7 @@ public class UnifiedPostService {
                     post.getCreatedTime(), post.getViewCount(), post.getLikeCount()));
         }
 
-        UnifiedPostListResponse result = new UnifiedPostListResponse(size, dtoList);
+        UnifiedPostListResponse result = new UnifiedPostListResponse(unifiedPostPage.getTotalElements(), dtoList);
 
         return ApiResult.success(result);
     }
@@ -91,8 +86,10 @@ public class UnifiedPostService {
     @Transactional
     public UnifiedPostDto findPostById(Long id, String memberLoginId){
 
-        UnifiedPost post = unifiedPostRepository.findById(id);
-        unifiedPostRepository.addViewCount(post, memberLoginId);
+        UnifiedPost post = unifiedPostRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+
+        postService.addViewCount(post, memberLoginId);
 
         if(memberLoginId.equals(post.getMember().getLoginId())){
             return UnifiedPostDto.builder()
@@ -124,46 +121,16 @@ public class UnifiedPostService {
         }
     }
 
-//    /*
-//    좋아요
-//     */
-//    @Transactional
-//    public void like(Long id){
-//
-//        UnifiedPost post = unifiedPostRepository.findById(id);
-//        unifiedPostRepository.like(post);
-//    }
-//
-//    /*
-//    좋아요 취소
-//     */
-//    @Transactional
-//    public void cancelLike(Long id){
-//
-//        UnifiedPost post = unifiedPostRepository.findById(id);
-//        unifiedPostRepository.cancelLike(post);
-//    }
-
     /*
     통합 게시물 수정
      */
     @Transactional
     public void modifyPost(UnifiedPostModifyRequest request){
 
-        UnifiedPost post = unifiedPostRepository.findById(request.getId());
+        UnifiedPost post = unifiedPostRepository.findById(request.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
         // 변경 감지 -> 자동 update
         post.modifyPost(request.getTitle(), request.getBodyContent(), request.getUnifiedPostType());
-    }
-
-    /*
-    통합 게시물 삭제
-     */
-    @Transactional
-    public void deletePost(Long postId){
-
-        Post post = unifiedPostRepository.findById(postId);
-
-        unifiedPostRepository.deletePost(post);
     }
 }

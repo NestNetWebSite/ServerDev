@@ -17,8 +17,12 @@ import NestNet.NestNetWebSite.exception.ErrorCode;
 import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import NestNet.NestNetWebSite.repository.post.ExamCollectionPostRepository;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
+import NestNet.NestNetWebSite.service.attachedfile.AttachedFileService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +39,8 @@ import java.util.Map;
 public class ExamCollectionPostService {
 
     private final ExamCollectionPostRepository examCollectionPostRepository;
-    private final AttachedFileRepository attachedFileRepository;
+    private final AttachedFileService attachedFileService;
+    private final PostService postService;
     private final MemberRepository memberRepository;
 
     /*
@@ -43,7 +48,7 @@ public class ExamCollectionPostService {
      */
     @Transactional
     public ApiResult<?> savePost(ExamCollectionPostRequest examCollectionPostRequest, List<MultipartFile> files,
-                         String memberLoginId, HttpServletResponse response){
+                         String memberLoginId){
 
         Member member = memberRepository.findByLoginId(memberLoginId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
@@ -52,20 +57,7 @@ public class ExamCollectionPostService {
 
         examCollectionPostRepository.save(post);
 
-        if(!files.isEmpty()){
-            List<AttachedFile> attachedFileList = new ArrayList<>();
-
-            for(MultipartFile file : files){
-                AttachedFile attachedFile = new AttachedFile(post, file);
-                attachedFileList.add(attachedFile);
-                post.addAttachedFiles(attachedFile);
-            }
-            boolean isFileSaved = attachedFileRepository.saveAll(attachedFileList, files);
-
-            if(isFileSaved == false){
-                return ApiResult.error(response, HttpStatus.INTERNAL_SERVER_ERROR, "파일 저장 실패");
-            }
-        }
+        attachedFileService.save(post, files);
 
         return ApiResult.success("게시물 저장 성공");
     }
@@ -73,13 +65,16 @@ public class ExamCollectionPostService {
     /*
     필터에 따른 족보 리스트 조희
      */
-    public ApiResult<?> findPostByFilter(String subject, String professor, Integer year, Integer semester, ExamType examType, int offset, int limit){
+    public ApiResult<?> findPostByFilter(String subject, String professor, Integer year, Integer semester, ExamType examType, int page, int size){
 
-        List<ExamCollectionPost> posts = examCollectionPostRepository.findAllExamCollectionPostByFilter(subject, professor, year, semester, examType, offset, limit);
-        Long size = examCollectionPostRepository.findTotalSize();       //전체 족보 게시물 갯수
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+
+        Page<ExamCollectionPost> postPage = examCollectionPostRepository.findAllByFilter(subject, professor, year, semester, examType, pageRequest);
+
+        List<ExamCollectionPost> examCollectionPostList = postPage.getContent();
 
         List<ExamCollectionPostListDto> dtoList = new ArrayList<>();
-        for(ExamCollectionPost post : posts){
+        for(ExamCollectionPost post : examCollectionPostList){
             dtoList.add(
                     ExamCollectionPostListDto.builder()
                             .id(post.getId())
@@ -92,7 +87,7 @@ public class ExamCollectionPostService {
                             .build());
         }
 
-        ExamCollectionPostListResponse result = new ExamCollectionPostListResponse(size, dtoList);
+        ExamCollectionPostListResponse result = new ExamCollectionPostListResponse(postPage.getTotalElements(), dtoList);
 
         return ApiResult.success(result);
     }
@@ -103,8 +98,10 @@ public class ExamCollectionPostService {
     @Transactional
     public ExamCollectionPostDto findPostById(Long id, String memberLoginId){
 
-        ExamCollectionPost post = examCollectionPostRepository.findById(id);
-        examCollectionPostRepository.addViewCount(post, memberLoginId);
+        ExamCollectionPost post = examCollectionPostRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+
+        postService.addViewCount(post, memberLoginId);
 
         if(memberLoginId.equals(post.getMember().getLoginId())){
             return ExamCollectionPostDto.builder()
@@ -144,47 +141,18 @@ public class ExamCollectionPostService {
         }
     }
 
-//    /*
-//    좋아요
-//     */
-//    @Transactional
-//    public void like(Long id){
-//
-//        ExamCollectionPost post = examCollectionPostRepository.findById(id);
-//        examCollectionPostRepository.like(post);
-//    }
-//
-//    /*
-//    좋아요 취소
-//     */
-//    @Transactional
-//    public void cancelLike(Long id){
-//
-//        ExamCollectionPost post = examCollectionPostRepository.findById(id);
-//        examCollectionPostRepository.cancelLike(post);
-//    }
-
     /*
     족보 게시물 수정
      */
     @Transactional
     public void modifyPost(ExamCollectionPostModifyRequest modifyRequest){
 
-        ExamCollectionPost post = examCollectionPostRepository.findById(modifyRequest.getId());
+        ExamCollectionPost post = examCollectionPostRepository.findById(modifyRequest.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
         // 변경 감지 -> 자동 update
         post.modifyPost(modifyRequest.getTitle(), modifyRequest.getBodyContent(), modifyRequest.getSubject(),
                 modifyRequest.getProfessor(), modifyRequest.getYear(), modifyRequest.getSemester(), modifyRequest.getExamType());
     }
 
-    /*
-    족보 게시물 삭제
-     */
-    @Transactional
-    public void deletePost(Long id){
-
-        Post post = examCollectionPostRepository.findById(id);
-
-        examCollectionPostRepository.deletePost(post);
-    }
 }

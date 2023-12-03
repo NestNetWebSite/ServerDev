@@ -48,9 +48,9 @@ public class ExamCollectionPostController {
     @Operation(summary = "시험 기출 게시물 단건 저장", description = "시험 기출 게시물을 저장한다. 파일 저장에 실패한 경우 500 에러를 반환한다.")
     public ApiResult<?> savePost(@RequestPart("data") @Valid ExamCollectionPostRequest examCollectionPostRequest,
                                  @RequestPart(value = "file", required = false) List<MultipartFile> files,
-                                 @AuthenticationPrincipal UserDetails userDetails, HttpServletResponse response){
+                                 @AuthenticationPrincipal UserDetails userDetails){
 
-        return examCollectionPostService.savePost(examCollectionPostRequest, files, userDetails.getUsername(), response);
+        return examCollectionPostService.savePost(examCollectionPostRequest, files, userDetails.getUsername());
     }
 
     /*
@@ -120,7 +120,7 @@ public class ExamCollectionPostController {
     public ApiResult<?> deletePost(@RequestParam(value = "postId") Long postId, HttpServletResponse response){
 
         attachedFileService.deleteFiles(postId);
-        examCollectionPostService.deletePost(postId);
+        postService.deletePost(postId);
         commentService.deleteAllComments(postId);
         postLikeService.deleteLike(postId);
 
