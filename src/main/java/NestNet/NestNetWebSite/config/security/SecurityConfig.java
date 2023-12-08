@@ -78,8 +78,10 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer(){
         return web -> web
                 .ignoring()
-                .requestMatchers("/auth/signup", "/auth/login")
                 .requestMatchers("/swagger-ui/index.html", "/swagger-ui/**", "/v3/api-docs/**")
+                .requestMatchers("/auth/signup", "/auth/login")
+                .requestMatchers("/member/find-id", "/member/get-temp-pw")
+                .requestMatchers("/attendance/weekly", "/attendance/monthly")
                 .requestMatchers("/photo-post/**", "/photo-post")
                 .requestMatchers("/image/**");
     }
@@ -125,11 +127,11 @@ public class SecurityConfig {
 //                        .requestMatchers("/photo-post/post").hasAnyAuthority("PRESIDENT", "VICE_PRESIDENT", "MANAGER")
 //                        .requestMatchers("/photo-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER")
                         // 인생네컷
-//                        .requestMatchers("/life4cut/save").hasAnyAuthority("PRESIDENT", "VICE_PRESIDENT", "MANAGER")
-                        .requestMatchers("/life4cut/**").permitAll()
+                        .requestMatchers("/life4cut/save").hasAnyAuthority("PRESIDENT", "VICE_PRESIDENT", "MANAGER")
+//                        .requestMatchers("/life4cut/**").permitAll()
                         // 멤버 프로필
-                        .requestMatchers("/member-profile/member-info").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER")
-                        .requestMatchers("/member/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER")
+                        .requestMatchers("/member-profile/member-info/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER", "WITHDRAWN_MEMBER")
+                        .requestMatchers("/member/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER", "WITHDRAWN_MEMBER")
                         .anyRequest().authenticated()       //나머지 요청은 모두 권한 필요함.
 
                 )

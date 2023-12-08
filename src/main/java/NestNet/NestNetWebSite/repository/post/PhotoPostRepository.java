@@ -13,6 +13,6 @@ public interface PhotoPostRepository extends JpaRepository<PhotoPost, Long> {
     Optional<PhotoPost> findById(Long id);
 
     // 사진 게시판 리스트 조회(페이징)
-    Page<PhotoPost> findAllByPaging(Pageable pageable);
+    Page<PhotoPost> findAll(Pageable pageable);
 
 }

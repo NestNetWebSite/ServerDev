@@ -211,11 +211,9 @@ public class TokenProvider implements InitializingBean {
         String refreshToken = null;
 
         Cookie[] cookies = request.getCookies();
-        System.out.println("쿠키없음 / ");
+
         if (cookies != null && cookies.length > 0){
-            System.out.println("쿠키는 있는데 좀 이상");
             for(Cookie cookie : cookies){
-                System.out.println("리프레시 토큰 얻는덴데 역 ㅣ오냐");
                 if(cookie.getName().equals("refresh-token")){
                     refreshToken = cookie.getValue();
                     System.out.println("최종 : " + refreshToken);

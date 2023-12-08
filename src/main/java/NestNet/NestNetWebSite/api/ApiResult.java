@@ -1,9 +1,7 @@
 package NestNet.NestNetWebSite.api;
 
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 @Getter
 public class ApiResult<T> {
@@ -23,10 +21,8 @@ public class ApiResult<T> {
         return new ApiResult<>(true, response, null);
     }
 
-    public static <T> ApiResult<?> error(HttpServletResponse response, HttpStatus status, String message) {
+    public static <T> ApiResult<?> error(HttpStatus status, String message) {
 
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setStatus(status.value());
         return new ApiResult<>(false, null, new ApiError(status, message));
     }
 

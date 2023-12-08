@@ -52,10 +52,8 @@ public class ThumbNailService {
 
         try {
             file.transferTo(saveFilePath);
-        } catch (IOException e){
-
-        } catch (IllegalStateException e){
-
+        } catch (IOException | IllegalStateException e){
+            throw new CustomException(ErrorCode.CANNOT_SAVE_FILE);
         }
     }
 
@@ -66,7 +64,7 @@ public class ThumbNailService {
 
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
 
-        Page<ThumbNail> thumbNailPage = thumbNailRepository.findAllByPaging(pageRequest);
+        Page<ThumbNail> thumbNailPage = thumbNailRepository.findAll(pageRequest);
 
         List<ThumbNail> thumbNailList = thumbNailPage.getContent();
 

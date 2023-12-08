@@ -89,7 +89,6 @@ public class PostLikeService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
-        List<PostLike> postLikeList = postLikeRepository.findAllByPost(post);
-        postLikeRepository.deleteAll(postLikeList);
+        postLikeRepository.deleteAllByPost(post);
     }
 }

@@ -9,6 +9,8 @@ import NestNet.NestNetWebSite.domain.member.MemberAuthority;
 import NestNet.NestNetWebSite.dto.request.LoginRequest;
 import NestNet.NestNetWebSite.dto.request.SignUpRequest;
 import NestNet.NestNetWebSite.dto.response.TokenResponse;
+import NestNet.NestNetWebSite.exception.CustomException;
+import NestNet.NestNetWebSite.exception.ErrorCode;
 import NestNet.NestNetWebSite.repository.manager.MemberSignUpManagementRepository;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import io.jsonwebtoken.Claims;
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -49,9 +52,10 @@ public class AuthService {
     @Transactional
     public ApiResult<?> sendSignUpRequest(SignUpRequest signUpRequestDto, HttpServletResponse response){
 
-        // 아이디 중복 확인
-        if(memberRepository.findByLoginId(signUpRequestDto.getLoginId()) != null){
-            return ApiResult.error(response, HttpStatus.CONFLICT, "이미 가입된 유저 아이디입니다.");
+        Optional<Member> member = memberRepository.findByLoginId(signUpRequestDto.getLoginId());
+
+        if(member.isPresent()){
+            throw new CustomException(ErrorCode.ALREADY_EXIST);
         }
 
         MemberAuthority enrollAuthority = signUpRequestDto.getMemberAuthority();        //사용자가 신청한 권한
@@ -77,6 +81,8 @@ public class AuthService {
     @Transactional
     public TokenResponse login(LoginRequest loginRequest){
 
+        TokenResponse tokenResponse;
+
         try{
             //인증 전의 UsernamePasswordAuthenticationToken 객체(Authentication의 구현체)
             UsernamePasswordAuthenticationToken authenticationToken =
@@ -92,12 +98,13 @@ public class AuthService {
             //레디스에 리프레시 토큰 저장
             redisUtil.setData(refreshToken, "refresh-token", refreshTokenExpTime);
 
-            TokenResponse tokenResponse = new TokenResponse(accessToken, refreshToken);
+            tokenResponse = new TokenResponse(accessToken, refreshToken);
 
-            return tokenResponse;
         } catch (Exception e){
-            return null;
+            throw new CustomException(ErrorCode.ID_PASSWORD_NOT_MATCH);
         }
+
+        return tokenResponse;
     }
 
     /*
@@ -121,16 +128,13 @@ public class AuthService {
         //리프레시 토큰 삭제
         String refreshToken = tokenProvider.getRefreshToken(request);
         if(refreshToken != null){
+            System.out.println("삭제");
             redisUtil.deleteData(refreshToken);
         }
 
         //레디스에 블랙리스트 등록
         redisUtil.setData(accessToken, "logout", remainTime);
 
-        //블랙리스트(key : 엑세스 토큰 / value : logout)
-        if(redisUtil.hasKey(accessToken) && !redisUtil.hasKey(refreshToken)){
-            return ApiResult.success("로그아웃 되었습니다");
-        }
-        return ApiResult.error(response, HttpStatus.INTERNAL_SERVER_ERROR, "서버 에러/ 관리자에게 문의하세요");
+        return ApiResult.success("로그아웃 되었습니다");
     }
 }

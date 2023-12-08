@@ -49,10 +49,6 @@ public class AuthController {
 
         TokenResponse tokenResponse = authService.login(loginRequest);
 
-        if(tokenResponse == null){
-            return ApiResult.error(response, HttpStatus.BAD_REQUEST, "아이디 / 비밀번호 불일치");
-        }
-
         HttpHeaders httpHeaders = new HttpHeaders();
 
         httpHeaders.set(CustomAuthorizationFilter.AUTHORIZATION_HEADER, "Bearer " + tokenResponse.getAccessToken());

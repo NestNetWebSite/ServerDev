@@ -20,9 +20,9 @@ spring:
       max-file-size: 5MB
       max-request-size: 10MB
 
-  mvc:
-    pathmatch:
-      matching-strategy: ant_path_matcher
+#  mvc:
+#    pathmatch:
+#      matching-strategy: ant_path_matcher
 
   mail:
     host: smtp.naver.com          # 네이버 SMTP 호스트 주소

@@ -40,9 +40,9 @@ public class ManagerController {
      */
     @PostMapping("/manager/approve-signup")
     @Operation(summary = "회원가입 요청 단건 승인", description = "하나의 회원가입 요청을 승인한다. 회원가입 요청을 찾을 수 없을 시 500 에러를 반환한다.")
-    public ApiResult<?> approveSignUpMember(@Valid @RequestBody MemberSignUpManagementRequest dto, HttpServletResponse response){
+    public ApiResult<?> approveSignUpMember(@Valid @RequestBody MemberSignUpManagementRequest dto){
 
-        return managerService.approveSignUp(dto, response);
+        return managerService.approveSignUp(dto);
     }
 
     /*
@@ -56,7 +56,7 @@ public class ManagerController {
     }
 
     /*
-    회원 정보 조회
+    전체 회원 정보 조회
      */
     @GetMapping("/manager/member-info")
     @Operation(summary = "모든 회원 정보 조회", description = "회원 정보를 조회한다. 이때, 이름, 권한을 필터링(필수 아님)할 수 있다.")

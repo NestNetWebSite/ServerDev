@@ -18,7 +18,7 @@ public interface ThumbNailRepository extends JpaRepository<ThumbNail, Long> {
     Optional<ThumbNail> findByPost(Post post);
 
     // 사진 게시판 썸네일 모두 조회 (페이징)
-    Page<ThumbNail> findAllByPaging(Pageable pageable);
+    Page<ThumbNail> findAll(Pageable pageable);
 
     @Modifying
     void delete(ThumbNail thumbNail);

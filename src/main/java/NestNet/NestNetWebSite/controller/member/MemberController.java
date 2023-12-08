@@ -64,7 +64,7 @@ public class MemberController {
             @ApiResponse(responseCode = "404", description = "회원 아이디가 틀렸습니다."),
             @ApiResponse(responseCode = "500", description = "서버에서 이메일 전송을 실패하였습니다. 관리자에게 문의하세요")
     })
-    public ApiResult<?> getTemporaryPassword(@Valid @RequestBody MemberGetTemporaryPwRequest dto, HttpServletResponse response){
+    public ApiResult<?> getTemporaryPassword(@Valid @RequestBody MemberGetTemporaryPwRequest dto){
 
         TemporaryInfoDto emailAndPw = memberService.createTemporaryPassword(dto.getLoginId());
 
@@ -81,7 +81,7 @@ public class MemberController {
     public ApiResult<?> changePassword(@Valid @RequestBody MemberPasswordChangeRequest dto,
                                        @AuthenticationPrincipal UserDetails userDetails){
 
-        return memberService.changeMemberPassword(dto.getPassword(), userDetails.getUsername());
+        return memberService.changeMemberPassword(userDetails.getUsername(), dto.getPassword());
     }
 
     /*

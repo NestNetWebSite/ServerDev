@@ -31,9 +31,9 @@ public class Life4CutController {
     }
 
     /*
-    인생네컷 랜덤 조회
+    인생네컷 조회 (내림차순)
      */
-    @GetMapping("/life4cut/{limit}")
+    @GetMapping("/life4cut/{page}/{size}")
     @Operation(summary = "인생네컷 다건 조회", description = "size(갯수)만큼 인생네컷을 랜덤으로 조회하여 반환한다.", responses = {
             @ApiResponse(responseCode = "200", description = "게시글 조회 성공", content = @Content(schema = @Schema(implementation = Life4CutResponse.class)))
     })

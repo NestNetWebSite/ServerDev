@@ -18,7 +18,7 @@ public interface AttachedFileRepository extends JpaRepository<AttachedFile, Long
     List<AttachedFile> findAllByPost(@Param("post") Post post);
 
     // 게시물 + 파일명으로 파일 단건 조회
-    @Query("select a from AttachedFile a where a.post =: post and a.saveFileName =: saveFileName")
+    @Query("select a from AttachedFile a where a.post =:post and a.saveFileName =:saveFileName")
     Optional<AttachedFile> findByPostAndFileName(@Param("post") Post post, @Param("saveFileName") String saveFileName);
 
     // 파일 삭제

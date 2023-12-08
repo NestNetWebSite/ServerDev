@@ -23,6 +23,6 @@ public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
 
     // 여러개 삭제
     @Modifying
-    void deleteAll(List<PostLike> postLikeList);
+    void deleteAllByPost(Post post);
 
 }

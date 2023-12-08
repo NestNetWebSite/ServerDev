@@ -99,7 +99,7 @@ public class AttachedFileService {
         try{
             resource = new InputStreamResource(new FileInputStream(realFile));
         } catch (FileNotFoundException e){
-
+            throw new CustomException(ErrorCode.FILE_NOT_FOUND);
         }
 
         return resource;
@@ -179,10 +179,8 @@ public class AttachedFileService {
 
             try {
                 file.transferTo(saveFilePath);
-            } catch (IOException e){
-
-            } catch (IllegalStateException e){
-
+            } catch (IOException | IllegalStateException e){
+                throw new CustomException(ErrorCode.CANNOT_SAVE_FILE);
             }
         }
     }

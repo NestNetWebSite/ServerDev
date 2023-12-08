@@ -116,8 +116,6 @@ public class CommentService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
-        List<Comment> commentList = commentRepository.findAllByPost(post);
-
-        commentRepository.deleteAllInBatch(commentList);
+        commentRepository.deleteAllByPost(post);
     }
 }

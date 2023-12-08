@@ -42,10 +42,12 @@ public class MemberProfileService {
     /*
     본인이 작성한 글 목록 조회
      */
-    public ApiResult<?> findAllPostById(String loginId){
+    public ApiResult<?> findAllPostById(Long memberId, String loginId){
 
         Member member = memberRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
+
+        if(memberId != member.getId()) throw new CustomException(ErrorCode.MEMBER_NO_PERMISSION);
 
         List<Post> postList = postRepository.findAllByMember(member);
 

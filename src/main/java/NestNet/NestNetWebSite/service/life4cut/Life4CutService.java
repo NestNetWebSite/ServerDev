@@ -53,7 +53,7 @@ public class Life4CutService {
 
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
 
-        Page<Life4Cut> life4CutPage = life4CutRepository.findBy(pageRequest);
+        Page<Life4Cut> life4CutPage = life4CutRepository.findAll(pageRequest);
         List<Life4Cut> life4CutList = life4CutPage.getContent();
         List<Life4CutResponse> responseList = new ArrayList<>();
 

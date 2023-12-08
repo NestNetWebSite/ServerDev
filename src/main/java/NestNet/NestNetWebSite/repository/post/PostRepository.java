@@ -18,7 +18,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Optional<Post> findById(Long postId);
 
     // 사용자가 쓴 글 조회 (족보, 통합, 사진 게시판)
-    @Query("select p from Post p where p.member =: member")
+    @Query("select p from Post p where p.member =:member")
     List<Post> findAllByMember (@Param("member") Member member);
 
     // 게시판 카테고리별 게시물 총 갯수 조회

@@ -9,9 +9,4 @@ public class AttendanceStatisticsDto {
 
     private String memberName;
     private Long point;
-
-    public AttendanceStatisticsDto(String memberName, Long attendanceNum) {
-        this.memberName = memberName;
-        this.point = attendanceNum * 10;
-    }
 }

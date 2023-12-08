@@ -14,7 +14,7 @@ public interface Life4CutRepository extends JpaRepository<Life4Cut, Long> {
     Optional<Life4Cut> findById(Long id);
 
     // 여러 건 페이징 조회 (id 내림차순)
-    Page<Life4Cut> findBy(Pageable pageable);
+    Page<Life4Cut> findAll(Pageable pageable);
 
     // 삭제
     @Modifying

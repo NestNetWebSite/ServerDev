@@ -29,4 +29,24 @@ public class AttendanceController {
 
         return attendanceService.saveAttendance(userDetails.getUsername(), response);
     }
+
+    /*
+    주간 출석 통계 조회
+     */
+    @GetMapping("attendance/weekly")
+    @Operation(summary = "주간 출석 조회", description = "")
+    public ApiResult<?> findWeeklyAttendance(){
+
+        return attendanceService.findWeeklyAttendanceStatistics();
+    }
+
+    /*
+    월간 출석 통계 조회
+     */
+    @GetMapping("attendance/monthly")
+    @Operation(summary = "월간 출석 조회", description = "")
+    public ApiResult<?> findMonthlyAttendance(){
+
+        return attendanceService.findMonthlyAttendanceStatistics();
+    }
 }

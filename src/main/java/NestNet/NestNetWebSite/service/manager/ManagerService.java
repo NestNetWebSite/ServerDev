@@ -53,20 +53,24 @@ public class ManagerService {
     회원 가입 요청 승인
      */
     @Transactional
-    public ApiResult<?> approveSignUp(MemberSignUpManagementRequest dto, HttpServletResponse response){
-
+    public ApiResult<?> approveSignUp(MemberSignUpManagementRequest dto){
 
         Member member = memberRepository.findByLoginId(dto.getLoginId())
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
 
         member.changeAuthority(dto.getMemberAuthority());         //권한 설정
+
+        System.out.println(member.getLoginId() + "  " + member.getId());
+
         Optional<MemberSignUpManagement> memberSignUpManagement = memberSignUpManagementRepository.findByMember(member);
+
+        System.out.println(memberSignUpManagement.get().getId());
 
         if(memberSignUpManagement.isPresent()){
             memberSignUpManagement.get().setComplete(true);
         }
         else{
-            return ApiResult.error(response, HttpStatus.INTERNAL_SERVER_ERROR, "회원가입 요청을 찾을 수 없습니다.");
+            throw new CustomException(ErrorCode.MEMBER_SIGNUP_REQUEST_NOT_FOUND);
         }
 
         memberRepository.save(member);

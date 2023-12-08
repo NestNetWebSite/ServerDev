@@ -38,13 +38,14 @@ public class MemberProfileController {
     /*
     회원이 작성한 글 모두 조회 --> 버튼을 숨길 수 있을 때.. 버튼을 숨길 수 없을 때는 현재 페이지의 주인과 로그인한 사용자가 일치하는지 확인해야함.
      */
-    @GetMapping("/member-profile/my-post")
+    @GetMapping("/member-profile/my-post/{member_id}")
     @Operation(summary = "회원이 작성한 글 조회", description = "로그인한 사용자가 자신이 작성한 글을 조회한다.", responses = {
             @ApiResponse(responseCode = "200", description = "", content = @Content(schema = @Schema(implementation = PostInfoResponse.class)))
     })
-    public ApiResult<?> showMyPostList(@AuthenticationPrincipal UserDetails userDetails){
+    public ApiResult<?> showMyPostList(@PathVariable("member_id") Long memberId,
+                                       @AuthenticationPrincipal UserDetails userDetails){
 
-        return memberProfileService.findAllPostById(userDetails.getUsername());
+        return memberProfileService.findAllPostById(memberId, userDetails.getUsername());
     }
 
     /*
