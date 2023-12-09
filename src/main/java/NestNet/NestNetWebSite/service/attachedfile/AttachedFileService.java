@@ -44,6 +44,7 @@ public class AttachedFileService {
     public void save(Post post, List<MultipartFile> files){
 
         if(!files.isEmpty()){
+
             List<AttachedFile> attachedFileList = new ArrayList<>();
 
             for(MultipartFile file : files){
@@ -59,10 +60,7 @@ public class AttachedFileService {
     /*
     게시물에 해당된 첨부파일 모두 조회
      */
-    public List<AttachedFileResponse> findAllFilesByPost(Long postId){
-
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+    public List<AttachedFileResponse> findAllFilesByPost(Post post){
 
         List<AttachedFile> files = attachedFileRepository.findAllByPost(post);
 
@@ -109,17 +107,17 @@ public class AttachedFileService {
     첨부파일 수정
      */
     @Transactional
-    public void modifyFiles(List<Long> existFileIdList, List<MultipartFile> fileList, Long postId){
-
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+    public void modifyFiles(Post post, List<Long> existFileIdList, List<MultipartFile> fileList){
 
         List<AttachedFile> deleteFileList = attachedFileRepository.findAllByPost(post);      //이전에 있던 파일 중 삭제할 파일
 
         // 이전에 있던 파일 중 삭제될 파일만 남김
         for(int i = 0; i < deleteFileList.size(); i++){
+
+            if(existFileIdList == null) break;
+
             for(Long existFileId : existFileIdList){
-                if(deleteFileList.get(i).getId() == existFileId){
+                if(existFileId.equals(deleteFileList.get(i).getId())){
                     deleteFileList.remove(deleteFileList.get(i));
                 }
             }
@@ -132,8 +130,10 @@ public class AttachedFileService {
         deleteRealFile(deleteFileList);
 
         List<AttachedFile> newFileList = new ArrayList<>();     // 새로 입력된 파일
-        for(MultipartFile file : fileList){
-            newFileList.add(new AttachedFile(post, file));
+        if(fileList != null){
+            for(MultipartFile file : fileList){
+                newFileList.add(new AttachedFile(post, file));
+            }
         }
 
         // Save To DB
@@ -147,10 +147,8 @@ public class AttachedFileService {
     첨부파일 삭제
      */
     @Transactional
-    public void deleteFiles(Long postId){
+    public void deleteFiles(Post post){
 
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
         List<AttachedFile> files = attachedFileRepository.findAllByPost(post);
 
         // Delete From DB

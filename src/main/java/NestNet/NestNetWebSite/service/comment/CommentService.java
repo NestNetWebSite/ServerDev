@@ -59,10 +59,7 @@ public class CommentService {
     /*
     게시물에 따른 댓글 모두 조회
      */
-    public List<CommentResponse> findCommentByPost(Long postId, String memberLoginId){
-
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+    public List<CommentResponse> findCommentByPost(Post post, String memberLoginId){
 
         List<Comment> commentList = commentRepository.findAllByPost(post);
 
@@ -111,10 +108,7 @@ public class CommentService {
     게시물에 관련된 댓글 모두 삭제
      */
     @Transactional
-    public void deleteAllComments(Long postId){
-
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+    public void deleteAllComments(Post post){
 
         commentRepository.deleteAllByPost(post);
     }

@@ -16,5 +16,6 @@ public class PhotoPostResponse {
     PhotoPostDto photoPostDto;
     List<AttachedFileResponse> fileDtoList;
     List<CommentResponse> commentResponseList;
+    Long thumbNailId;
     boolean isMemberLiked;
 }

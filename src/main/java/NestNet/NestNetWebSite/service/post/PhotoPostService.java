@@ -8,6 +8,8 @@ import NestNet.NestNetWebSite.domain.post.photo.PhotoPost;
 import NestNet.NestNetWebSite.domain.post.photo.ThumbNail;
 import NestNet.NestNetWebSite.dto.request.PhotoPostModifyRequest;
 import NestNet.NestNetWebSite.dto.request.PhotoPostRequest;
+import NestNet.NestNetWebSite.dto.response.AttachedFileResponse;
+import NestNet.NestNetWebSite.dto.response.CommentResponse;
 import NestNet.NestNetWebSite.dto.response.photopost.PhotoPostDto;
 import NestNet.NestNetWebSite.dto.response.photopost.PhotoPostResponse;
 import NestNet.NestNetWebSite.dto.response.photopost.ThumbNailDto;
@@ -19,6 +21,8 @@ import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import NestNet.NestNetWebSite.repository.post.PhotoPostRepository;
 import NestNet.NestNetWebSite.repository.post.ThumbNailRepository;
 import NestNet.NestNetWebSite.service.attachedfile.AttachedFileService;
+import NestNet.NestNetWebSite.service.comment.CommentService;
+import NestNet.NestNetWebSite.service.like.PostLikeService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -38,15 +42,16 @@ public class PhotoPostService {
     private final PhotoPostRepository photoPostRepository;
     private final MemberRepository memberRepository;
     private final AttachedFileService attachedFileService;
-    private final PostService postService;
+    private final CommentService commentService;
+    private final PostLikeService postLikeService;
     private final ThumbNailService thumbNailService;
+    private final PostService postService;
 
     /*
     사진 게시판에 게시물 저장
      */
     @Transactional
-    public ApiResult<?> savePost(PhotoPostRequest photoPostRequest, List<MultipartFile> files,
-                                 String memberLoginId, HttpServletResponse response){
+    public ApiResult<?> savePost(PhotoPostRequest photoPostRequest, List<MultipartFile> files, String memberLoginId){
 
         Member member = memberRepository.findByLoginId(memberLoginId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
@@ -55,11 +60,13 @@ public class PhotoPostService {
 
         photoPostRepository.save(post);
 
-        attachedFileService.save(post, files);
+        if(files != null){
+            attachedFileService.save(post, files);
 
-        MultipartFile thumbNailFile = files.get(0);         //썸네일 사진
+            MultipartFile thumbNailFile = files.get(0);         //썸네일 사진
 
-        thumbNailService.saveThumbNail(post, thumbNailFile);
+            thumbNailService.saveThumbNail(post, thumbNailFile);
+        }
 
         return ApiResult.success("게시물 저장 성공");
     }
@@ -68,15 +75,21 @@ public class PhotoPostService {
     사진 게시물 단건 조회
      */
     @Transactional
-    public PhotoPostDto findPostById(Long id, String memberLoginId){
+    public PhotoPostResponse findPostById(Long id, String memberLoginId){
 
         PhotoPost post = photoPostRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
+        PhotoPostDto postDto = null;
+        List<AttachedFileResponse> fileDtoList = attachedFileService.findAllFilesByPost(post);
+        List<CommentResponse> commentResponseList = commentService.findCommentByPost(post, memberLoginId);
+        boolean isMemberLiked = postLikeService.isMemberLikedByPost(post, memberLoginId);
+        ThumbNail thumbNail = thumbNailService.findThumbNail(post);
+
         postService.addViewCount(post, memberLoginId);
 
         if(memberLoginId.equals(post.getMember().getLoginId())){
-            return PhotoPostDto.builder()
+            postDto =  PhotoPostDto.builder()
                     .id(post.getId())
                     .title(post.getTitle())
                     .bodyContent(post.getBodyContent())
@@ -89,7 +102,7 @@ public class PhotoPostService {
                     .build();
         }
         else{
-            return PhotoPostDto.builder()
+            postDto =  PhotoPostDto.builder()
                     .id(post.getId())
                     .title(post.getTitle())
                     .bodyContent(post.getBodyContent())
@@ -101,16 +114,26 @@ public class PhotoPostService {
                     .isMemberWritten(false)
                     .build();
         }
+
+        return new PhotoPostResponse(postDto, fileDtoList, commentResponseList, thumbNail.getId(), isMemberLiked);
+
     }
 
     /*
     사진 게시물 수정
      */
     @Transactional
-    public void modifyPost(PhotoPostModifyRequest photoPostModifyRequest, Long postId){
+    public void modifyPost(PhotoPostModifyRequest photoPostModifyRequest,
+                           List<Long> fileIdList, List<MultipartFile> files, Long thumbNailId){
 
-        PhotoPost post = photoPostRepository.findById(postId)
+        PhotoPost post = photoPostRepository.findById(photoPostModifyRequest.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+
+        attachedFileService.modifyFiles(post, fileIdList, files);
+
+        if(thumbNailId == null){
+
+        }
 
         // 변경 감지 -> 자동 update
         post.modifyPost(photoPostModifyRequest.getTitle(), photoPostModifyRequest.getBodyContent());

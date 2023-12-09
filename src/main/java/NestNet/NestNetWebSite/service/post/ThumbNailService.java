@@ -58,6 +58,17 @@ public class ThumbNailService {
     }
 
     /*
+    게시물 썸네일 단건 조회
+     */
+    public ThumbNail findThumbNail(Post post){
+
+        ThumbNail thumbNail = thumbNailRepository.findByPost(post)
+                .orElseThrow(() -> new CustomException(ErrorCode.THUMBNAIL_FILE_NOT_FOUND));
+
+        return thumbNail;
+    }
+
+    /*
     사진 게시판 썸네일 조회 (페이징)
      */
     public ApiResult<?> findThumbNails(int page, int size){
@@ -82,7 +93,7 @@ public class ThumbNailService {
             );
         }
 
-        ThumbNailResponse result = new ThumbNailResponse(thumbNailDtoList);
+        ThumbNailResponse result = new ThumbNailResponse(thumbNailPage.getTotalElements(), thumbNailDtoList);
 
         return ApiResult.success(result);
     }

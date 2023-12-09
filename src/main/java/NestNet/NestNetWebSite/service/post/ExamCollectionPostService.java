@@ -8,6 +8,8 @@ import NestNet.NestNetWebSite.domain.post.exam.ExamCollectionPost;
 import NestNet.NestNetWebSite.domain.post.exam.ExamType;
 import NestNet.NestNetWebSite.dto.request.ExamCollectionPostModifyRequest;
 import NestNet.NestNetWebSite.dto.request.ExamCollectionPostRequest;
+import NestNet.NestNetWebSite.dto.response.AttachedFileResponse;
+import NestNet.NestNetWebSite.dto.response.CommentResponse;
 import NestNet.NestNetWebSite.dto.response.examcollectionpost.ExamCollectionPostDto;
 import NestNet.NestNetWebSite.dto.response.examcollectionpost.ExamCollectionPostListDto;
 import NestNet.NestNetWebSite.dto.response.examcollectionpost.ExamCollectionPostResponse;
@@ -18,6 +20,8 @@ import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import NestNet.NestNetWebSite.repository.post.ExamCollectionPostRepository;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import NestNet.NestNetWebSite.service.attachedfile.AttachedFileService;
+import NestNet.NestNetWebSite.service.comment.CommentService;
+import NestNet.NestNetWebSite.service.like.PostLikeService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -40,6 +44,8 @@ public class ExamCollectionPostService {
 
     private final ExamCollectionPostRepository examCollectionPostRepository;
     private final AttachedFileService attachedFileService;
+    private final CommentService commentService;
+    private final PostLikeService postLikeService;
     private final PostService postService;
     private final MemberRepository memberRepository;
 
@@ -57,7 +63,9 @@ public class ExamCollectionPostService {
 
         examCollectionPostRepository.save(post);
 
-        attachedFileService.save(post, files);
+        if(files != null){
+            attachedFileService.save(post, files);
+        }
 
         return ApiResult.success("게시물 저장 성공");
     }
@@ -96,15 +104,20 @@ public class ExamCollectionPostService {
     족보 게시물 단건 상세 조회
      */
     @Transactional
-    public ExamCollectionPostDto findPostById(Long id, String memberLoginId){
+    public ExamCollectionPostResponse findPostById(Long id, String memberLoginId){
 
         ExamCollectionPost post = examCollectionPostRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
+        ExamCollectionPostDto postDto = null;
+        List<AttachedFileResponse> fileDtoList = attachedFileService.findAllFilesByPost(post);
+        List<CommentResponse> commentResponseList = commentService.findCommentByPost(post, memberLoginId);
+        boolean isMemberLiked = postLikeService.isMemberLikedByPost(post, memberLoginId);
+
         postService.addViewCount(post, memberLoginId);
 
         if(memberLoginId.equals(post.getMember().getLoginId())){
-            return ExamCollectionPostDto.builder()
+            postDto = ExamCollectionPostDto.builder()
                     .id(post.getId())
                     .title(post.getTitle())
                     .bodyContent(post.getBodyContent())
@@ -122,7 +135,7 @@ public class ExamCollectionPostService {
                     .build();
         }
         else{
-            return ExamCollectionPostDto.builder()
+            postDto = ExamCollectionPostDto.builder()
                     .id(post.getId())
                     .title(post.getTitle())
                     .bodyContent(post.getBodyContent())
@@ -139,16 +152,20 @@ public class ExamCollectionPostService {
                     .isMemberWritten(false)
                     .build();
         }
+
+        return new ExamCollectionPostResponse(postDto, fileDtoList, commentResponseList, isMemberLiked);
     }
 
     /*
     족보 게시물 수정
      */
     @Transactional
-    public void modifyPost(ExamCollectionPostModifyRequest modifyRequest){
+    public void modifyPost(ExamCollectionPostModifyRequest modifyRequest, List<Long> fileIdList, List<MultipartFile> files){
 
         ExamCollectionPost post = examCollectionPostRepository.findById(modifyRequest.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+
+        attachedFileService.modifyFiles(post, fileIdList, files);
 
         // 변경 감지 -> 자동 update
         post.modifyPost(modifyRequest.getTitle(), modifyRequest.getBodyContent(), modifyRequest.getSubject(),

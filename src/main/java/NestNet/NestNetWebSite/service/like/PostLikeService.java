@@ -30,10 +30,7 @@ public class PostLikeService {
     좋아요 저장
      */
     @Transactional
-    public void saveLike(Long postId, String memberLoginId){
-
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+    public void saveLike(Post post, String memberLoginId){
 
         Member member = memberRepository.findByLoginId(memberLoginId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
@@ -47,10 +44,7 @@ public class PostLikeService {
     좋아요 취소
      */
     @Transactional
-    public void cancelLike(Long postId, String memberLoginId){
-
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+    public void cancelLike(Post post, String memberLoginId){
 
         Member member = memberRepository.findByLoginId(memberLoginId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
@@ -65,29 +59,23 @@ public class PostLikeService {
     /*
     로그인한 회원의 좋아요 여부 조회
      */
-    public boolean isMemberLikedByPost(Long postId, String memberLoginId){
-
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+    public boolean isMemberLikedByPost(Post post, String memberLoginId){
 
         Member member = memberRepository.findByLoginId(memberLoginId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
 
         Optional<PostLike> like = postLikeRepository.findByMemberAndPost(member, post);
 
-        if(!like.isPresent()) return false;
+        if(like.isPresent()) return true;
 
-        return true;
+        return false;
     }
 
     /*
     게시물 관련 좋아요 삭제
      */
     @Transactional
-    public void deleteLike(Long postId){
-
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+    public void deleteLike(Post post){
 
         postLikeRepository.deleteAllByPost(post);
     }

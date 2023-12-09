@@ -22,7 +22,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -36,10 +35,6 @@ import java.util.*;
 public class ExamCollectionPostController {
 
     private final ExamCollectionPostService examCollectionPostService;
-    private final AttachedFileService attachedFileService;
-    private final CommentService commentService;
-    private final PostLikeService postLikeService;
-    private final PostService postService;
 
     /*
     시험 기출 게시판 게시물 저장
@@ -65,9 +60,9 @@ public class ExamCollectionPostController {
                                           @RequestParam(value = "year", required = false) Integer year,
                                           @RequestParam(value = "semester", required = false) Integer semester,
                                           @RequestParam(value = "examType", required = false) ExamType examType,
-                                          @RequestParam("offset") int offset, @RequestParam("limit") int limit){
+                                          @RequestParam("page") int page, @RequestParam("size") int size){
 
-        return examCollectionPostService.findPostByFilter(subject, professor, year, semester, examType, offset, limit);
+        return examCollectionPostService.findPostByFilter(subject, professor, year, semester, examType, page, size);
     }
 
     /*
@@ -79,12 +74,7 @@ public class ExamCollectionPostController {
     })
     public ApiResult<?> showPost(@PathVariable("post_id") Long postId, @AuthenticationPrincipal UserDetails userDetails){
 
-        ExamCollectionPostDto postDto = examCollectionPostService.findPostById(postId, userDetails.getUsername());
-        List<AttachedFileResponse> fileDtoList = attachedFileService.findAllFilesByPost(postId);
-        List<CommentResponse> commentResponseList = commentService.findCommentByPost(postId, userDetails.getUsername());
-        boolean isMemberLiked = postLikeService.isMemberLikedByPost(postId, userDetails.getUsername());
-
-        ExamCollectionPostResponse result = new ExamCollectionPostResponse(postDto, fileDtoList, commentResponseList, isMemberLiked);
+        ExamCollectionPostResponse result = examCollectionPostService.findPostById(postId, userDetails.getUsername());
 
         return ApiResult.success(result);
     }
@@ -96,58 +86,11 @@ public class ExamCollectionPostController {
     @Operation(summary = "시험 기출 게시판 게시물 수정", description = "파일 저장에 문제가 생기는 경우 500 에러를 반환한다.")
     public ApiResult<?> modifyPost(@RequestPart("data") ExamCollectionPostModifyRequest modifyRequest,
                                    @RequestPart(value = "file-id", required = false) List<Long> fileIdList,
-                                   @RequestPart(value = "file", required = false) List<MultipartFile> files,
-                                   HttpServletResponse response){
+                                   @RequestPart(value = "file", required = false) List<MultipartFile> files){
 
-        if(fileIdList == null){
-            fileIdList = new ArrayList<>();
-        }
-        if(files == null){
-            files = new ArrayList<>();
-        }
-
-        examCollectionPostService.modifyPost(modifyRequest);
-        attachedFileService.modifyFiles(fileIdList, files, modifyRequest.getId());
+        examCollectionPostService.modifyPost(modifyRequest, fileIdList, files);
 
         return ApiResult.success("게시물 수정 완료");
-    }
-
-    /*
-    시험 기출 게시판 게시물 삭제 -> 게시물, 첨부파일, 댓글, 좋아요 모두 삭제
-     */
-    @DeleteMapping("/exam-collection-post/delete")
-    @Operation(summary = "시험 기출 게시판 게시물 삭제", description = "파일 삭제에 문제가 생기는 경우 500 에러를 반환한다.")
-    public ApiResult<?> deletePost(@RequestParam(value = "postId") Long postId, HttpServletResponse response){
-
-        attachedFileService.deleteFiles(postId);
-        postService.deletePost(postId);
-        commentService.deleteAllComments(postId);
-        postLikeService.deleteLike(postId);
-
-        return ApiResult.success("게시물 삭제 완료");
-    }
-
-
-    /*
-    좋아요 누름
-     */
-    @PostMapping("/exam-collection-post/like")
-    @Operation(summary = "좋아요", description = "")
-    public void like(@RequestBody PostLikeRequest request, @AuthenticationPrincipal UserDetails userDetails){
-
-        postLikeService.saveLike(request.getPostId(), userDetails.getUsername());
-        postService.like(request.getPostId());
-    }
-
-    /*
-    좋아요 취소
-     */
-    @PostMapping("/exam-collection-post/cancel-like")
-    @Operation(summary = "좋아요 취소", description = "")
-    public void dislike(@RequestBody PostLikeRequest request, @AuthenticationPrincipal UserDetails userDetails){
-
-        postLikeService.cancelLike(request.getPostId(), userDetails.getUsername());
-        postService.cancelLike(request.getPostId());
     }
 
 }

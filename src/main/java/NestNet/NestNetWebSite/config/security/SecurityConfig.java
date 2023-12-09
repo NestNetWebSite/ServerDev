@@ -82,7 +82,6 @@ public class SecurityConfig {
                 .requestMatchers("/auth/signup", "/auth/login")
                 .requestMatchers("/member/find-id", "/member/get-temp-pw")
                 .requestMatchers("/attendance/weekly", "/attendance/monthly")
-                .requestMatchers("/photo-post/**", "/photo-post")
                 .requestMatchers("/image/**");
     }
 
@@ -115,17 +114,15 @@ public class SecurityConfig {
                         .requestMatchers("/auth/signup", "auth/login").permitAll()                      //로그인, 회원가입 접근 허용
                         // 관리자 패이지는 관리자만 접근 가능
                         .requestMatchers("/manager/**").hasAuthority("MANAGER")                  //manager하위 리소스는 MANAGER 권한으로 허용
+                        // 게시판 통합 기능은 모든 회원 접근 가능
+                        .requestMatchers("/post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER",  "WITHDRAWN_MEMBER")
                         // 통합 게시판은 모든 회원 접근 가능
-                        .requestMatchers("/unified-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER")
+                        .requestMatchers("/unified-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER", "WITHDRAWN_MEMBER")
                         // 족보 게시판은 졸업생을 제외한 모든 회원 접근 가능
-                        .requestMatchers("/exam-collection-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER")
+                        .requestMatchers("/exam-collection-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "WITHDRAWN_MEMBER")
                         // 사진 게시판 리스트 조회는 권한 필요없음 / 사진 게시판 작성은 회장, 부회장, 관리자 접근 가능 / 그 외 조회는 모든 회원 접근 가능
-                        .requestMatchers("/photo-post").permitAll()
-                        .requestMatchers("/photo-post/post").permitAll()
-                        .requestMatchers("/photo-post/**").permitAll()
-                                .requestMatchers("/file/**").permitAll()
-//                        .requestMatchers("/photo-post/post").hasAnyAuthority("PRESIDENT", "VICE_PRESIDENT", "MANAGER")
-//                        .requestMatchers("/photo-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER")
+                        .requestMatchers("/photo-post/post").hasAnyAuthority("PRESIDENT", "VICE_PRESIDENT", "MANAGER")
+                        .requestMatchers("/photo-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER", "WITHDRAWN_MEMBER")
                         // 인생네컷
                         .requestMatchers("/life4cut/save").hasAnyAuthority("PRESIDENT", "VICE_PRESIDENT", "MANAGER")
 //                        .requestMatchers("/life4cut/**").permitAll()

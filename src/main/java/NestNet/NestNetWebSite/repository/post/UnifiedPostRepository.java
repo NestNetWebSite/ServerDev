@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
@@ -18,6 +19,6 @@ public interface UnifiedPostRepository extends JpaRepository<UnifiedPost, Long> 
     @Query("select u from UnifiedPost u where " +
             "(:unifiedPostType is null or u.unifiedPostType =: unifiedPostType) " +
             "order by u.id desc")
-    Page<UnifiedPost> findByUnifiedPostTypeByPaging(UnifiedPostType unifiedPostType, Pageable pageable);
+    Page<UnifiedPost> findByUnifiedPostTypeByPaging(@Param("unifiedPostType") UnifiedPostType unifiedPostType, Pageable pageable);
 
 }

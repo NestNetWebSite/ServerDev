@@ -8,15 +8,20 @@ import NestNet.NestNetWebSite.domain.post.unified.UnifiedPost;
 import NestNet.NestNetWebSite.domain.post.unified.UnifiedPostType;
 import NestNet.NestNetWebSite.dto.request.UnifiedPostModifyRequest;
 import NestNet.NestNetWebSite.dto.request.UnifiedPostRequest;
+import NestNet.NestNetWebSite.dto.response.AttachedFileResponse;
+import NestNet.NestNetWebSite.dto.response.CommentResponse;
 import NestNet.NestNetWebSite.dto.response.unifiedpost.UnifiedPostDto;
 import NestNet.NestNetWebSite.dto.response.unifiedpost.UnifiedPostListDto;
 import NestNet.NestNetWebSite.dto.response.unifiedpost.UnifiedPostListResponse;
+import NestNet.NestNetWebSite.dto.response.unifiedpost.UnifiedPostResponse;
 import NestNet.NestNetWebSite.exception.CustomException;
 import NestNet.NestNetWebSite.exception.ErrorCode;
 import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import NestNet.NestNetWebSite.repository.post.UnifiedPostRepository;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import NestNet.NestNetWebSite.service.attachedfile.AttachedFileService;
+import NestNet.NestNetWebSite.service.comment.CommentService;
+import NestNet.NestNetWebSite.service.like.PostLikeService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -38,13 +43,16 @@ public class UnifiedPostService {
     private final UnifiedPostRepository unifiedPostRepository;
     private final MemberRepository memberRepository;
     private final AttachedFileService attachedFileService;
+    private final CommentService commentService;
+    private final PostLikeService postLikeService;
     private final PostService postService;
 
     /*
     통합 게시판 게시물 저장
      */
     @Transactional
-    public ApiResult<?> savePost(UnifiedPostRequest unifiedPostRequest, List<MultipartFile> files, String memberLoginId) {
+    public ApiResult<?> savePost(UnifiedPostRequest unifiedPostRequest, List<MultipartFile> files,
+                                 String memberLoginId) {
 
         Member member = memberRepository.findByLoginId(memberLoginId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
@@ -53,7 +61,9 @@ public class UnifiedPostService {
 
         unifiedPostRepository.save(post);
 
-        attachedFileService.save(post, files);
+        if(files != null){
+            attachedFileService.save(post, files);
+        }
 
         return ApiResult.success("게시물 저장 성공");
     }
@@ -84,15 +94,20 @@ public class UnifiedPostService {
     통합 게시판 게시물 단건 조회
      */
     @Transactional
-    public UnifiedPostDto findPostById(Long id, String memberLoginId){
+    public UnifiedPostResponse findPostById(Long id, String memberLoginId){
 
         UnifiedPost post = unifiedPostRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
+        UnifiedPostDto postDto = null;
+        List<AttachedFileResponse> fileDtoList = attachedFileService.findAllFilesByPost(post);
+        List<CommentResponse> commentResponseList = commentService.findCommentByPost(post, memberLoginId);
+        boolean isMemberLiked = postLikeService.isMemberLikedByPost(post, memberLoginId);
+
         postService.addViewCount(post, memberLoginId);
 
         if(memberLoginId.equals(post.getMember().getLoginId())){
-            return UnifiedPostDto.builder()
+            postDto = UnifiedPostDto.builder()
                     .id(post.getId())
                     .title(post.getTitle())
                     .bodyContent(post.getBodyContent())
@@ -106,7 +121,7 @@ public class UnifiedPostService {
                     .build();
         }
         else{
-            return UnifiedPostDto.builder()
+            postDto = UnifiedPostDto.builder()
                     .id(post.getId())
                     .title(post.getTitle())
                     .bodyContent(post.getBodyContent())
@@ -119,16 +134,20 @@ public class UnifiedPostService {
                     .isMemberWritten(true)
                     .build();
         }
+
+        return new UnifiedPostResponse(postDto, fileDtoList, commentResponseList, isMemberLiked);
     }
 
     /*
     통합 게시물 수정
      */
     @Transactional
-    public void modifyPost(UnifiedPostModifyRequest request){
+    public void modifyPost(UnifiedPostModifyRequest request, List<Long> fileIdList, List<MultipartFile> files){
 
         UnifiedPost post = unifiedPostRepository.findById(request.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+
+        attachedFileService.modifyFiles(post, fileIdList, files);
 
         // 변경 감지 -> 자동 update
         post.modifyPost(request.getTitle(), request.getBodyContent(), request.getUnifiedPostType());

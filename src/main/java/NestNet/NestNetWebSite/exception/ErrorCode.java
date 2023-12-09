@@ -26,6 +26,7 @@ public enum ErrorCode {
     // 409 CONFLICT
     ALREADY_ATTENDED(HttpStatus.CONFLICT, "이미 출석하셨습니다."),
     ALREADY_EXIST(HttpStatus.CONFLICT, "이미 존재하는 아이디입니다."),
+    ALREADY_LIKED(HttpStatus.CONFLICT, "이미 좋아요를 눌렀습니다."),
 
     // 500
     CANNOT_SAVE_FILE(HttpStatus.INTERNAL_SERVER_ERROR, "파일 저장에 실패했습니다. 관리자에게 문의하세요."),
