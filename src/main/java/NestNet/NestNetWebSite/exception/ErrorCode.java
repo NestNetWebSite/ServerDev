@@ -12,6 +12,7 @@ public enum ErrorCode {
     ID_PASSWORD_NOT_MATCH(HttpStatus.BAD_REQUEST, "아이디 / 비밀번호가 일치하지 않습니다."),
 
     // 403 FORBIDDEN
+    MEMBER_NOT_PERMISSION_YET(HttpStatus.FORBIDDEN, "아직 승인되지 않은 회원입니다. 관리자에게 문의하세요"),
     MEMBER_NO_PERMISSION(HttpStatus.FORBIDDEN, "해당 회원에 권한이 없습니다. 본인만 조회 가능합니다."),
 
     // 404 NOT FOUND

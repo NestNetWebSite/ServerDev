@@ -74,6 +74,17 @@ public class MemberController {
     }
 
     /*
+    회원 비밀번호 인증
+     */
+    @PostMapping("/member/check-pw")
+    @Operation(summary = "회원 비밀번호 인증", description = "로그인한 회원이 자신의 비밀번호를 인증한다.(비밀번호 변경 전)")
+    public ApiResult<?> checkPassword(@Valid @RequestBody MemberPasswordChangeRequest dto,
+                                       @AuthenticationPrincipal UserDetails userDetails){
+
+        return memberService.checkMemberPassword(userDetails.getUsername(), dto.getPassword());
+    }
+
+    /*
     회원 비밀번호 변경
      */
     @PostMapping("/member/change-pw")

@@ -46,11 +46,23 @@ public class AuthService {
     @Value("#{environment['jwt.refresh-exp-time']}")
     private long refreshTokenExpTime;              //리프레쉬 토큰 유효기간
 
+    @Value("#{environment['mail-secret-string']}")
+    private String mailSecretString;                //회원가입 시 이메일 인증에서 사용되는 문자열
+
+    /*
+    회원 가입 시 이메일 인증 정답 여부 확인
+     */
+    public ApiResult<?> checkEmailAuth(String answer){
+
+        if(answer.equals(mailSecretString)) return ApiResult.success("이메일 인증이 완료되었습니다.");
+        else return ApiResult.success("틀렸습니다. 하지만, 이메일을 정상적으로 받으셨다면 정답에 nestnet을 입력하세요.");
+    }
+
     /*
     관리자에게 회원가입 요청을 보냄
      */
     @Transactional
-    public ApiResult<?> sendSignUpRequest(SignUpRequest signUpRequestDto, HttpServletResponse response){
+    public ApiResult<?> sendSignUpRequest(SignUpRequest signUpRequestDto){
 
         Optional<Member> member = memberRepository.findByLoginId(signUpRequestDto.getLoginId());
 
@@ -92,6 +104,13 @@ public class AuthService {
             //authenticationManager가 UserDetailsService의 loadByUsername매서드를 호출하여 인증 수행
             Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
+//            Member member = memberRepository.findByLoginId(loginRequest.getLoginId())
+//                    .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
+//
+//            if(member.getMemberAuthority().equals(MemberAuthority.WAITING_FOR_APPROVAL)){
+//                throw new CustomException(ErrorCode.MEMBER_NOT_PERMISSION_YET);
+//            }
+
             String accessToken = tokenProvider.createAccessToken(authentication);
             String refreshToken = tokenProvider.createRefreshToken(authentication);
 
@@ -111,7 +130,7 @@ public class AuthService {
     로그아웃
      */
     @Transactional
-    public ApiResult<?> logout(HttpServletRequest request, HttpServletResponse response){
+    public ApiResult<?> logout(HttpServletRequest request){
 
         String accessToken = tokenProvider.resolveToken(request);
 

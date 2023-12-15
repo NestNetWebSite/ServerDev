@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.multipart.MultipartResolver;
+import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -15,6 +17,14 @@ import java.io.File;
 @Configuration
 @EnableWebMvc
 public class WebConfig implements WebMvcConfigurer {
+
+    /*
+    multipart 데이터 파싱 및 처리
+     */
+    @Bean
+    public MultipartResolver multipartResolver(){
+        return new StandardServletMultipartResolver();
+    }
 
     /*
    Cross-Origin Resource Sharing (CORS)
@@ -31,7 +41,7 @@ public class WebConfig implements WebMvcConfigurer {
 
         configuration.setAllowCredentials(true);         //자격 증명 허용 여부 설정. Authorization을 이용해 인증 서비스를 할 때 true로 세팅
 //        configuration.addAllowedOrigin("http://**");
-        configuration.addAllowedOriginPattern("http://172.20.10.6:3000");      //모든 ip에 대해 응답을 허용
+        configuration.addAllowedOriginPattern("http://172.30.1.23:3000");      //모든 ip에 대해 응답을 허용
         configuration.addAllowedOriginPattern("http://172.20.10.4:3000");      //모든 ip에 대해 응답을 허용
         configuration.addAllowedOriginPattern("http://172.30.9.247:3000");      //모든 ip에 대해 응답을 허용
         configuration.addAllowedHeader("*");             //모든 header에 대해 응답을 허용
@@ -56,4 +66,6 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/image/**")
                 .addResourceLocations("file:///C:" + File.separator + "nestnetFile" + File.separator);
     }
+
+
 }

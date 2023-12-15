@@ -2,10 +2,13 @@ package NestNet.NestNetWebSite.controller.auth;
 
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.config.auth.CustomAuthorizationFilter;
+import NestNet.NestNetWebSite.dto.request.EmailAuthAnswerRequest;
+import NestNet.NestNetWebSite.dto.request.EmailAuthRequest;
 import NestNet.NestNetWebSite.dto.request.LoginRequest;
 import NestNet.NestNetWebSite.dto.request.SignUpRequest;
 import NestNet.NestNetWebSite.dto.response.TokenResponse;
 import NestNet.NestNetWebSite.service.auth.AuthService;
+import NestNet.NestNetWebSite.service.mail.MailService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,18 +28,39 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final MailService mailService;
 
     @Value("#{environment['jwt.refresh-exp-time']}")
     private long refreshTokenExpTime;                           // refresh 토큰 유효 기간
+
+    /*
+    회원 가입 시 인증 이메일 전송 Post 요청
+     */
+    @PostMapping("/auth/mail-auth")
+    @Operation(summary = "인증 이메일 전송 요청", description = "이메일 전송에 실패했을 경우 500 에러를 반환한다.")
+    public ApiResult<?> sendAuthEmail(@Valid @RequestBody EmailAuthRequest emailAuthRequest){
+
+        return mailService.sendEmailAuthentication(emailAuthRequest.getEmail());
+    }
+
+    /*
+    회원 가입 시 인증 이메일의 문제 정답 여부를 Post 요청
+     */
+    @PostMapping("/auth/mail-auth-answer")
+    @Operation(summary = "인증 이메일 문제의 정답 여부 확인 요청", description = "")
+    public ApiResult<?> sendAuthEmail(@Valid @RequestBody EmailAuthAnswerRequest emailAuthAnswerRequest){
+
+        return authService.checkEmailAuth(emailAuthAnswerRequest.getAnswer());
+    }
 
     /*
     회원가입 post 요청
      */
     @PostMapping("/auth/signup")
     @Operation(summary = "회원가입", description = "아이디 중복 요청의 경우 409 에러를 반환한다.")
-    public ApiResult<?> signUp(@Valid @RequestBody SignUpRequest signUpRequest, HttpServletResponse response){
+    public ApiResult<?> signUp(@Valid @RequestBody SignUpRequest signUpRequest){
 
-        return authService.sendSignUpRequest(signUpRequest, response);
+        return authService.sendSignUpRequest(signUpRequest);
     }
 
     /*
@@ -63,9 +87,9 @@ public class AuthController {
      */
     @GetMapping("/auth/logout")
     @Operation(summary = "로그아웃", description = "로그아웃이 정상적으로 작동하지 않은 경우 500 에러를 반환한다.")
-    public ApiResult<?> logout(HttpServletRequest request, HttpServletResponse response){
+    public ApiResult<?> logout(HttpServletRequest request){
 
-        return authService.logout(request, response);
+        return authService.logout(request);
     }
 
 }

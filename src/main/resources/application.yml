@@ -50,6 +50,7 @@ jwt:
   access-exp-time: 7200000    # 2시간 7200000
   refresh-exp-time: 1209600000    # 14일
 
+mail-secret-string : ${mail-secret-string}
 
 logging:
   level:

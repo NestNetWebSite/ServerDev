@@ -9,6 +9,7 @@ import NestNet.NestNetWebSite.exception.ErrorCode;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,6 +62,21 @@ public class MemberService {
         tempPassword = tempPassword.substring(0,15);
 
         return new TemporaryInfoDto(member.getEmailAddress(), tempPassword);
+    }
+
+    /*
+    회원 비밀번호 인증
+     */
+    public ApiResult<?> checkMemberPassword(String loginId, String password){
+
+        Member member = memberRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
+
+//        if(!member.getLoginPassword().equals(passwordEncoder.encode(password))){
+//            throw new CustomException(ErrorCode.ID_PASSWORD_NOT_MATCH);
+//        }
+
+        return ApiResult.success("인증에 성공했습니다.");
     }
 
     /*

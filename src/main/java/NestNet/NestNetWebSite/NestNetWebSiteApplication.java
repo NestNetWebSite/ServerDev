@@ -11,12 +11,5 @@ public class NestNetWebSiteApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(NestNetWebSiteApplication.class, args);
-
 	}
-
-	@Bean
-	public MultipartResolver multipartResolver(){
-		return new StandardServletMultipartResolver();
-	}
-
 }

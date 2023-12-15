@@ -24,15 +24,27 @@ public class MemberProfileController {
     private final MemberProfileService memberProfileService;
 
     /*
-    회원 정보 조회
+    회원 정보 조회 (마이페이지)
      */
-    @GetMapping("/member-profile/member-info/{member_id}")
+    @GetMapping("/member-profile/member-info")
     @Operation(summary = "회원 정보 조회", description = "특정 회원의 정보를 조회한다.", responses = {
             @ApiResponse(responseCode = "200", description = "", content = @Content(schema = @Schema(implementation = MemberProfileMemberInfoResponse.class)))
     })
-    public ApiResult<?> showMemberInfo(@PathVariable("member_id") Long memberId){
+    public ApiResult<?> showMemberInfo(@AuthenticationPrincipal UserDetails userDetails){
 
-        return memberProfileService.findMemberInfoById(memberId);
+        return memberProfileService.findMemberInfoByLoginId(userDetails.getUsername(), false);
+    }
+
+    /*
+    타 회원 정보 조회
+     */
+    @GetMapping("/member-profile/member-info/{member_login_id}")
+    @Operation(summary = "회원 정보 조회", description = "특정 회원의 정보를 조회한다.", responses = {
+            @ApiResponse(responseCode = "200", description = "", content = @Content(schema = @Schema(implementation = MemberProfileMemberInfoResponse.class)))
+    })
+    public ApiResult<?> showMemberInfo(@PathVariable("member_login_id") String memberLoginId){
+
+        return memberProfileService.findMemberInfoByLoginId(memberLoginId, true);
     }
 
     /*

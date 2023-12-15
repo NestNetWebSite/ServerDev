@@ -28,13 +28,21 @@ public class MemberProfileService {
     /*
     회원 프로필 조회
      */
-    public ApiResult<?> findMemberInfoById(Long id){
+    public ApiResult<?> findMemberInfoByLoginId(String memberLoginId, boolean isOtherMember){
 
-        Member member = memberRepository.findById(id)
-                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+        Member member = memberRepository.findByLoginId(memberLoginId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
 
-        MemberProfileMemberInfoResponse memberInfoDto = new MemberProfileMemberInfoResponse(member.getName(), member.getEmailAddress(),
-                member.getMemberAuthority(), member.getGrade(), member.getGraduateYear());
+        MemberProfileMemberInfoResponse memberInfoDto;
+
+        if(!isOtherMember){
+            memberInfoDto = new MemberProfileMemberInfoResponse(member.getLoginId(), member.getName(),
+                    member.getEmailAddress(), member.getStudentId(), member.getMemberAuthority(), member.getGrade(), member.getGraduateYear(), true);
+        }
+        else{       //타 회원 정보이면
+            memberInfoDto = new MemberProfileMemberInfoResponse(member.getLoginId(), member.getName(),
+                    member.getEmailAddress(), member.getStudentId(), member.getMemberAuthority(), member.getGrade(), member.getGraduateYear(), false);
+        }
 
         return ApiResult.success(memberInfoDto);
     }
