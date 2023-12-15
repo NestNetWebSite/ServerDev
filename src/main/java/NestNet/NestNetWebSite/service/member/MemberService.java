@@ -72,9 +72,9 @@ public class MemberService {
         Member member = memberRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
 
-//        if(!member.getLoginPassword().equals(passwordEncoder.encode(password))){
-//            throw new CustomException(ErrorCode.ID_PASSWORD_NOT_MATCH);
-//        }
+        if(!passwordEncoder.matches(password, member.getLoginPassword())){
+            throw new CustomException(ErrorCode.ID_PASSWORD_NOT_MATCH);
+        }
 
         return ApiResult.success("인증에 성공했습니다.");
     }
