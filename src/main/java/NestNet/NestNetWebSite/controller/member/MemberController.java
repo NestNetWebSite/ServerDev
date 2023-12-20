@@ -36,7 +36,7 @@ public class MemberController {
     public ApiResult<?> modifyMemberInfo(@Valid @RequestBody MemberModifyInfoRequest memberModifyInfoRequest,
                                          @AuthenticationPrincipal UserDetails userDetails){
 
-        return memberService.modifyMemberInfo(memberModifyInfoRequest, userDetails.getUsername());
+        return memberService.modifyMemberInfo(memberModifyInfoRequest, userDetails);
     }
 
     /*
@@ -67,8 +67,6 @@ public class MemberController {
     public ApiResult<?> getTemporaryPassword(@Valid @RequestBody MemberGetTemporaryPwRequest dto){
 
         TemporaryInfoDto emailAndPw = memberService.createTemporaryPassword(dto.getLoginId());
-
-        memberService.changeMemberPassword(dto.getLoginId(), emailAndPw.getPassword());
 
         return mailService.sendEmailTemporaryPassword(emailAndPw.getEmail(), emailAndPw.getPassword());
     }

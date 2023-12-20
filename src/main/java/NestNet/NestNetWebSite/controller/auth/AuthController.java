@@ -69,7 +69,7 @@ public class AuthController {
     @PostMapping("/auth/login")
     @Operation(summary = "로그인", description = "Http 응답 헤더에 " +
             "(Authorization : 엑세스 토큰 / refresh-token : 리프레시 토큰 / refresh-token-exp-time : 리프레시 토큰 만료시간) 삽입")
-    public ApiResult<?> login(@Valid @RequestBody LoginRequest loginRequest, HttpServletResponse response){
+    public ApiResult<?> login(@Valid @RequestBody LoginRequest loginRequest){
 
         TokenResponse tokenResponse = authService.login(loginRequest);
 

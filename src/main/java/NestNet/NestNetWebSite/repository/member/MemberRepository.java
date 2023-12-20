@@ -15,7 +15,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findById(Long id);
 
     // 로그인 아이디로 회원 단건 조회
-    Optional<Member> findByLoginId(String loginId);
+    @Query("select m from Member m where m.loginId =:loginId")
+    Optional<Member> findByLoginId(@Param("loginId") String loginId);
 
     // 이름 + 이메일로 회원 단건 조회
     @Query("select m from Member m where m.name =:name and m.emailAddress =:emailAddress")

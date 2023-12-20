@@ -2,6 +2,8 @@ package NestNet.NestNetWebSite.config.auth;
 
 import NestNet.NestNetWebSite.config.jwt.TokenProvider;
 import NestNet.NestNetWebSite.config.redis.RedisUtil;
+import NestNet.NestNetWebSite.exception.CustomException;
+import NestNet.NestNetWebSite.exception.ErrorCode;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,6 +42,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {       //ht
         // 엑세스 토큰 없으면 -> 다시 로그인 해야함
         if(!StringUtils.hasText(accessToken)){
             log.info("CustomAuthorizationFilter.class / doFilterInternal : 엑세스 토큰 없음");
+
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setStatus(HttpStatus.FORBIDDEN.value());
             return;
@@ -48,6 +51,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {       //ht
         // 블랙리스트에 있으면 로그아웃되었거나, 토큰이 만료된 상태인 것임. 401에러 -> 다시 로그인 해야함.
         if(redisUtil.hasKey(accessToken)){
             log.info("CustomAuthorizationFilter.class / doFilterInternal : 블랙리스트에 등록된 엑세스 토큰");
+
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return;
@@ -69,6 +73,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {       //ht
         }
         else{
             log.info("CustomAuthorizationFilter.class / doFilterInternal : JWT access 토큰, refresh 토큰 모두 유효하지 않음");
+
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return;

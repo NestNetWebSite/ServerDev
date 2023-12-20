@@ -55,7 +55,7 @@ public class AuthService {
     public ApiResult<?> checkEmailAuth(String answer){
 
         if(answer.equals(mailSecretString)) return ApiResult.success("이메일 인증이 완료되었습니다.");
-        else return ApiResult.success("틀렸습니다. 하지만, 이메일을 정상적으로 받으셨다면 정답에 nestnet을 입력하세요.");
+        else throw new CustomException(ErrorCode.CODE_NOT_CORRECT);
     }
 
     /*
@@ -94,6 +94,8 @@ public class AuthService {
     public TokenResponse login(LoginRequest loginRequest){
 
         TokenResponse tokenResponse;
+
+        System.out.println(loginRequest.getPassword());
 
         try{
             //인증 전의 UsernamePasswordAuthenticationToken 객체(Authentication의 구현체)
