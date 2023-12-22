@@ -4,6 +4,7 @@ import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.member.MemberAuthority;
 import NestNet.NestNetWebSite.dto.request.MemberChangeAuthorityRequest;
 import NestNet.NestNetWebSite.dto.request.MemberSignUpManagementRequest;
+import NestNet.NestNetWebSite.dto.response.manager.MemberInfoResponse;
 import NestNet.NestNetWebSite.dto.response.manager.MemberSignUpManagementResponse;
 import NestNet.NestNetWebSite.service.manager.ManagerService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -59,7 +60,9 @@ public class ManagerController {
     전체 회원 정보 조회
      */
     @GetMapping("/manager/member-info")
-    @Operation(summary = "모든 회원 정보 조회", description = "회원 정보를 조회한다. 이때, 이름, 권한을 필터링(필수 아님)할 수 있다.")
+    @Operation(summary = "모든 회원 정보 조회", description = "회원 정보를 조회한다. 이때, 이름, 권한을 필터링(필수 아님)할 수 있다.", responses = {
+            @ApiResponse(responseCode = "200", description = "회원 정보 조회 성공", content = @Content(schema = @Schema(implementation = MemberInfoResponse.class)))
+    })
     public ApiResult<?> showMemberInfo(@RequestParam(value = "name", required = false) String name,
                                        @RequestParam(value = "memberAuthority", required = false) MemberAuthority memberAuthority){
 

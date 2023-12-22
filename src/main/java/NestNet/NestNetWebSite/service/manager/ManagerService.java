@@ -4,18 +4,16 @@ import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.manager.MemberSignUpManagement;
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.member.MemberAuthority;
-import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.dto.request.MemberSignUpManagementRequest;
-import NestNet.NestNetWebSite.dto.response.MemberInfoResponse;
+import NestNet.NestNetWebSite.dto.response.manager.MemberInfoDto;
+import NestNet.NestNetWebSite.dto.response.manager.MemberInfoResponse;
 import NestNet.NestNetWebSite.dto.response.manager.MemberSignUpManagementDto;
 import NestNet.NestNetWebSite.dto.response.manager.MemberSignUpManagementResponse;
 import NestNet.NestNetWebSite.exception.CustomException;
 import NestNet.NestNetWebSite.exception.ErrorCode;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import NestNet.NestNetWebSite.repository.manager.MemberSignUpManagementRepository;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -113,13 +111,15 @@ public class ManagerService {
 
         List<Member> memberList = memberRepository.findAllByNameAndMemberAuthority(name, memberAuthority);
 
-        List<MemberInfoResponse> memberInfoResponseList = new ArrayList<>();
+        List<MemberInfoDto> memberInfoDtoList = new ArrayList<>();
         for(Member member : memberList){
-            memberInfoResponseList.add(new MemberInfoResponse(member.getMemberAuthority(), member.getName(), member.getLoginId(), member.getEmailAddress(),
+            memberInfoDtoList.add(new MemberInfoDto(member.getId(), member.getMemberAuthority(), member.getName(), member.getLoginId(), member.getEmailAddress(),
                     member.getStudentId(), member.getGrade(), member.getGraduateYear()));
         }
 
-        return ApiResult.success(memberInfoResponseList);
+        MemberInfoResponse result = new MemberInfoResponse(memberInfoDtoList);
+
+        return ApiResult.success(result);
     }
 
     /*
