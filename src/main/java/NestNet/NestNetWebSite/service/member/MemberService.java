@@ -2,17 +2,15 @@ package NestNet.NestNetWebSite.service.member;
 
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.member.Member;
+import NestNet.NestNetWebSite.dto.MemberIdDto;
 import NestNet.NestNetWebSite.dto.request.MemberModifyInfoRequest;
 import NestNet.NestNetWebSite.dto.response.member.TemporaryInfoDto;
 import NestNet.NestNetWebSite.exception.CustomException;
 import NestNet.NestNetWebSite.exception.ErrorCode;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
+import NestNet.NestNetWebSite.service.auth.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,22 +25,19 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
-    private final CustomUserDetailsService customUserDetailsService;
 
     /*
     회원 정보 변경
      */
     @Transactional
-    public ApiResult<?> modifyMemberInfo(MemberModifyInfoRequest dto, UserDetails userDetails){
+    public MemberIdDto modifyMemberInfo(MemberModifyInfoRequest dto, String loginId){
 
-        Member member = memberRepository.findByLoginId(userDetails.getUsername())
+        Member member = memberRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
 
         member.modifyInfo(dto.getLoginId(), dto.getName(), dto.getStudentId(), dto.getGrade(), dto.getEmailAddress());
 
-//        userDetails
-
-        return ApiResult.success("회원 정보가 수정되었습니다.");
+        return new MemberIdDto(member.getLoginId());
     }
 
     /*
@@ -115,13 +110,7 @@ public class MemberService {
 
         member.withdraw();
 
-        return ApiResult.success(memberName + "(" + loginId + ") 님 탈퇴 처리 되었습니다. 감사합니다.");
+        return ApiResult.success(memberName + "(" + loginId + ") 님 탈퇴 처리 되었습니다.");
     }
-
-    // 새로운 Authentication 생성
-//    protected Authentication createNewAuthentication(UserDetails userDetails, String newLoginId){
-//
-//        Authentication authentication = new UsernamePasswordAuthenticationToken()
-//    }
 
 }

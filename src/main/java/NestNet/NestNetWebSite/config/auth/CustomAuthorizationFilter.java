@@ -26,6 +26,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {       //ht
 
     public static final String AUTHORIZATION_HEADER = "Authorization";
     private final TokenProvider tokenProvider;
+    private final Authenticator authenticator;
     private final RedisUtil redisUtil;
 
     @Override
@@ -68,8 +69,8 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {       //ht
             Authentication authentication = tokenProvider.getAuthentication(validatedAccessToken);
 
             //토큰을 통해 생성한 Authentication 객체 스프링 시큐리티 컨텍스트에 저장
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            log.debug("Security Context에 '{}' 인증 정보를 저장했습니다, uri: {}", authentication.getName(), requestURI);
+            authenticator.setAuthenticationInSecurityContext(authentication);
+
         }
         else{
             log.info("CustomAuthorizationFilter.class / doFilterInternal : JWT access 토큰, refresh 토큰 모두 유효하지 않음");

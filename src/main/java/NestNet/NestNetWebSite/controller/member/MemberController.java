@@ -1,23 +1,23 @@
 package NestNet.NestNetWebSite.controller.member;
 
 import NestNet.NestNetWebSite.api.ApiResult;
+import NestNet.NestNetWebSite.dto.MemberIdDto;
 import NestNet.NestNetWebSite.dto.request.*;
+import NestNet.NestNetWebSite.dto.response.TokenDto;
 import NestNet.NestNetWebSite.dto.response.member.TemporaryInfoDto;
+import NestNet.NestNetWebSite.service.auth.AuthService;
 import NestNet.NestNetWebSite.service.mail.MailService;
 import NestNet.NestNetWebSite.service.member.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,6 +27,7 @@ public class MemberController {
 
     private final MailService mailService;
     private final MemberService memberService;
+    private final AuthService authService;
 
     /*
     회원 정보 수정
@@ -34,9 +35,15 @@ public class MemberController {
     @PostMapping("/member/modify-info")
     @Operation(summary = "회원 단건 정보 수정", description = "로그인한 회원이 자신의 정보를 수정한다.")
     public ApiResult<?> modifyMemberInfo(@Valid @RequestBody MemberModifyInfoRequest memberModifyInfoRequest,
-                                         @AuthenticationPrincipal UserDetails userDetails){
+                                         @AuthenticationPrincipal UserDetails userDetails,
+                                         HttpServletRequest request){
 
-        return memberService.modifyMemberInfo(memberModifyInfoRequest, userDetails);
+        MemberIdDto dto = memberService.modifyMemberInfo(memberModifyInfoRequest, userDetails.getUsername());
+
+        // 새로운 인증 정보 발급
+        TokenDto tokenDto = authService.setAuthenticationSecurityContext(dto.getLoginId(), request);
+
+        return ApiResult.success(tokenDto);
     }
 
     /*

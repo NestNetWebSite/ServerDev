@@ -1,6 +1,7 @@
 package NestNet.NestNetWebSite.service.auth;
 
 import NestNet.NestNetWebSite.api.ApiResult;
+import NestNet.NestNetWebSite.config.auth.Authenticator;
 import NestNet.NestNetWebSite.config.jwt.TokenProvider;
 import NestNet.NestNetWebSite.config.redis.RedisUtil;
 import NestNet.NestNetWebSite.domain.manager.MemberSignUpManagement;
@@ -8,6 +9,7 @@ import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.member.MemberAuthority;
 import NestNet.NestNetWebSite.dto.request.LoginRequest;
 import NestNet.NestNetWebSite.dto.request.SignUpRequest;
+import NestNet.NestNetWebSite.dto.response.TokenDto;
 import NestNet.NestNetWebSite.dto.response.TokenResponse;
 import NestNet.NestNetWebSite.exception.CustomException;
 import NestNet.NestNetWebSite.exception.ErrorCode;
@@ -39,8 +41,8 @@ public class AuthService {
     private final MemberRepository memberRepository;
     private final MemberSignUpManagementRepository memberSignUpManagementRepository;
     private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final TokenProvider tokenProvider;
+    private final Authenticator authenticator;
     private final RedisUtil redisUtil;
 
     @Value("#{environment['jwt.refresh-exp-time']}")
@@ -95,23 +97,8 @@ public class AuthService {
 
         TokenResponse tokenResponse;
 
-        System.out.println(loginRequest.getPassword());
-
         try{
-            //인증 전의 UsernamePasswordAuthenticationToken 객체(Authentication의 구현체)
-            UsernamePasswordAuthenticationToken authenticationToken =
-                    new UsernamePasswordAuthenticationToken(loginRequest.getLoginId(), loginRequest.getPassword());
-
-            //인증 후의 Authentication 객체
-            //authenticationManager가 UserDetailsService의 loadByUsername매서드를 호출하여 인증 수행
-            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-
-//            Member member = memberRepository.findByLoginId(loginRequest.getLoginId())
-//                    .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
-//
-//            if(member.getMemberAuthority().equals(MemberAuthority.WAITING_FOR_APPROVAL)){
-//                throw new CustomException(ErrorCode.MEMBER_NOT_PERMISSION_YET);
-//            }
+            Authentication authentication = authenticator.createAuthenticationByIdPassword(loginRequest.getLoginId(), loginRequest.getPassword());
 
             String accessToken = tokenProvider.createAccessToken(authentication);
             String refreshToken = tokenProvider.createRefreshToken(authentication);
@@ -134,28 +121,29 @@ public class AuthService {
     @Transactional
     public ApiResult<?> logout(HttpServletRequest request){
 
-        String accessToken = tokenProvider.resolveToken(request);
+        tokenProvider.invalidateAccessToken(request);
 
-        Claims claims = tokenProvider.getTokenClaims(accessToken);
-
-        long expTime = claims.getExpiration().getTime();     //토큰의 만료 시각
-        long now = new Date().getTime();                     //현재 시각
-
-        // 남은 엑세스토큰 유효 시간
-        long remainTime = expTime - now;        // 테스트 사이트 : https://currentmillis.com/
-
-        //기간이 만료된 엑세스 토큰인 경우는 필터에서 걸러지기 때문에 없음.
-
-        //리프레시 토큰 삭제
-        String refreshToken = tokenProvider.getRefreshToken(request);
-        if(refreshToken != null){
-            System.out.println("삭제");
-            redisUtil.deleteData(refreshToken);
-        }
-
-        //레디스에 블랙리스트 등록
-        redisUtil.setData(accessToken, "logout", remainTime);
+        tokenProvider.invalidateRefreshToken(request);
 
         return ApiResult.success("로그아웃 되었습니다");
     }
+
+
+    // 인증 정보 발급 및 security context 등록 + 새로운 토큰 발급
+    public TokenDto setAuthenticationSecurityContext(String loginId, HttpServletRequest request){
+
+        Authentication authentication = authenticator.createAuthentication(loginId);
+
+        String newAccessToken = tokenProvider.createAccessToken(authentication);
+        String newRefreshToken = tokenProvider.createRefreshToken(authentication);
+
+        tokenProvider.invalidateRefreshToken(request);
+
+        //레디스에 리프레시 토큰 저장
+        redisUtil.setData(newRefreshToken, "refresh-token", refreshTokenExpTime);
+
+        return new TokenDto(newAccessToken, newRefreshToken);
+    }
+
+
 }

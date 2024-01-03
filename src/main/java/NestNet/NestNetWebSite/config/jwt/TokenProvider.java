@@ -1,7 +1,7 @@
 package NestNet.NestNetWebSite.config.jwt;
 
+import NestNet.NestNetWebSite.config.auth.Authenticator;
 import NestNet.NestNetWebSite.config.redis.RedisUtil;
-import NestNet.NestNetWebSite.service.member.CustomUserDetailsService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -12,9 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -27,7 +25,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class TokenProvider implements InitializingBean {
 
-    private final CustomUserDetailsService customUserDetailsService;
+    private final Authenticator authenticator;
     private final RedisUtil redisUtil;
 
     @Value("#{environment['jwt.secret']}")
@@ -41,8 +39,6 @@ public class TokenProvider implements InitializingBean {
     public static final String AUTHORIZATION_HEADER = "Authorization";
 
     private Key key;
-
-
 
     /*
    빈이 생성되고 의존관계 주입까지 완료된 후, Key 변수에 값 할당
@@ -68,7 +64,7 @@ public class TokenProvider implements InitializingBean {
         //엑세스 토큰 생성
         return Jwts.builder()
                 .setSubject(authentication.getName())           //로그인 아이디
-                .claim(AUTHORITIES_KEY, authority)              //권한한
+                .claim(AUTHORITIES_KEY, authority)              //권한
                 .setExpiration(validity)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
@@ -95,37 +91,29 @@ public class TokenProvider implements InitializingBean {
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
 
-        log.info("createRefreshToken :" + authentication.getName() + refreshToken);
-
         return refreshToken;
     }
 
     /*
-    토큰의 정보를 가져옴
+    토큰에서 claim 정보 추출
      */
-    public Claims getTokenClaims(String accessToken){
+    public Claims getTokenClaims(String token){
 
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(key)                 //서버의 시크릿 키로 서명 검증
+                .setSigningKey(key)
                 .build()
-                .parseClaimsJws(accessToken)
+                .parseClaimsJws(token)
                 .getBody();
 
         return claims;
     }
 
     /*
-    jwt access 토큰을 이용하여 Authentication 객체 리턴
+    jwt 토큰을 이용하여 Authentication 객체 리턴
      */
     public Authentication getAuthentication(String accessToken){
 
-        //토큰의 body의 클레임 정보 ex){sub=admin, auth=admin, exp=1688709600}
-        Claims claims = getTokenClaims(accessToken);
-
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername(claims.getSubject());
-
-        //Authentication 인터페이스의 구현 객체
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+        return authenticator.createAuthentication(getTokenClaims(accessToken).getSubject());
     }
 
     /*
@@ -159,7 +147,6 @@ public class TokenProvider implements InitializingBean {
             //리프레쉬 토큰이 유효하면 DB 기존 값 지우고 엑세스 토큰 재발급
             if(refreshToken != null && validateRefreshToken(refreshToken)){
 
-                log.info("TokenProvider.class / validateAccessToken : validateAccessToken 매서드 리프레시 토큰 : " + refreshToken);
                 log.info("TokenProvider.class / validateAccessToken : JWT access 토큰 재발급");
 
                 Authentication authentication = getAuthentication(refreshToken);
@@ -216,7 +203,6 @@ public class TokenProvider implements InitializingBean {
             for(Cookie cookie : cookies){
                 if(cookie.getName().equals("refresh-token")){
                     refreshToken = cookie.getValue();
-                    System.out.println("최종 : " + refreshToken);
                     break;
                 }
             }
@@ -247,6 +233,37 @@ public class TokenProvider implements InitializingBean {
         }
 
         return false;
+    }
+
+    /*
+    access 토큰 폐기 (블랙리스트 등록)
+     */
+    public void invalidateAccessToken(HttpServletRequest request){
+
+        String accessToken = resolveToken(request);
+
+        Claims claims = getTokenClaims(accessToken);
+
+        long expTime = claims.getExpiration().getTime();     //토큰의 만료 시각
+        long now = new Date().getTime();                     //현재 시각
+
+        // 남은 엑세스토큰 유효 시간
+        long remainTime = expTime - now;        // 테스트 사이트 : https://currentmillis.com/
+
+        //레디스에 블랙리스트 등록
+        redisUtil.setData(accessToken, "logout", remainTime);
+    }
+
+    /*
+    refresh 토큰 폐기
+     */
+    public void invalidateRefreshToken(HttpServletRequest request){
+
+        String refreshToken = getRefreshToken(request);
+
+        if(refreshToken != null){
+            redisUtil.deleteData(refreshToken);
+        }
     }
 
 }

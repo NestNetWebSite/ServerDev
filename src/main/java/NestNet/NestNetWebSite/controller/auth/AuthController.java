@@ -92,4 +92,14 @@ public class AuthController {
         return authService.logout(request);
     }
 
+    @RequestMapping("/forbidden")
+    public String forbidden(){
+        return "Forbidden";
+    }
+
+    @RequestMapping("/unauthorized")
+    public String unauthorized(){
+        return "Unauthorized";
+    }
+
 }

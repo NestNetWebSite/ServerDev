@@ -1,4 +1,4 @@
-package NestNet.NestNetWebSite.service.member;
+package NestNet.NestNetWebSite.service.auth;
 
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.exception.CustomException;

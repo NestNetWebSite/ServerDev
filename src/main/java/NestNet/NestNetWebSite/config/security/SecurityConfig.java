@@ -1,21 +1,22 @@
 package NestNet.NestNetWebSite.config.security;
 
+import NestNet.NestNetWebSite.config.auth.Authenticator;
 import NestNet.NestNetWebSite.config.auth.CustomAuthorizationFilter;
 import NestNet.NestNetWebSite.config.jwt.TokenProvider;
 import NestNet.NestNetWebSite.config.jwt.errorHandler.JwtAccessDeniedHandler;
 import NestNet.NestNetWebSite.config.jwt.errorHandler.JwtAuthenticationEntryPoint;
 import NestNet.NestNetWebSite.config.redis.RedisUtil;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
-import NestNet.NestNetWebSite.service.member.CustomUserDetailsService;
+import NestNet.NestNetWebSite.service.auth.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -33,6 +34,7 @@ import org.springframework.web.filter.CorsFilter;
 public class SecurityConfig {
 
     private final TokenProvider tokenProvider;
+    private final Authenticator authenticator;
     private final CorsFilter corsFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
@@ -57,11 +59,11 @@ public class SecurityConfig {
     }
 
     /*
-    커스텀 필터 등록
+    커스텀 필터
      */
     @Bean
     public CustomAuthorizationFilter customAuthorizationFilter(){
-        return new CustomAuthorizationFilter(tokenProvider, redisUtil);
+        return new CustomAuthorizationFilter(tokenProvider, authenticator, redisUtil);
     }
 
 
@@ -82,6 +84,7 @@ public class SecurityConfig {
                 .requestMatchers("/auth/signup", "/auth/login", "/auth/mail-auth", "/auth/mail-auth-answer")
                 .requestMatchers("/member/find-id", "/member/get-temp-pw")
                 .requestMatchers("/attendance/weekly", "/attendance/monthly")
+                .requestMatchers("/forbidden", "unauthorized")
                 .requestMatchers("/image/**");
     }
 
@@ -100,20 +103,19 @@ public class SecurityConfig {
 
                 //각 예외 인터페이스를 커스텀한 두 예외 등록. 401, 403 에러
                 .exceptionHandling(exceptionHandling -> exceptionHandling
-                        .accessDeniedHandler(jwtAccessDeniedHandler)
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                        .accessDeniedHandler(jwtAccessDeniedHandler)
                 )
 
-                //http 요청에 대한 접근 권한을 설정한다.
+                //http 요청에 대한 접근 권한을 설정
                 //로그인, 회원가입 api는 토큰이 없는 상태로 요청이 들어오기 때문에 permitAll()로 열어줌
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()        //html, css같은 정적 리소스에 대해 접근 허용
                         .requestMatchers(HttpMethod.GET, "/image/**").permitAll()
-//                        .requestMatchers( "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/auth/signup", "auth/login").permitAll()                      //로그인, 회원가입 접근 허용
                         // 관리자 패이지는 관리자만 접근 가능
-                        .requestMatchers("/manager/**").hasAuthority("MANAGER")                  //manager하위 리소스는 MANAGER 권한으로 허용
+                        .requestMatchers("/manager/**").hasAnyAuthority("MANAGER", "ADMIN")                  //manager하위 리소스는 MANAGER 권한으로 허용
                         // 게시판 통합 기능은 모든 회원 접근 가능
                         .requestMatchers("/post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER",  "WITHDRAWN_MEMBER")
                         // 통합 게시판은 모든 회원 접근 가능
