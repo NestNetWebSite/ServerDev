@@ -123,7 +123,7 @@ public class SecurityConfig {
                         // 족보 게시판은 졸업생을 제외한 모든 회원 접근 가능
                         .requestMatchers("/exam-collection-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "WITHDRAWN_MEMBER")
                         // 사진 게시판 리스트 조회는 권한 필요없음 / 사진 게시판 작성은 회장, 부회장, 관리자 접근 가능 / 그 외 조회는 모든 회원 접근 가능
-                        .requestMatchers("/photo-post/post").hasAnyAuthority("PRESIDENT", "VICE_PRESIDENT", "MANAGER")
+                        .requestMatchers("/photo-post/post").hasAnyAuthority("PRESIDENT", "VICE_PRESIDENT", "MANAGER", "ADMIN")
                         .requestMatchers("/photo-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER", "WITHDRAWN_MEMBER")
                         // 인생네컷
                         .requestMatchers("/life4cut/save").hasAnyAuthority("PRESIDENT", "VICE_PRESIDENT", "MANAGER")

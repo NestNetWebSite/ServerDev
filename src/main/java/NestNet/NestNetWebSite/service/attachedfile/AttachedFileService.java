@@ -41,6 +41,7 @@ public class AttachedFileService {
     /*
     첨부파일 저장 -> 저장 로직은 게시물에 종속적. 게시물 저장하는 서비스 로직에서 수행
      */
+    @Transactional
     public void save(Post post, List<MultipartFile> files){
 
         if(!files.isEmpty()){
