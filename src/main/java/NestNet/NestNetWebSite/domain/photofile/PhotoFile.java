@@ -1,7 +1,8 @@
-package NestNet.NestNetWebSite.domain.attachedfile;
+package NestNet.NestNetWebSite.domain.photofile;
 
 import NestNet.NestNetWebSite.domain.post.Post;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,43 +12,50 @@ import java.text.Normalizer;
 import java.util.UUID;
 
 /**
- * 첨부파일 엔티티
+ * 사진 게시판 파일 엔티티
  */
 @Entity
 @Getter
 @NoArgsConstructor
-public class AttachedFile {
+@AllArgsConstructor
+public class PhotoFile {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "attached_file_id")
+    @Column(name = "photo_file_id")
     private Long id;                                            // PK
 
-    @ManyToOne(fetch = FetchType.LAZY)  //양방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
-    private Post post;                                          // 첨부파일이 포함된 게시물
+    private Post post;                                          // 파일이 연관된 게시물
 
     private String originalFileName;                            // 사용자가 입력한 파일 이름
     private String saveFileName;                                // 실제 저장된 파일 이름
-    private String saveFilePath;                                // 파일 경로 (서버)
+    private String saveFilePath;                                // 파일 저장 경로
 
-    @Transient      //영속성 컨텍스트에 관리되지 않음
+    private boolean thumbNail;                                // 썸네일 파일인지
+
+    @Transient
     private static String basePath = "C:" + File.separator + "nestnetFile" + File.separator;
 
     /*
     생성자
      */
-    public AttachedFile(Post post, MultipartFile file){
+    public PhotoFile(Post post, MultipartFile file, boolean thumbNail){
         this.post = post;
         createFileName(file);
         createSavePath();
-    }
-
-    //== setter ==//
-    public void setPost(Post post) {
-        this.post = post;
+        this.thumbNail = thumbNail;
     }
 
     //== 비지니스 로직 ==//
+
+    /*
+    썸네일로 지정
+     */
+    public void setThumbNail(){
+        this.thumbNail = true;
+    }
+
     /*
     파일 이름 중복 방지를 위한 파일명 생성
      */
@@ -69,7 +77,7 @@ public class AttachedFile {
         folderNameBuilder.append(this.post.getCreatedTime().getYear());
 
         if(this.post.getCreatedTime().getMonth().getValue() <= 6){      //상반기 작성된 글
-           folderNameBuilder.append("_first_half");
+            folderNameBuilder.append("_first_half");
         }
         else{
             folderNameBuilder.append("_second_half");

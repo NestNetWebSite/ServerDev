@@ -1,16 +1,15 @@
 package NestNet.NestNetWebSite.service.post;
 
 import NestNet.NestNetWebSite.config.redis.RedisUtil;
-import NestNet.NestNetWebSite.domain.like.PostLike;
 import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.domain.post.PostCategory;
-import NestNet.NestNetWebSite.domain.post.exam.ExamCollectionPost;
 import NestNet.NestNetWebSite.exception.CustomException;
 import NestNet.NestNetWebSite.exception.ErrorCode;
 import NestNet.NestNetWebSite.repository.post.PostRepository;
 import NestNet.NestNetWebSite.service.attachedfile.AttachedFileService;
 import NestNet.NestNetWebSite.service.comment.CommentService;
 import NestNet.NestNetWebSite.service.like.PostLikeService;
+import NestNet.NestNetWebSite.service.photofile.PhotoFileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +24,7 @@ public class PostService {
     private final AttachedFileService attachedFileService;
     private final CommentService commentService;
     private final PostLikeService postLikeService;
-    private final ThumbNailService thumbNailService;
+    private final PhotoFileService photoFileService;
     private final PostRepository postRepository;
     private final RedisUtil redisUtil;
 
@@ -51,12 +50,15 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
-        attachedFileService.deleteFiles(post);
+
         commentService.deleteAllComments(post);
         postLikeService.deleteLike(post);
 
         if(post.getPostCategory().equals(PostCategory.PHOTO)){
-            thumbNailService.deleteThumbNail(post);
+            photoFileService.deleteFiles(post);
+        }
+        else{
+            attachedFileService.deleteFiles(post);
         }
 
         postRepository.delete(post);

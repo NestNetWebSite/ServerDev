@@ -6,7 +6,6 @@ import NestNet.NestNetWebSite.dto.request.PhotoPostRequest;
 import NestNet.NestNetWebSite.dto.response.photopost.PhotoPostResponse;
 import NestNet.NestNetWebSite.dto.response.photopost.ThumbNailResponse;
 import NestNet.NestNetWebSite.service.post.PhotoPostService;
-import NestNet.NestNetWebSite.service.post.ThumbNailService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -27,7 +26,6 @@ import java.util.List;
 public class PhotoPostController {
 
     private final PhotoPostService photoPostService;
-    private final ThumbNailService thumbNailService;
 
     /*
     사진 게시판 게시물 저장
@@ -49,7 +47,7 @@ public class PhotoPostController {
     })
     public ApiResult<?> showThumbNail(@RequestParam("page") int page, @RequestParam("size") int size){
 
-        return thumbNailService.findThumbNails(page, size);
+        return photoPostService.findThumbNail(page, size);
     }
 
 

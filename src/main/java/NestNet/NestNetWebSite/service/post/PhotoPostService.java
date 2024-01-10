@@ -1,15 +1,12 @@
 package NestNet.NestNetWebSite.service.post;
 
 import NestNet.NestNetWebSite.api.ApiResult;
-import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.member.Member;
-import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.domain.post.photo.PhotoPost;
-import NestNet.NestNetWebSite.domain.post.photo.ThumbNail;
 import NestNet.NestNetWebSite.dto.request.PhotoPostModifyRequest;
 import NestNet.NestNetWebSite.dto.request.PhotoPostRequest;
-import NestNet.NestNetWebSite.dto.response.AttachedFileResponse;
 import NestNet.NestNetWebSite.dto.response.CommentResponse;
+import NestNet.NestNetWebSite.dto.response.photopost.PhotoFileDto;
 import NestNet.NestNetWebSite.dto.response.photopost.PhotoPostDto;
 import NestNet.NestNetWebSite.dto.response.photopost.PhotoPostResponse;
 import NestNet.NestNetWebSite.dto.response.photopost.ThumbNailDto;
@@ -17,16 +14,14 @@ import NestNet.NestNetWebSite.dto.response.photopost.ThumbNailResponse;
 import NestNet.NestNetWebSite.exception.CustomException;
 import NestNet.NestNetWebSite.exception.ErrorCode;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
-import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import NestNet.NestNetWebSite.repository.post.PhotoPostRepository;
-import NestNet.NestNetWebSite.repository.post.ThumbNailRepository;
-import NestNet.NestNetWebSite.service.attachedfile.AttachedFileService;
 import NestNet.NestNetWebSite.service.comment.CommentService;
 import NestNet.NestNetWebSite.service.like.PostLikeService;
-import jakarta.servlet.http.HttpServletResponse;
+import NestNet.NestNetWebSite.service.photofile.PhotoFileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,10 +36,9 @@ public class PhotoPostService {
 
     private final PhotoPostRepository photoPostRepository;
     private final MemberRepository memberRepository;
-    private final AttachedFileService attachedFileService;
+    private final PhotoFileService photoFileService;
     private final CommentService commentService;
     private final PostLikeService postLikeService;
-    private final ThumbNailService thumbNailService;
     private final PostService postService;
 
     /*
@@ -61,14 +55,38 @@ public class PhotoPostService {
         photoPostRepository.save(post);
 
         if(files != null){
-            attachedFileService.save(post, files);
-
-            MultipartFile thumbNailFile = files.get(0);         //썸네일 사진
-
-            thumbNailService.saveThumbNail(post, thumbNailFile);
+            photoFileService.save(post, files);
         }
 
         return ApiResult.success("게시물 저장 성공");
+    }
+
+    /*
+    사진 게시판 썸네일 조회
+     */
+    public ApiResult<?> findThumbNail(int page, int size){
+
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+
+        Page<PhotoPost> photoPostPage = photoPostRepository.findAll(pageRequest);
+
+        List<PhotoPost> photoPostList = photoPostPage.getContent();
+
+        List<PhotoFileDto> photoFileDtoList = photoFileService.findThumbNail(page, size);
+
+        List<ThumbNailDto> thumbNailDtoList = new ArrayList<>();
+        for(int i = 0; i < photoPostList.size(); i++){
+            PhotoPost post = photoPostList.get(i);
+            PhotoFileDto photoFileDto = photoFileDtoList.get(i);
+            thumbNailDtoList.add(
+                    new ThumbNailDto(post.getId(), post.getTitle(), post.getViewCount(),
+                            post.getLikeCount(), photoFileDto.getSaveFilePath(), photoFileDto.getSaveFileName())
+            );
+        }
+
+        Long totalSize = photoPostPage.getTotalElements();
+
+        return ApiResult.success(new ThumbNailResponse(totalSize, thumbNailDtoList));
     }
 
     /*
@@ -81,10 +99,9 @@ public class PhotoPostService {
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
         PhotoPostDto postDto = null;
-        List<AttachedFileResponse> fileDtoList = attachedFileService.findAllFilesByPost(post);
+        List<PhotoFileDto> fileDtoList = photoFileService.findAllFilesByPost(post);
         List<CommentResponse> commentResponseList = commentService.findCommentByPost(post, memberLoginId);
         boolean isMemberLiked = postLikeService.isMemberLikedByPost(post, memberLoginId);
-        ThumbNail thumbNail = thumbNailService.findThumbNail(post);
 
         postService.addViewCount(post, memberLoginId);
 
@@ -115,7 +132,7 @@ public class PhotoPostService {
                     .build();
         }
 
-        return new PhotoPostResponse(postDto, fileDtoList, commentResponseList, thumbNail.getId(), isMemberLiked);
+        return new PhotoPostResponse(postDto, fileDtoList, commentResponseList, isMemberLiked);
 
     }
 
@@ -129,7 +146,7 @@ public class PhotoPostService {
         PhotoPost post = photoPostRepository.findById(photoPostModifyRequest.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
-        attachedFileService.modifyFiles(post, fileIdList, files);
+        photoFileService.modifyFiles(post, fileIdList, files);
 
         if(thumbNailId == null){
 

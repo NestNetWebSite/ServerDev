@@ -1,16 +1,16 @@
 package NestNet.NestNetWebSite.domain.life4cut;
 
-import NestNet.NestNetWebSite.domain.post.PostCategory;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.text.Normalizer;
 import java.util.UUID;
 
+/**
+ * 인생네컷 엔티티
+ */
 @Entity
 @Getter
 @NoArgsConstructor

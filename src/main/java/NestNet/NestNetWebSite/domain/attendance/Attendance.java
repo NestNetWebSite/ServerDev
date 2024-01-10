@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+/**
+ * 출석 엔티티
+ */
 @Entity
 @Getter
 @NoArgsConstructor
