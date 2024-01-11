@@ -141,16 +141,12 @@ public class PhotoPostService {
      */
     @Transactional
     public void modifyPost(PhotoPostModifyRequest photoPostModifyRequest,
-                           List<Long> fileIdList, List<MultipartFile> files, Long thumbNailId){
+                           List<Long> fileIdList, List<MultipartFile> files){
 
         PhotoPost post = photoPostRepository.findById(photoPostModifyRequest.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
         photoFileService.modifyFiles(post, fileIdList, files);
-
-        if(thumbNailId == null){
-
-        }
 
         // 변경 감지 -> 자동 update
         post.modifyPost(photoPostModifyRequest.getTitle(), photoPostModifyRequest.getBodyContent());

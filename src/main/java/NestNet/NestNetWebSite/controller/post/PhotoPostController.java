@@ -72,11 +72,10 @@ public class PhotoPostController {
     @Operation(summary = "사진 게시판 게시물 수정", description = "로그인한 사용자가 자신이 작성한 사진 게시물을 수정한다. 파일 수정에서 문제가 발생할 경우 500 에러를 반환한다.")
     public ApiResult<?> modifyPost(@RequestPart("data") PhotoPostModifyRequest photoPostModifyRequest,
                                    @RequestPart(value = "file-id", required = false) List<Long> fileIdList,
-                                   @RequestPart(value = "file", required = false) List<MultipartFile> files,
-                                   @RequestPart(value = "thumbNail-id", required = false) Long thumbNailId){
+                                   @RequestPart(value = "file", required = false) List<MultipartFile> files){
 
 
-        photoPostService.modifyPost(photoPostModifyRequest, fileIdList, files, thumbNailId);
+        photoPostService.modifyPost(photoPostModifyRequest, fileIdList, files);
 
         return ApiResult.success("게시물 수정 완료");
     }
