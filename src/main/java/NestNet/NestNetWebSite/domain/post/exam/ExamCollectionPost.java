@@ -61,23 +61,4 @@ public class ExamCollectionPost extends Post {
         this.examType = examType;
     }
 
-    public void setSubject(String subject) {
-        this.subject = subject;
-    }
-
-    public void setProfessor(String professor) {
-        this.professor = professor;
-    }
-
-    public void setYear(int year) {
-        this.year = year;
-    }
-
-    public void setSemester(int semester) {
-        this.semester = semester;
-    }
-
-    public void setExamType(ExamType examType) {
-        this.examType = examType;
-    }
 }

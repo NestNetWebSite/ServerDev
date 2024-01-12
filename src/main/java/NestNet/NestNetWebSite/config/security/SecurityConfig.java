@@ -84,6 +84,7 @@ public class SecurityConfig {
                 .requestMatchers("/auth/signup", "/auth/login", "/auth/mail-auth", "/auth/mail-auth-answer")
                 .requestMatchers("/member/find-id", "/member/get-temp-pw")
                 .requestMatchers("/attendance/weekly", "/attendance/monthly")
+                .requestMatchers("/photo-post/**")
                 .requestMatchers("/forbidden", "unauthorized")
                 .requestMatchers("/image/**");
     }

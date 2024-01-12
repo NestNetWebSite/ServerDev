@@ -49,8 +49,4 @@ public class UnifiedPost extends Post {
         super.setModifiedTime(LocalDateTime.now());
     }
 
-    //== setter ==//
-    public void setUnifiedPostType(UnifiedPostType unifiedPostType) {
-        this.unifiedPostType = unifiedPostType;
-    }
 }

@@ -35,7 +35,10 @@ public class PhotoPostController {
     public ApiResult<?> savePost(@RequestPart("data") @Valid PhotoPostRequest photoPostRequest, @RequestPart("file") List<MultipartFile> files,
                          @AuthenticationPrincipal UserDetails userDetails){
 
-        return photoPostService.savePost(photoPostRequest, files, userDetails.getUsername());
+        // 허원일 테스트용
+        return photoPostService.savePost(photoPostRequest, files, "admin");
+
+//        return photoPostService.savePost(photoPostRequest, files, userDetails.getUsername());
     }
 
     /*
@@ -45,7 +48,9 @@ public class PhotoPostController {
     @Operation(summary = "사진 게시판 게시물 목록(썸네일) 조회", description = "", responses = {
             @ApiResponse(responseCode = "200", description = "", content = @Content(schema = @Schema(implementation = ThumbNailResponse.class)))
     })
-    public ApiResult<?> showThumbNail(@RequestParam("page") int page, @RequestParam("size") int size){
+    public ApiResult<?> showThumbNail(@RequestParam("page") int page){
+
+        int size = 12;
 
         return photoPostService.findThumbNail(page, size);
     }
@@ -60,7 +65,10 @@ public class PhotoPostController {
     })
     public ApiResult<?> showPost(@PathVariable("post_id") Long postId, @AuthenticationPrincipal UserDetails userDetails){
 
-        PhotoPostResponse result = photoPostService.findPostById(postId, userDetails.getUsername());
+        // 허원일 테스트용
+        PhotoPostResponse result = photoPostService.findPostById(postId, "admin");
+
+//        PhotoPostResponse result = photoPostService.findPostById(postId, userDetails.getUsername());
 
         return ApiResult.success(result);
     }

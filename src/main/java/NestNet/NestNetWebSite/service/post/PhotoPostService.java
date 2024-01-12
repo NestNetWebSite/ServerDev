@@ -84,9 +84,7 @@ public class PhotoPostService {
             );
         }
 
-        Long totalSize = photoPostPage.getTotalElements();
-
-        return ApiResult.success(new ThumbNailResponse(totalSize, thumbNailDtoList));
+        return ApiResult.success(new ThumbNailResponse(thumbNailDtoList));
     }
 
     /*

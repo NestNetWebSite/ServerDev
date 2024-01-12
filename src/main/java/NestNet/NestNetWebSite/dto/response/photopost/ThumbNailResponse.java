@@ -12,7 +12,5 @@ import java.util.List;
 @Builder
 public class ThumbNailResponse {
 
-    Long totalSize;
-
     List<ThumbNailDto> dtoList = new ArrayList<>();
 }
