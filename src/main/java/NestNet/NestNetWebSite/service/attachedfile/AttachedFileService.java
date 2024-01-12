@@ -51,7 +51,6 @@ public class AttachedFileService {
             for(MultipartFile file : files){
                 AttachedFile attachedFile = new AttachedFile(post, file);
                 attachedFileList.add(attachedFile);
-                post.addAttachedFiles(attachedFile);
             }
             attachedFileRepository.saveAll(attachedFileList);
             saveRealFile(attachedFileList, files);

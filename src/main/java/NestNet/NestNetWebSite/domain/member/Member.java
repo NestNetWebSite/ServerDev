@@ -45,11 +45,6 @@ public class Member {
 
     private LocalDateTime joinDate;                 // 회원가입 날짜
 
-    //== setter ==//
-//    public void setMemberAuthority(MemberAuthority memberAuthority) {
-//        this.memberAuthority = memberAuthority;
-//    }
-
     //== 비지니스 로직 ==//
     /*
     비밀번호 암호화

@@ -31,7 +31,7 @@ public abstract class Post {
     @Column(columnDefinition = "TEXT")
     private String bodyContent;                                     // 본문
 
-    @ManyToOne(fetch = FetchType.LAZY)  //단반향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;                                          // 작성 멤버
 
@@ -45,12 +45,6 @@ public abstract class Post {
     private LocalDateTime createdTime;                              // 글 쓴 시각
 
     private LocalDateTime modifiedTime;                             // 글 수정한 시각
-
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AttachedFile> attachedFileList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> commentList = new ArrayList<>();
 
     /*
     생성자
@@ -66,10 +60,10 @@ public abstract class Post {
     }
 
     //== 연관관계 편의 매서드 ==//
-    public void addAttachedFiles(AttachedFile attachedFile){
-        this.attachedFileList.add(attachedFile);
-        attachedFile.setPost(this);
-    }
+//    public void addAttachedFiles(AttachedFile attachedFile){
+//        this.attachedFileList.add(attachedFile);
+//        attachedFile.setPost(this);
+//    }
 
     //== 비지니스 로직 ==//
 

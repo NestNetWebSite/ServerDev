@@ -22,7 +22,7 @@ public class AttachedFile {
     @Column(name = "attached_file_id")
     private Long id;                                            // PK
 
-    @ManyToOne(fetch = FetchType.LAZY)  //양방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;                                          // 첨부파일이 포함된 게시물
 
