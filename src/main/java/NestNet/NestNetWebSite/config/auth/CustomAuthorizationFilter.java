@@ -24,7 +24,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CustomAuthorizationFilter extends OncePerRequestFilter {       //http 요청마다 처리하도록 하는 필터
 
-    public static final String AUTHORIZATION_HEADER = "Authorization";
     private final TokenProvider tokenProvider;
     private final Authenticator authenticator;
     private final RedisUtil redisUtil;
@@ -34,23 +33,40 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {       //ht
             throws ServletException, IOException {
 
         String servletPath = request.getServletPath();
-        String requestURI = request.getRequestURI();
 
         log.info("CustomAuthorizationFilter.class / doFilterInternal :" + servletPath +  ": 엑세스 토큰을 검사");
 
+        boolean nowCreated = false;         //엑세스 토큰이 이번에 만들어진 것인지 확인하는 변수
         String accessToken = tokenProvider.resolveToken(request);
 
         // 엑세스 토큰 없으면 -> 다시 로그인 해야함
         if(!StringUtils.hasText(accessToken)){
             log.info("CustomAuthorizationFilter.class / doFilterInternal : 엑세스 토큰 없음");
 
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.setStatus(HttpStatus.FORBIDDEN.value());
-            return;
+            String refreshToken = tokenProvider.getRefreshToken(request);
+
+            if(refreshToken != null){
+                boolean refreshTokenValid = tokenProvider.validateRefreshToken(refreshToken);
+                if(refreshTokenValid){      //리프레시 토큰이 유효하면 엑세스 토큰 새로 발급
+
+                    accessToken = tokenProvider.createNewAccessToken(refreshToken, response);
+                    nowCreated = true;
+                }
+                else{
+                    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                    response.setStatus(HttpStatus.FORBIDDEN.value());
+                    return;
+                }
+            }
+            else{
+                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                response.setStatus(HttpStatus.FORBIDDEN.value());
+                return;
+            }
         }
 
         // 블랙리스트에 있으면 로그아웃되었거나, 토큰이 만료된 상태인 것임. 401에러 -> 다시 로그인 해야함.
-        if(redisUtil.hasKey(accessToken)){
+        if(!nowCreated && redisUtil.hasKey(accessToken)){
             log.info("CustomAuthorizationFilter.class / doFilterInternal : 블랙리스트에 등록된 엑세스 토큰");
 
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -58,14 +74,10 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {       //ht
             return;
         }
 
-        // access 토큰 검증
-        Map<String, Object> map = tokenProvider.validateAccessToken(accessToken, request, response);
+        // access 토큰 유효성 검증
+        String validatedAccessToken = tokenProvider.validateAccessToken(accessToken, request, response);
 
-        response = (HttpServletResponse) map.get("response");
-
-        if(map.get("accessToken") != null){
-            String validatedAccessToken = map.get("accessToken").toString();
-
+        if(validatedAccessToken != null){
             Authentication authentication = tokenProvider.getAuthentication(validatedAccessToken);
 
             //토큰을 통해 생성한 Authentication 객체 스프링 시큐리티 컨텍스트에 저장

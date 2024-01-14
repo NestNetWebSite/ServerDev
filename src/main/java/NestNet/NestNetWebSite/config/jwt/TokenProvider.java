@@ -1,6 +1,7 @@
 package NestNet.NestNetWebSite.config.jwt;
 
 import NestNet.NestNetWebSite.config.auth.Authenticator;
+import NestNet.NestNetWebSite.config.cookie.CookieManager;
 import NestNet.NestNetWebSite.config.redis.RedisUtil;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -27,6 +28,8 @@ public class TokenProvider implements InitializingBean {
 
     private final Authenticator authenticator;
     private final RedisUtil redisUtil;
+
+    private final CookieManager cookieManager;
 
     @Value("#{environment['jwt.secret']}")
     private String secret;                                      // 시크릿 키
@@ -119,25 +122,17 @@ public class TokenProvider implements InitializingBean {
     /*
    유효한 토큰인지 확인
     */
-    public Map<String, Object> validateAccessToken(String accessToken, HttpServletRequest request, HttpServletResponse response) {
-
-        Map<String, Object> map = new HashMap<>();
+    public String validateAccessToken(String accessToken, HttpServletRequest request, HttpServletResponse response) {
 
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken);
 
-            map.put("accessToken", accessToken);
-            map.put("response", response);
-
-            return map;
+            return accessToken;
 
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             log.info("TokenProvider.class / validateAccessToken : 잘못된 JWT 서명");
 
-            map.put("accessToken", null);
-            map.put("response", response);
-
-            return map;
+            return null;
 
         } catch (ExpiredJwtException e) {
             log.info("TokenProvider.class / validateAccessToken : 만료된 JWT access 토큰");
@@ -149,24 +144,14 @@ public class TokenProvider implements InitializingBean {
 
                 log.info("TokenProvider.class / validateAccessToken : JWT access 토큰 재발급");
 
-                Authentication authentication = getAuthentication(refreshToken);
+                String newAccessToken = createNewAccessToken(refreshToken, response);
 
-                String newAccessToken = createAccessToken(authentication);
-
-                response.addHeader(AUTHORIZATION_HEADER, newAccessToken);       //새 발급한 access 토큰 응답헤더에 추가
-
-                map.put("accessToken", newAccessToken);
-                map.put("response", response);
-
-                return map;
+                return newAccessToken;
             }
             else{       //리프레쉬 토큰이 유효하지 않으면 다시 로그인하라는 예외 발생
                 log.info("refresh 토큰 만료 / 다시 로그인 해야함");
 
-                map.put("accessToken", null);
-                map.put("response", response);
-
-                return map;
+                return null;
             }
         }
 
@@ -241,6 +226,20 @@ public class TokenProvider implements InitializingBean {
         }
 
         return false;
+    }
+
+    /*
+    refresh 토큰으로 새로운 access 토큰 발급 & 쿠키 세팅
+     */
+    public String createNewAccessToken(String refreshToken, HttpServletResponse response){
+
+        Authentication authentication = getAuthentication(refreshToken);
+
+        String newAccessToken = createAccessToken(authentication);
+
+        cookieManager.setCookie("Authorization", newAccessToken, response);
+
+        return newAccessToken;
     }
 
     /*
