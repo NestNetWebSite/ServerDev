@@ -58,22 +58,33 @@ public class ManagerService {
 
         member.changeAuthority(dto.getMemberAuthority());         //권한 설정
 
-        System.out.println(member.getLoginId() + "  " + member.getId());
+        MemberSignUpManagement memberSignUpManagement = memberSignUpManagementRepository.findByMember(member)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_SIGNUP_REQUEST_NOT_FOUND));
 
-        Optional<MemberSignUpManagement> memberSignUpManagement = memberSignUpManagementRepository.findByMember(member);
-
-        System.out.println(memberSignUpManagement.get().getId());
-
-        if(memberSignUpManagement.isPresent()){
-            memberSignUpManagement.get().setComplete(true);
-        }
-        else{
-            throw new CustomException(ErrorCode.MEMBER_SIGNUP_REQUEST_NOT_FOUND);
-        }
+        memberSignUpManagementRepository.delete(memberSignUpManagement);
 
         memberRepository.save(member);
 
         return ApiResult.success(member.getLoginId() + " 님의 회원가입 요청 승인이 완료되었습니다.");
+    }
+
+    /*
+    회원 가입 요청 미승인
+     */
+    @Transactional
+    public ApiResult<?> rejectSignUp(MemberSignUpManagementRequest dto){
+
+        Member member = memberRepository.findByLoginId(dto.getLoginId())
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
+
+        memberRepository.delete(member);
+
+        MemberSignUpManagement memberSignUpManagement = memberSignUpManagementRepository.findByMember(member)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_SIGNUP_REQUEST_NOT_FOUND));
+
+        memberSignUpManagementRepository.delete(memberSignUpManagement);
+
+        return ApiResult.success(member.getLoginId() + " 님의 회원가입 요청 거절이 완료되었습니다.");
     }
 
     /*
@@ -107,9 +118,10 @@ public class ManagerService {
     /*
     전체 회원 정보 조회 (권한에 따른 필터링)
      */
-    public ApiResult<?> findAllMemberInfo(String name, MemberAuthority memberAuthority){
+    public ApiResult<?> findAllMemberInfo(){
 
-        List<Member> memberList = memberRepository.findAllByNameAndMemberAuthority(name, memberAuthority);
+        // 승인 대기 제외
+        List<Member> memberList = memberRepository.findAllByNameAndMemberAuthority(MemberAuthority.WAITING_FOR_APPROVAL);
 
         List<MemberInfoDto> memberInfoDtoList = new ArrayList<>();
         for(Member member : memberList){
@@ -127,6 +139,9 @@ public class ManagerService {
      */
     @Transactional
     public ApiResult<?> withDrawMember(Long id){
+
+        System.out.println("여기");
+        System.out.println(id);
 
         Member member = memberRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));

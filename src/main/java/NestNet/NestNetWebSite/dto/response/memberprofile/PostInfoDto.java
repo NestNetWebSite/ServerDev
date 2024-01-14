@@ -11,4 +11,6 @@ public class PostInfoDto {
     private Long id;
     private String title;
     private PostCategory postCategory;
+    private Long viewCount;
+    private int likeCount;
 }

@@ -168,12 +168,16 @@ public class AttachedFileService {
             AttachedFile attachedFile = attachedFiles.get(i);
             MultipartFile file = files.get(i);
 
+            System.out.println("여기");
+
             StringBuilder filePathBuilder = new StringBuilder(basePath)
                     .append(attachedFile.getSaveFilePath())
                     .append(File.separator)
                     .append(attachedFile.getSaveFileName());
 
             Path saveFilePath = Paths.get(filePathBuilder.toString());
+
+            System.out.println(filePathBuilder.toString());
 
             try {
                 file.transferTo(saveFilePath);

@@ -63,6 +63,16 @@ public class AttachedFile {
      */
     public void createSavePath(){
 
+        File depth1Folder = new File(basePath + this.post.getPostCategory().toString());
+
+        if(!depth1Folder.exists()){
+            try {
+                depth1Folder.mkdir();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+
         StringBuilder folderNameBuilder = new StringBuilder();
         folderNameBuilder.append(this.post.getPostCategory().toString());
         folderNameBuilder.append(File.separator);
@@ -77,11 +87,11 @@ public class AttachedFile {
 
         String path = folderNameBuilder.toString();    //파일 저장 경로 ( ex) C:/nestnetFile/EXAM/)
 
-        File folder = new File(basePath + path);               //해당 경로에 폴더 생성
+        File depth2Folder = new File(basePath + path);               //해당 경로에 폴더 생성
 
-        if(!folder.exists()){       //해당 폴더가 존재하지 않을 경우 생성
+        if(!depth2Folder.exists()){       //해당 폴더가 존재하지 않을 경우 생성
             try {
-                folder.mkdir();
+                depth2Folder.mkdir();
             }catch (Exception e){
                 e.printStackTrace();
             }

@@ -27,8 +27,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     // 모든 회원 조회
     @Query("select m from Member m where m.name <> '알수없음' and " +
-            "(:name is null or m.name =:name) and " +
-            "(:memberAuthority is null or m.memberAuthority =:memberAuthority)")
-    List<Member> findAllByNameAndMemberAuthority(@Param("name") String name, @Param("memberAuthority") MemberAuthority memberAuthority);
+            "m.loginId <> 'admin' and " +
+            "m.memberAuthority <>:memberAuthority")
+    List<Member> findAllByNameAndMemberAuthority(@Param("memberAuthority") MemberAuthority memberAuthority);
 
 }

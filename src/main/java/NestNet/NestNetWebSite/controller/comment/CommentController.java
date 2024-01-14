@@ -24,7 +24,10 @@ public class CommentController {
     public void writeComment(@PathVariable("post_id") Long postId, @RequestBody CommentRequest commentRequest,
                                   @AuthenticationPrincipal UserDetails userDetails){
 
-        commentService.saveComment(commentRequest, postId, userDetails.getUsername());
+        // 허원일용
+        commentService.saveComment(commentRequest, postId, "admin");
+
+//        commentService.saveComment(commentRequest, postId, userDetails.getUsername());
     }
 
     /*
@@ -32,8 +35,7 @@ public class CommentController {
      */
     @PostMapping("/comment/modify/{comment_id}")
     @Operation(summary = "댓글 수정", description = "로그인한 사용자가 자신이 작성한 댓글을 수정할 수 있다.")
-    public void modifyComment(@PathVariable("comment_id") Long commentId, @RequestBody CommentRequest commentRequest,
-                              @AuthenticationPrincipal UserDetails userDetails){
+    public void modifyComment(@PathVariable("comment_id") Long commentId, @RequestBody CommentRequest commentRequest){
 
         commentService.modifyComment(commentRequest, commentId);
     }
@@ -43,7 +45,7 @@ public class CommentController {
      */
     @DeleteMapping("/comment/delete/{comment_id}")
     @Operation(summary = "댓글 삭제", description = "로그인한 사용자가 자신이 작성한 댓글을 삭제할 수 있다.")
-    public void deleteComment(@PathVariable("comment_id") Long commentId, @AuthenticationPrincipal UserDetails userDetails){
+    public void deleteComment(@PathVariable("comment_id") Long commentId){
 
         commentService.deleteComment(commentId);
     }

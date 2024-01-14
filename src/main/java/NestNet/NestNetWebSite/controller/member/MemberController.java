@@ -1,6 +1,7 @@
 package NestNet.NestNetWebSite.controller.member;
 
 import NestNet.NestNetWebSite.api.ApiResult;
+import NestNet.NestNetWebSite.config.cookie.CookieManager;
 import NestNet.NestNetWebSite.dto.MemberIdDto;
 import NestNet.NestNetWebSite.dto.request.*;
 import NestNet.NestNetWebSite.dto.response.TokenDto;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +31,8 @@ public class MemberController {
     private final MemberService memberService;
     private final AuthService authService;
 
+    private final CookieManager cookieManager;
+
     /*
     회원 정보 수정
      */
@@ -36,14 +40,17 @@ public class MemberController {
     @Operation(summary = "회원 단건 정보 수정", description = "로그인한 회원이 자신의 정보를 수정한다.")
     public ApiResult<?> modifyMemberInfo(@Valid @RequestBody MemberModifyInfoRequest memberModifyInfoRequest,
                                          @AuthenticationPrincipal UserDetails userDetails,
-                                         HttpServletRequest request){
+                                         HttpServletRequest request, HttpServletResponse response){
 
         MemberIdDto dto = memberService.modifyMemberInfo(memberModifyInfoRequest, userDetails.getUsername());
 
         // 새로운 인증 정보 발급
         TokenDto tokenDto = authService.setAuthenticationSecurityContext(dto.getLoginId(), request);
 
-        return ApiResult.success(tokenDto);
+        cookieManager.setCookie("Authorization", tokenDto.getAccessToken(), response);
+        cookieManager.setCookie("refresh-token", tokenDto.getRefreshToken(), response);
+
+        return ApiResult.success("회원 정보가 수정되었습니다.");
     }
 
     /*

@@ -61,7 +61,7 @@ public class MemberProfileService {
 
         List<PostInfoDto> dtoList = new ArrayList<>();
         for(Post post : postList){
-            dtoList.add(new PostInfoDto(post.getId(), post.getTitle(), post.getPostCategory()));
+            dtoList.add(new PostInfoDto(post.getId(), post.getTitle(), post.getPostCategory(), post.getViewCount(), post.getLikeCount()));
         }
 
         PostInfoResponse postInfoResponse = new PostInfoResponse(dtoList);

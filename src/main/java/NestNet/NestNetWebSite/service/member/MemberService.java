@@ -23,6 +23,7 @@ import java.util.*;
 @Slf4j
 public class MemberService {
 
+    private final AuthService authService;
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 

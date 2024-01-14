@@ -10,26 +10,19 @@ import NestNet.NestNetWebSite.domain.member.MemberAuthority;
 import NestNet.NestNetWebSite.dto.request.LoginRequest;
 import NestNet.NestNetWebSite.dto.request.SignUpRequest;
 import NestNet.NestNetWebSite.dto.response.TokenDto;
-import NestNet.NestNetWebSite.dto.response.TokenResponse;
 import NestNet.NestNetWebSite.exception.CustomException;
 import NestNet.NestNetWebSite.exception.ErrorCode;
 import NestNet.NestNetWebSite.repository.manager.MemberSignUpManagementRepository;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -93,9 +86,9 @@ public class AuthService {
     로그인
      */
     @Transactional
-    public TokenResponse login(LoginRequest loginRequest){
+    public TokenDto login(LoginRequest loginRequest){
 
-        TokenResponse tokenResponse;
+        TokenDto tokenDto;
 
         try{
             Authentication authentication = authenticator.createAuthenticationByIdPassword(loginRequest.getLoginId(), loginRequest.getPassword());
@@ -106,13 +99,13 @@ public class AuthService {
             //레디스에 리프레시 토큰 저장
             redisUtil.setData(refreshToken, "refresh-token", refreshTokenExpTime);
 
-            tokenResponse = new TokenResponse(accessToken, refreshToken);
+            tokenDto = new TokenDto(accessToken, refreshToken);
 
         } catch (Exception e){
             throw new CustomException(ErrorCode.ID_PASSWORD_NOT_MATCH);
         }
 
-        return tokenResponse;
+        return tokenDto;
     }
 
     /*

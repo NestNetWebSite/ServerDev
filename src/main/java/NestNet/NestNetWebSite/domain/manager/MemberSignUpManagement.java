@@ -26,9 +26,6 @@ public class MemberSignUpManagement {
     @Enumerated(EnumType.STRING)
     private MemberAuthority requestMemberAuthority;             // 회원이 신청한 권한
 
-    @ColumnDefault("false")
-    private boolean isComplete;                                 // 회원가입 승인 여부
-
     /*
     생성자
      */
@@ -37,7 +34,4 @@ public class MemberSignUpManagement {
         this.requestMemberAuthority = requestMemberAuthority;
     }
 
-    public void setComplete(boolean complete) {
-        isComplete = complete;
-    }
 }

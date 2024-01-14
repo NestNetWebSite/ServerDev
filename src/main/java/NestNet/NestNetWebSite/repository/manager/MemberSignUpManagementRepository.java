@@ -18,7 +18,7 @@ public interface MemberSignUpManagementRepository extends JpaRepository<MemberSi
     List<MemberSignUpManagement> findAll();
 
     // 미승인된 회원가입 요청 Member로 조회
-    @Query("select m from MemberSignUpManagement m where m.member =:member and m.isComplete = false")
+    @Query("select m from MemberSignUpManagement m where m.member =:member")
     Optional<MemberSignUpManagement> findByMember(@Param("member") Member member);
 
 }

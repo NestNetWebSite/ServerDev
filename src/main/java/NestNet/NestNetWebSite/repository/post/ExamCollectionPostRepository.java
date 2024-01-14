@@ -18,7 +18,7 @@ public interface ExamCollectionPostRepository extends JpaRepository<ExamCollecti
 
     // 족보 게시물 조건에 따른 리스트 조회 (페이징)
     @Query("select p from ExamCollectionPost p where" +
-            "(:subject is null or p.subject =: subject )" + " and " +
+            "(:subject is null or p.subject like %:subject% )" + " and " +
             "(:professor is null or p.professor =: professor )" + " and " +
             "(:year is null or p.year =: year )" + " and " +
             "(:semester is null or p.semester =: semester )" + " and " +

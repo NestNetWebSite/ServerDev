@@ -41,8 +41,8 @@ public class WebConfig implements WebMvcConfigurer {
 
         configuration.setAllowCredentials(true);         //자격 증명 허용 여부 설정. Authorization을 이용해 인증 서비스를 할 때 true로 세팅
 //        configuration.addAllowedOrigin("http://**");
-        configuration.addAllowedOriginPattern("http://172.30.6.185:3000");      //모든 ip에 대해 응답을 허용
-        configuration.addAllowedOriginPattern("http://172.20.10.4:3000");      //모든 ip에 대해 응답을 허용
+        configuration.addAllowedOriginPattern("http://172.30.1.69:3000");      //모든 ip에 대해 응답을 허용
+        configuration.addAllowedOriginPattern("http://172.30.1.34:3000");      //모든 ip에 대해 응답을 허용
         configuration.addAllowedOriginPattern("http://192.168.219.143:3000");      //모든 ip에 대해 응답을 허용
         configuration.addAllowedHeader("*");             //모든 header에 대해 응답을 허용
         configuration.addAllowedMethod("*");             //모든 매서드(get, post, put, delete..)에 대해 응답을 허용

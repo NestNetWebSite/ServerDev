@@ -177,17 +177,25 @@ public class TokenProvider implements InitializingBean {
      */
     public String resolveToken(HttpServletRequest request){
 
-        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
+        Cookie[] cookies = request.getCookies();
+
+        String accessToken = null;
+
+        if (cookies != null && cookies.length > 0){
+            for(Cookie cookie : cookies){
+                if(cookie.getName().equals("Authorization")){
+                    accessToken = cookie.getValue();
+                    break;
+                }
+            }
+        }
 
         //"Bearer " 부분 슬라이싱. 바로 뒤부터 토큰임
-        if(bearerToken != null && bearerToken.startsWith("Bearer ")){
-            return bearerToken.substring(7);
-        }
-        if(bearerToken != null){
-            return  bearerToken;
+        if(accessToken != null && accessToken.startsWith("Bearer ")){
+            accessToken = accessToken.substring(7);
         }
 
-        return null;
+        return accessToken;
     }
 
     /*

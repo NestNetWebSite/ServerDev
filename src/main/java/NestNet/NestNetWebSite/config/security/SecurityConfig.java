@@ -85,6 +85,8 @@ public class SecurityConfig {
                 .requestMatchers("/member/find-id", "/member/get-temp-pw")
                 .requestMatchers("/attendance/weekly", "/attendance/monthly")
                 .requestMatchers("/photo-post/**")
+                .requestMatchers("/comment/**")
+                .requestMatchers("/manager/**")
                 .requestMatchers("/forbidden", "unauthorized")
                 .requestMatchers("/image/**");
     }
@@ -132,6 +134,8 @@ public class SecurityConfig {
                         // 멤버 프로필
                         .requestMatchers("/member-profile/member-info/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER", "WITHDRAWN_MEMBER")
                         .requestMatchers("/member/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER", "WITHDRAWN_MEMBER")
+                        // 자기소개 게시판
+                        .requestMatchers("/introduction-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER", "WITHDRAWN_MEMBER")
                         .anyRequest().authenticated()       //나머지 요청은 모두 권한 필요함.
 
                 )

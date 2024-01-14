@@ -1,22 +1,21 @@
 package NestNet.NestNetWebSite.controller.auth;
 
 import NestNet.NestNetWebSite.api.ApiResult;
-import NestNet.NestNetWebSite.config.auth.CustomAuthorizationFilter;
+import NestNet.NestNetWebSite.config.cookie.CookieManager;
 import NestNet.NestNetWebSite.dto.request.EmailAuthAnswerRequest;
 import NestNet.NestNetWebSite.dto.request.EmailAuthRequest;
 import NestNet.NestNetWebSite.dto.request.LoginRequest;
 import NestNet.NestNetWebSite.dto.request.SignUpRequest;
-import NestNet.NestNetWebSite.dto.response.TokenResponse;
+import NestNet.NestNetWebSite.dto.response.TokenDto;
 import NestNet.NestNetWebSite.service.auth.AuthService;
 import NestNet.NestNetWebSite.service.mail.MailService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -28,8 +27,7 @@ public class AuthController {
     private final AuthService authService;
     private final MailService mailService;
 
-    @Value("#{environment['jwt.refresh-exp-time']}")
-    private long refreshTokenExpTime;                           // refresh 토큰 유효 기간
+    private final CookieManager cookieManager;
 
     /*
     회원 가입 시 인증 이메일 전송 Post 요청
@@ -67,17 +65,14 @@ public class AuthController {
     @PostMapping("/auth/login")
     @Operation(summary = "로그인", description = "Http 응답 헤더에 " +
             "(Authorization : 엑세스 토큰 / refresh-token : 리프레시 토큰 / refresh-token-exp-time : 리프레시 토큰 만료시간) 삽입")
-    public ApiResult<?> login(@Valid @RequestBody LoginRequest loginRequest){
+    public ApiResult<?> login(@Valid @RequestBody LoginRequest loginRequest, HttpServletResponse response){
 
-        TokenResponse tokenResponse = authService.login(loginRequest);
+        TokenDto tokenDto = authService.login(loginRequest);
 
-        HttpHeaders httpHeaders = new HttpHeaders();
+        cookieManager.setCookie("Authorization", tokenDto.getAccessToken(), response);
+        cookieManager.setCookie("refresh-token", tokenDto.getRefreshToken(), response);
 
-        httpHeaders.set(CustomAuthorizationFilter.AUTHORIZATION_HEADER, "Bearer " + tokenResponse.getAccessToken());
-        httpHeaders.set("refresh-token", tokenResponse.getRefreshToken());
-        httpHeaders.set("refresh-token-exp-time", Integer.toString((int)refreshTokenExpTime / 1000));
-
-        return ApiResult.success(httpHeaders);
+        return ApiResult.success("로그인 되었습니다.");
     }
 
     /*
