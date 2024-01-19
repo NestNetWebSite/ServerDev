@@ -45,6 +45,11 @@ public class Comment {
         this.createdTime = LocalDateTime.now();
     }
 
+    //== setter ==//
+    public void injectPost(Post post){
+        this.post = post;
+    }
+
     //== 비지니스 로직 ==//
     /*
     댓글 수정

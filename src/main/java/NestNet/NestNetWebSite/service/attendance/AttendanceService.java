@@ -11,7 +11,6 @@ import NestNet.NestNetWebSite.repository.attendance.AttendanceRepository;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

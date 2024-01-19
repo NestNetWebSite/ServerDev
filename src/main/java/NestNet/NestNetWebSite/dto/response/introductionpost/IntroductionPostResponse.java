@@ -1,6 +1,5 @@
-package NestNet.NestNetWebSite.dto.response.photopost;
+package NestNet.NestNetWebSite.dto.response.introductionpost;
 
-import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.dto.response.AttachedFileDto;
 import NestNet.NestNetWebSite.dto.response.CommentDto;
 import lombok.AllArgsConstructor;
@@ -10,10 +9,11 @@ import java.util.List;
 
 @Getter
 @AllArgsConstructor
-public class PhotoPostResponse {
+public class IntroductionPostResponse {
 
-    private PhotoPostDto photoPostDto;
+    private IntroductionPostDto introductionPostDto;
     private List<AttachedFileDto> fileDtoList;
     private List<CommentDto> commentDtoList;
     private boolean isMemberLiked;
+
 }

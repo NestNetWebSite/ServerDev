@@ -8,6 +8,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class TokenDto {
 
-    String accessToken;
-    String refreshToken;
+    private String accessToken;
+    private String refreshToken;
 }

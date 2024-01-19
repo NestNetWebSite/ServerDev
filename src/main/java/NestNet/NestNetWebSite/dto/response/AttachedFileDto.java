@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 @Builder
-public class AttachedFileResponse {
+public class AttachedFileDto {
 
     private Long id;
     private String originalFileName;

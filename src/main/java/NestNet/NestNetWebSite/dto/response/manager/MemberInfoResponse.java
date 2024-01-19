@@ -14,5 +14,5 @@ import java.util.List;
 @AllArgsConstructor
 public class MemberInfoResponse {
 
-    List<MemberInfoDto> dtoList = new ArrayList<>();
+    private List<MemberInfoDto> dtoList = new ArrayList<>();
 }

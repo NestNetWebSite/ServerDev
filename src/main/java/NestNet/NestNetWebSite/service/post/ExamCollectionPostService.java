@@ -2,40 +2,36 @@ package NestNet.NestNetWebSite.service.post;
 
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
+import NestNet.NestNetWebSite.domain.comment.Comment;
 import NestNet.NestNetWebSite.domain.member.Member;
-import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.domain.post.exam.ExamCollectionPost;
 import NestNet.NestNetWebSite.domain.post.exam.ExamType;
 import NestNet.NestNetWebSite.dto.request.ExamCollectionPostModifyRequest;
 import NestNet.NestNetWebSite.dto.request.ExamCollectionPostRequest;
-import NestNet.NestNetWebSite.dto.response.AttachedFileResponse;
-import NestNet.NestNetWebSite.dto.response.CommentResponse;
+import NestNet.NestNetWebSite.dto.response.AttachedFileDto;
+import NestNet.NestNetWebSite.dto.response.CommentDto;
 import NestNet.NestNetWebSite.dto.response.examcollectionpost.ExamCollectionPostDto;
 import NestNet.NestNetWebSite.dto.response.examcollectionpost.ExamCollectionPostListDto;
 import NestNet.NestNetWebSite.dto.response.examcollectionpost.ExamCollectionPostResponse;
 import NestNet.NestNetWebSite.dto.response.examcollectionpost.ExamCollectionPostListResponse;
 import NestNet.NestNetWebSite.exception.CustomException;
 import NestNet.NestNetWebSite.exception.ErrorCode;
-import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import NestNet.NestNetWebSite.repository.post.ExamCollectionPostRepository;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import NestNet.NestNetWebSite.service.attachedfile.AttachedFileService;
 import NestNet.NestNetWebSite.service.comment.CommentService;
 import NestNet.NestNetWebSite.service.like.PostLikeService;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @Transactional(readOnly = true)
@@ -63,8 +59,13 @@ public class ExamCollectionPostService {
 
         examCollectionPostRepository.save(post);
 
-        if(files != null){
-            attachedFileService.save(post, files);
+        if(!ObjectUtils.isEmpty(files)){
+            List<AttachedFile> savedFileList = attachedFileService.save(post, files);
+
+            // 양방향 연관관계 주입
+            for(AttachedFile attachedFile : savedFileList){
+                post.addAttachedFile(attachedFile);
+            }
         }
 
         return ApiResult.success("게시물 저장 성공");
@@ -106,17 +107,37 @@ public class ExamCollectionPostService {
     @Transactional
     public ExamCollectionPostResponse findPostById(Long id, String memberLoginId){
 
+        Member loginMember = memberRepository.findByLoginId(memberLoginId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
+
         ExamCollectionPost post = examCollectionPostRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
+        List<AttachedFile> attachedFileList = post.getAttachedFileList();
+
+        List<Comment> commentList = post.getCommentList();
+
+        List<AttachedFileDto> fileDtoList = new ArrayList<>();
+        List<CommentDto> commentDtoList = new ArrayList<>();
         ExamCollectionPostDto postDto = null;
-        List<AttachedFileResponse> fileDtoList = attachedFileService.findAllFilesByPost(post);
-        List<CommentResponse> commentResponseList = commentService.findCommentByPost(post, memberLoginId);
-        boolean isMemberLiked = postLikeService.isMemberLikedByPost(post, memberLoginId);
 
-        postService.addViewCount(post, memberLoginId);
+        for(AttachedFile attachedFile : attachedFileList){
+            fileDtoList.add(new AttachedFileDto(attachedFile.getId(), attachedFile.getOriginalFileName(),
+                    attachedFile.getSaveFilePath(), attachedFile.getSaveFileName()));
+        }
 
-        if(memberLoginId.equals(post.getMember().getLoginId())){
+        for(Comment comment : commentList){
+            if(loginMember.getId() == comment.getMember().getId()){
+                commentDtoList.add(new CommentDto(comment.getId(), comment.getMember().getName(), comment.getContent(),
+                        comment.getCreatedTime(), comment.getModifiedTime(), true));
+            }
+            else{
+                commentDtoList.add(new CommentDto(comment.getId(), comment.getMember().getName(), comment.getContent(),
+                        comment.getCreatedTime(), comment.getModifiedTime(), false));
+            }
+        }
+
+        if(loginMember.getId() == post.getMember().getId()){
             postDto = ExamCollectionPostDto.builder()
                     .id(post.getId())
                     .title(post.getTitle())
@@ -153,7 +174,11 @@ public class ExamCollectionPostService {
                     .build();
         }
 
-        return new ExamCollectionPostResponse(postDto, fileDtoList, commentResponseList, isMemberLiked);
+        boolean isMemberLiked = postLikeService.isMemberLikedByPost(post, loginMember);
+
+        postService.addViewCount(post, loginMember.getId());
+
+        return new ExamCollectionPostResponse(postDto, fileDtoList, commentDtoList, isMemberLiked);
     }
 
     /*

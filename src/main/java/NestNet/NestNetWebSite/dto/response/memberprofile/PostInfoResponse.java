@@ -11,6 +11,6 @@ import java.util.List;
 @AllArgsConstructor
 public class PostInfoResponse {
 
-    List<PostInfoDto> dtoList = new ArrayList<>();
+    private List<PostInfoDto> dtoList = new ArrayList<>();
 
 }

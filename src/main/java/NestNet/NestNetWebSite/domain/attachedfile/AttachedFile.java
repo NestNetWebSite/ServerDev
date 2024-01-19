@@ -43,7 +43,7 @@ public class AttachedFile {
     }
 
     //== setter ==//
-    public void setPost(Post post) {
+    public void injectPost(Post post) {
         this.post = post;
     }
 

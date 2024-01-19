@@ -15,6 +15,6 @@ import java.util.List;
 @AllArgsConstructor
 public class ExamCollectionPostListResponse {
 
-    Long totalSize;
-    List<ExamCollectionPostListDto> dtoList = new ArrayList<>();
+    private Long totalSize;
+    private List<ExamCollectionPostListDto> dtoList = new ArrayList<>();
 }

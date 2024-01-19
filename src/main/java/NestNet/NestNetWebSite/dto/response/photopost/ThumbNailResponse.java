@@ -12,5 +12,5 @@ import java.util.List;
 @Builder
 public class ThumbNailResponse {
 
-    List<ThumbNailDto> dtoList = new ArrayList<>();
+    private List<ThumbNailDto> dtoList = new ArrayList<>();
 }

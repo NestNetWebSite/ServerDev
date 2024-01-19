@@ -1,18 +1,17 @@
 package NestNet.NestNetWebSite.service.attachedfile;
 
-import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.post.Post;
-import NestNet.NestNetWebSite.dto.response.AttachedFileResponse;
 import NestNet.NestNetWebSite.exception.CustomException;
 import NestNet.NestNetWebSite.exception.ErrorCode;
 import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import NestNet.NestNetWebSite.repository.post.PostRepository;
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,7 +24,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -42,35 +40,35 @@ public class AttachedFileService {
     첨부파일 저장
      */
     @Transactional
-    public void save(Post post, List<MultipartFile> files){
+    public List<AttachedFile> save(Post post, List<MultipartFile> files){
 
-        if(!files.isEmpty()){
+        List<AttachedFile> attachedFileList = new ArrayList<>();
 
-            List<AttachedFile> attachedFileList = new ArrayList<>();
-
-            for(MultipartFile file : files){
-                AttachedFile attachedFile = new AttachedFile(post, file);
-                attachedFileList.add(attachedFile);
-            }
-            attachedFileRepository.saveAll(attachedFileList);
-            saveRealFile(attachedFileList, files);
+        for(MultipartFile file : files){
+            AttachedFile attachedFile = new AttachedFile(post, file);
+            attachedFileList.add(attachedFile);
         }
+
+        attachedFileRepository.saveAll(attachedFileList);
+        saveRealFile(attachedFileList, files);
+
+        return attachedFileList;
     }
 
     /*
-    게시물에 해당된 첨부파일 모두 조회
+    게시물에 해당된 첨부파일 중 썸네일만 조회
      */
-    public List<AttachedFileResponse> findAllFilesByPost(Post post){
+    public AttachedFile findThumbNailFileByPost(Post post){
 
-        List<AttachedFile> files = attachedFileRepository.findAllByPost(post);
+        PageRequest pageRequest = PageRequest.of(0, 1, Sort.by(Sort.Direction.ASC, "id"));
 
-        List<AttachedFileResponse> fileResponseList = new ArrayList<>();
+        Page<AttachedFile> filePage = attachedFileRepository.findThumbNailByPost(post, pageRequest);
 
-        for(AttachedFile file : files){
-            fileResponseList.add(new AttachedFileResponse(file.getId(), file.getOriginalFileName(), file.getSaveFilePath(), file.getSaveFileName()));
-        }
+        List<AttachedFile> attachedFileList = filePage.getContent();
 
-        return fileResponseList;
+        if(attachedFileList.isEmpty()) throw new CustomException(ErrorCode.THUMBNAIL_FILE_NOT_FOUND);
+
+        return attachedFileList.get(0);
     }
 
     /*
@@ -117,7 +115,7 @@ public class AttachedFileService {
             if(existFileIdList == null) break;
 
             for(Long existFileId : existFileIdList){
-                if(existFileId.equals(deleteFileList.get(i).getId())){
+                if(existFileId == deleteFileList.get(i).getId()){
                     deleteFileList.remove(deleteFileList.get(i));
                 }
             }

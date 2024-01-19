@@ -1,7 +1,7 @@
 package NestNet.NestNetWebSite.dto.response.unifiedpost;
 
-import NestNet.NestNetWebSite.dto.response.AttachedFileResponse;
-import NestNet.NestNetWebSite.dto.response.CommentResponse;
+import NestNet.NestNetWebSite.dto.response.AttachedFileDto;
+import NestNet.NestNetWebSite.dto.response.CommentDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -12,7 +12,7 @@ import java.util.List;
 public class UnifiedPostResponse {
 
     UnifiedPostDto unifiedPostDto;
-    List<AttachedFileResponse> fileDtoList;
-    List<CommentResponse> commentResponseList;
+    List<AttachedFileDto> fileDtoList;
+    List<CommentDto> commentDtoList;
     boolean isMemberLiked;
 }

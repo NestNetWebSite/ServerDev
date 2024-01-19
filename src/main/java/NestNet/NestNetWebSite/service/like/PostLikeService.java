@@ -59,10 +59,7 @@ public class PostLikeService {
     /*
     로그인한 회원의 좋아요 여부 조회
      */
-    public boolean isMemberLikedByPost(Post post, String memberLoginId){
-
-        Member member = memberRepository.findByLoginId(memberLoginId)
-                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
+    public boolean isMemberLikedByPost(Post post, Member member){
 
         Optional<PostLike> like = postLikeRepository.findByMemberAndPost(member, post);
 

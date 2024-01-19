@@ -4,6 +4,7 @@ import NestNet.NestNetWebSite.domain.post.photo.PhotoPost;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 
@@ -13,6 +14,7 @@ public interface PhotoPostRepository extends JpaRepository<PhotoPost, Long> {
     Optional<PhotoPost> findById(Long id);
 
     // 사진 게시판 리스트 조회(페이징)
-    Page<PhotoPost> findAll(Pageable pageable);
+    @Query("select pp from PhotoPost pp")
+    Page<PhotoPost> findAllThumbNail(Pageable pageable);
 
 }

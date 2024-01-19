@@ -2,7 +2,7 @@ package NestNet.NestNetWebSite.controller.member;
 
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.config.cookie.CookieManager;
-import NestNet.NestNetWebSite.dto.MemberIdDto;
+import NestNet.NestNetWebSite.dto.response.MemberIdDto;
 import NestNet.NestNetWebSite.dto.request.*;
 import NestNet.NestNetWebSite.dto.response.TokenDto;
 import NestNet.NestNetWebSite.dto.response.member.TemporaryInfoDto;

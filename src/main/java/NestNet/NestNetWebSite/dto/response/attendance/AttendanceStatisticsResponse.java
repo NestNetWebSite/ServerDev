@@ -10,5 +10,5 @@ import java.util.List;
 @AllArgsConstructor
 public class AttendanceStatisticsResponse {
 
-    List<AttendanceStatisticsDto> dtoList = new ArrayList<>();
+    private List<AttendanceStatisticsDto> dtoList = new ArrayList<>();
 }

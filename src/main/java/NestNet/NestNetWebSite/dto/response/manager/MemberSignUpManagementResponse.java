@@ -13,5 +13,5 @@ import java.util.List;
 @Builder
 public class MemberSignUpManagementResponse {
 
-    List<MemberSignUpManagementDto> dtoList = new ArrayList<>();
+    private List<MemberSignUpManagementDto> dtoList = new ArrayList<>();
 }

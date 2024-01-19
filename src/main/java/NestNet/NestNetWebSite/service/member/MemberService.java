@@ -2,7 +2,7 @@ package NestNet.NestNetWebSite.service.member;
 
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.member.Member;
-import NestNet.NestNetWebSite.dto.MemberIdDto;
+import NestNet.NestNetWebSite.dto.response.MemberIdDto;
 import NestNet.NestNetWebSite.dto.request.MemberModifyInfoRequest;
 import NestNet.NestNetWebSite.dto.response.member.TemporaryInfoDto;
 import NestNet.NestNetWebSite.exception.CustomException;

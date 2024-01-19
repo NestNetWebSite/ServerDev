@@ -4,19 +4,14 @@ import NestNet.NestNetWebSite.domain.comment.Comment;
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.dto.request.CommentRequest;
-import NestNet.NestNetWebSite.dto.response.CommentResponse;
 import NestNet.NestNetWebSite.exception.CustomException;
 import NestNet.NestNetWebSite.exception.ErrorCode;
 import NestNet.NestNetWebSite.repository.comment.CommentRepository;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import NestNet.NestNetWebSite.repository.post.PostRepository;
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -41,6 +36,9 @@ public class CommentService {
 
         Comment comment = commentRequest.toEntity(post, member);
 
+        // 양방향 연관관계 주입
+        post.addComment(comment);
+
         commentRepository.save(comment);
     }
 
@@ -59,38 +57,38 @@ public class CommentService {
     /*
     게시물에 따른 댓글 모두 조회
      */
-    public List<CommentResponse> findCommentByPost(Post post, String memberLoginId){
-
-        List<Comment> commentList = commentRepository.findAllByPost(post);
-
-        List<CommentResponse> resultList = new ArrayList<>();
-        for(Comment comment : commentList){
-            if((comment.getMember().getLoginId()).equals(memberLoginId)){       //현재 로그인한 멤버가 작성한 댓글이면
-                resultList.add(
-                        CommentResponse.builder()
-                                .id(comment.getId())
-                                .username(comment.getMember().getName())
-                                .content(comment.getContent())
-                                .createdTime(comment.getCreatedTime())
-                                .modifiedTime(comment.getModifiedTime())
-                                .isMemberWritten(true)
-                                .build());
-            }
-            else{
-                resultList.add(
-                        CommentResponse.builder()
-                                .id(comment.getId())
-                                .username(comment.getMember().getName())
-                                .content(comment.getContent())
-                                .createdTime(comment.getCreatedTime())
-                                .modifiedTime(comment.getModifiedTime())
-                                .isMemberWritten(false)
-                                .build());
-            }
-        }
-
-        return resultList;
-    }
+//    public List<CommentResponse> findCommentByPost(Post post, String memberLoginId){
+//
+//        List<Comment> commentList = commentRepository.findAllByPost(post);
+//
+//        List<CommentResponse> resultList = new ArrayList<>();
+//        for(Comment comment : commentList){
+//            if((comment.getMember().getLoginId()).equals(memberLoginId)){       //현재 로그인한 멤버가 작성한 댓글이면
+//                resultList.add(
+//                        CommentResponse.builder()
+//                                .id(comment.getId())
+//                                .username(comment.getMember().getName())
+//                                .content(comment.getContent())
+//                                .createdTime(comment.getCreatedTime())
+//                                .modifiedTime(comment.getModifiedTime())
+//                                .isMemberWritten(true)
+//                                .build());
+//            }
+//            else{
+//                resultList.add(
+//                        CommentResponse.builder()
+//                                .id(comment.getId())
+//                                .username(comment.getMember().getName())
+//                                .content(comment.getContent())
+//                                .createdTime(comment.getCreatedTime())
+//                                .modifiedTime(comment.getModifiedTime())
+//                                .isMemberWritten(false)
+//                                .build());
+//            }
+//        }
+//
+//        return resultList;
+//    }
 
     /*
     댓글 단건 삭제

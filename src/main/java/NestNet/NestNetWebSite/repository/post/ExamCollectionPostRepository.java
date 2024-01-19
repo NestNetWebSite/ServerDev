@@ -22,8 +22,7 @@ public interface ExamCollectionPostRepository extends JpaRepository<ExamCollecti
             "(:professor is null or p.professor =: professor )" + " and " +
             "(:year is null or p.year =: year )" + " and " +
             "(:semester is null or p.semester =: semester )" + " and " +
-            "(:examType is null or p.examType =: examType )" +
-            "order by p.id desc")
+            "(:examType is null or p.examType =: examType )")
     Page<ExamCollectionPost> findAllByFilter(@Param("subject") String subject, @Param("professor") String professor,
                                              @Param("year") Integer year, @Param("semester") Integer semester, @Param("examType") ExamType examType,
                                              Pageable pageable);
