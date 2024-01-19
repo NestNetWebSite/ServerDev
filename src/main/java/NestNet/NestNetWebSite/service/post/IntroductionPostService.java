@@ -4,7 +4,10 @@ import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.comment.Comment;
 import NestNet.NestNetWebSite.domain.member.Member;
+import NestNet.NestNetWebSite.domain.post.exam.ExamCollectionPost;
 import NestNet.NestNetWebSite.domain.post.introduction.IntroductionPost;
+import NestNet.NestNetWebSite.dto.request.ExamCollectionPostModifyRequest;
+import NestNet.NestNetWebSite.dto.request.IntroductionPostModifyRequest;
 import NestNet.NestNetWebSite.dto.request.IntroductionPostRequest;
 import NestNet.NestNetWebSite.dto.response.AttachedFileDto;
 import NestNet.NestNetWebSite.dto.response.CommentDto;
@@ -96,7 +99,7 @@ public class IntroductionPostService {
     자기 소개 게시판 게시물 단건 조회
      */
     @Transactional
-    public IntroductionPostResponse findPostById(Long id, String memberLoginId){
+    public ApiResult<?> findPostById(Long id, String memberLoginId){
 
         Member loginMember = memberRepository.findByLoginId(memberLoginId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
@@ -131,6 +134,7 @@ public class IntroductionPostService {
         if(loginMember.getId() == post.getMember().getId()){
             postDto = IntroductionPostDto.builder()
                     .id(post.getId())
+                    .title(post.getTitle())
                     .bodyContent(post.getBodyContent())
                     .viewCount(post.getViewCount())
                     .likeCount(post.getLikeCount())
@@ -143,6 +147,7 @@ public class IntroductionPostService {
         else{
             postDto = IntroductionPostDto.builder()
                     .id(post.getId())
+                    .title(post.getTitle())
                     .bodyContent(post.getBodyContent())
                     .viewCount(post.getViewCount())
                     .likeCount(post.getLikeCount())
@@ -157,7 +162,22 @@ public class IntroductionPostService {
 
         postService.addViewCount(post, loginMember.getId());
 
-        return new IntroductionPostResponse(postDto, fileDtoList, commentDtoList, isMemberLiked);
+        return ApiResult.success(new IntroductionPostResponse(postDto, fileDtoList, commentDtoList, isMemberLiked));
+    }
+
+    /*
+    자기소개 게시물 수정
+     */
+    @Transactional
+    public void modifyPost(IntroductionPostModifyRequest modifyRequest, List<Long> fileIdList, List<MultipartFile> files){
+
+        IntroductionPost post = introductionPostRepository.findById(modifyRequest.getId())
+                        .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+
+        attachedFileService.modifyFiles(post, fileIdList, files);
+
+        // 변경 감지 -> 자동 update
+        post.modifyPost(modifyRequest.getTitle(), modifyRequest.getBodyContent());
     }
 
 }
