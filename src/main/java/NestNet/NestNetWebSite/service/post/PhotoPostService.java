@@ -2,6 +2,7 @@ package NestNet.NestNetWebSite.service.post;
 
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.member.Member;
+import NestNet.NestNetWebSite.domain.photofile.PhotoFile;
 import NestNet.NestNetWebSite.domain.post.photo.PhotoPost;
 import NestNet.NestNetWebSite.dto.request.PhotoPostModifyRequest;
 import NestNet.NestNetWebSite.dto.request.PhotoPostRequest;
@@ -54,9 +55,13 @@ public class PhotoPostService {
 
         photoPostRepository.save(post);
 
+        List<PhotoFile> photoFiles = new ArrayList<>();
         if(files != null){
-            photoFileService.save(post, files);
+
+            photoFiles = photoFileService.save(post, files);
         }
+
+        post.setPhotoFileList(photoFiles);              //양방향 연관관계 주입
 
         return ApiResult.success("게시물 저장 성공");
     }
@@ -72,15 +77,17 @@ public class PhotoPostService {
 
         List<PhotoPost> photoPostList = photoPostPage.getContent();
 
-        List<PhotoFileDto> photoFileDtoList = photoFileService.findThumbNail(page, size);
-
         List<ThumbNailDto> thumbNailDtoList = new ArrayList<>();
-        for(int i = 0; i < photoPostList.size(); i++){
-            PhotoPost post = photoPostList.get(i);
-            PhotoFileDto photoFileDto = photoFileDtoList.get(i);
+        for(PhotoPost post : photoPostList){
+
+            PhotoFile photoFile = null;
+            for(PhotoFile file : post.getPhotoFileList()){
+                if(file.isThumbNail()) photoFile = file;
+            }
+
             thumbNailDtoList.add(
                     new ThumbNailDto(post.getId(), post.getTitle(), post.getViewCount(),
-                            post.getLikeCount(), photoFileDto.getSaveFilePath(), photoFileDto.getSaveFileName())
+                            post.getLikeCount(), photoFile.getSaveFilePath(), photoFile.getSaveFileName())
             );
         }
 

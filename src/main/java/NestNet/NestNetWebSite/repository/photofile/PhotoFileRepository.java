@@ -19,6 +19,10 @@ public interface PhotoFileRepository extends JpaRepository<PhotoFile, Long> {
     // 게시물에 해당하는 파일 모두 조회
     List<PhotoFile> findAllByPost(Post post);
 
+    // 게시물에 해당하는 썸네일 파일 단건 조회
+    @Query("select f from PhotoFile f where f.post =:post and f.thumbNail = true")
+    Optional<PhotoFile> findByPostAndThumbNail(@Param("post") Post post);
+
     // 게시물 + 파일명으로 파일 단건 조회
     @Query("select f from PhotoFile f where f.post =:post and f.saveFileName =:saveFileName")
     Optional<PhotoFile> findByPostAndSaveFileName(@Param("post") Post post, @Param("saveFileName") String saveFileName);

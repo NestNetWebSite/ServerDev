@@ -47,6 +47,13 @@ public class PhotoFile {
         this.thumbNail = thumbNail;
     }
 
+    /*
+    양방향 연관관계를 위한 setter
+     */
+    public void setPost(Post post){
+        this.post = post;
+    }
+
     //== 비지니스 로직 ==//
 
     /*

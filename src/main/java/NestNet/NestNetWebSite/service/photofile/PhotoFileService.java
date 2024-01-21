@@ -38,11 +38,11 @@ public class PhotoFileService {
     사진 파일 저장
      */
     @Transactional
-    public void save(Post post, List<MultipartFile> files){
+    public List<PhotoFile> save(Post post, List<MultipartFile> files){
+
+        List<PhotoFile> photoFileList = new ArrayList<>();
 
         if(!files.isEmpty()){
-
-            List<PhotoFile> photoFileList = new ArrayList<>();
 
             int idx = 0;
             for(MultipartFile file : files){
@@ -56,6 +56,8 @@ public class PhotoFileService {
             photoFileRepository.saveAll(photoFileList);
             saveRealFile(photoFileList, files);
         }
+
+        return photoFileList;
     }
 
     /*
@@ -141,12 +143,16 @@ public class PhotoFileService {
             for(Long existFileId : existFileIdList){
                 if(existFileId == deleteFileList.get(i).getId()){
 
+                    System.out.println();
+
                     if(deleteFileList.get(i).isThumbNail()) thumbNailExist = true;
 
                     deleteFileList.remove(deleteFileList.get(i));
                 }
             }
         }
+
+        System.out.println(deleteFileList.size());
 
         // Delete From DB
         photoFileRepository.deleteAll(deleteFileList);

@@ -32,8 +32,9 @@ public class PhotoPostController {
      */
     @PostMapping("/photo-post/post")
     @Operation(summary = "사진 게시판 게시물 저장", description = "")
-    public ApiResult<?> savePost(@RequestPart("data") @Valid PhotoPostRequest photoPostRequest, @RequestPart("file") List<MultipartFile> files,
-                         @AuthenticationPrincipal UserDetails userDetails){
+    public ApiResult<?> savePost(@RequestPart("data") @Valid PhotoPostRequest photoPostRequest,
+                                 @RequestPart(value = "file", required = false) List<MultipartFile> files,
+                                 @AuthenticationPrincipal UserDetails userDetails){
 
         // 허원일 테스트용
         return photoPostService.savePost(photoPostRequest, files, "admin");
