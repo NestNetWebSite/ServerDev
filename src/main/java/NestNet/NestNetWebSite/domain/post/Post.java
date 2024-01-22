@@ -62,7 +62,7 @@ public abstract class Post {
         this.member = member;
         this.viewCount = viewCount;
         this.likeCount = likeCount;
-        PostCategory = postCategory;
+        this.PostCategory = postCategory;
         this.createdTime = createdTime;
     }
 

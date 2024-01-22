@@ -4,22 +4,25 @@ import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.comment.Comment;
 import NestNet.NestNetWebSite.domain.member.Member;
-import NestNet.NestNetWebSite.domain.post.unified.UnifiedPost;
-import NestNet.NestNetWebSite.domain.post.unified.UnifiedPostType;
-import NestNet.NestNetWebSite.dto.request.UnifiedPostModifyRequest;
-import NestNet.NestNetWebSite.dto.request.UnifiedPostRequest;
+import NestNet.NestNetWebSite.domain.post.introduction.IntroductionPost;
+import NestNet.NestNetWebSite.domain.post.notice.NoticePost;
+import NestNet.NestNetWebSite.dto.request.IntroductionPostModifyRequest;
+import NestNet.NestNetWebSite.dto.request.NoticePostModifyRequest;
+import NestNet.NestNetWebSite.dto.request.NoticePostRequest;
 import NestNet.NestNetWebSite.dto.response.AttachedFileDto;
 import NestNet.NestNetWebSite.dto.response.CommentDto;
-import NestNet.NestNetWebSite.dto.response.unifiedpost.UnifiedPostDto;
-import NestNet.NestNetWebSite.dto.response.unifiedpost.UnifiedPostListDto;
-import NestNet.NestNetWebSite.dto.response.unifiedpost.UnifiedPostListResponse;
-import NestNet.NestNetWebSite.dto.response.unifiedpost.UnifiedPostResponse;
+import NestNet.NestNetWebSite.dto.response.introductionpost.IntroductionPostDto;
+import NestNet.NestNetWebSite.dto.response.introductionpost.IntroductionPostListDto;
+import NestNet.NestNetWebSite.dto.response.introductionpost.IntroductionPostListResponse;
+import NestNet.NestNetWebSite.dto.response.noticepost.NoticePostDto;
+import NestNet.NestNetWebSite.dto.response.noticepost.NoticePostListDto;
+import NestNet.NestNetWebSite.dto.response.noticepost.NoticePostListResponse;
+import NestNet.NestNetWebSite.dto.response.noticepost.NoticePostResponse;
 import NestNet.NestNetWebSite.exception.CustomException;
 import NestNet.NestNetWebSite.exception.ErrorCode;
-import NestNet.NestNetWebSite.repository.post.UnifiedPostRepository;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
+import NestNet.NestNetWebSite.repository.post.NoticePostRepository;
 import NestNet.NestNetWebSite.service.attachedfile.AttachedFileService;
-import NestNet.NestNetWebSite.service.comment.CommentService;
 import NestNet.NestNetWebSite.service.like.PostLikeService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
@@ -36,28 +39,26 @@ import java.util.List;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class UnifiedPostService {
+public class NoticePostService {
 
-    private final UnifiedPostRepository unifiedPostRepository;
+    private final NoticePostRepository noticePostRepository;
     private final MemberRepository memberRepository;
     private final AttachedFileService attachedFileService;
-    private final CommentService commentService;
     private final PostLikeService postLikeService;
     private final PostService postService;
 
     /*
-    통합 게시판 게시물 저장
+    공지사항 게시판에 게시물 저장
      */
     @Transactional
-    public ApiResult<?> savePost(UnifiedPostRequest unifiedPostRequest, List<MultipartFile> files,
-                                 String memberLoginId) {
+    public ApiResult<?> savePost(NoticePostRequest noticePostRequest, List<MultipartFile> files, String memberLoginId){
 
         Member member = memberRepository.findByLoginId(memberLoginId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
 
-        UnifiedPost post = unifiedPostRequest.toEntity(member);
+        NoticePost post = noticePostRequest.toEntity(member);
 
-        unifiedPostRepository.save(post);
+        noticePostRepository.save(post);
 
         if(!ObjectUtils.isEmpty(files)){
             List<AttachedFile> savedFileList = attachedFileService.save(post, files);
@@ -72,46 +73,46 @@ public class UnifiedPostService {
     }
 
     /*
-    통합 게시판 목록 조회
+    공지사항 게시판 게시물 리스트 조회
      */
-    public ApiResult<?> findPostList(UnifiedPostType unifiedPostType, int page, int size){
+    public ApiResult<?> findPostListByPaging(int page, int size){
 
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
 
-        Page<UnifiedPost> unifiedPostPage = unifiedPostRepository.findByUnifiedPostTypeByPaging(unifiedPostType, pageRequest);
+        Page<NoticePost> postPage = noticePostRepository.findAll(pageRequest);
 
-        List<UnifiedPost> postList = unifiedPostPage.getContent();
+        List<NoticePost> noticePostList = postPage.getContent();
 
-        List<UnifiedPostListDto> dtoList = new ArrayList<>();
-        for(UnifiedPost post : postList){
-            dtoList.add(new UnifiedPostListDto(post.getId(), post.getMember().getName(), post.getTitle(),
-                    post.getCreatedTime(), post.getViewCount(), post.getLikeCount()));
+        List<NoticePostListDto> dtoList = new ArrayList<>();
+        for(NoticePost post : noticePostList){
+            dtoList.add(new NoticePostListDto(post.getId(), post.getTitle(), post.getCreatedTime(),
+                    post.getViewCount(), post.getLikeCount(), post.getMember().getName()));
         }
 
-        UnifiedPostListResponse result = new UnifiedPostListResponse(unifiedPostPage.getTotalElements(), dtoList);
+        NoticePostListResponse result = new NoticePostListResponse(postPage.getTotalElements(), dtoList);
 
         return ApiResult.success(result);
     }
 
     /*
-    통합 게시판 게시물 단건 조회
+    공지사항 게시판 게시물 단건 조회
      */
     @Transactional
-    public UnifiedPostResponse findPostById(Long id, String memberLoginId){
+    public ApiResult<?> findPostById(Long postId, String memberLoginId){
 
         Member loginMember = memberRepository.findByLoginId(memberLoginId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
 
-        UnifiedPost post = unifiedPostRepository.findById(id)
+        NoticePost post = noticePostRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
         List<AttachedFile> attachedFileList = post.getAttachedFileList();
 
         List<Comment> commentList = post.getCommentList();
 
-        UnifiedPostDto postDto = null;
         List<AttachedFileDto> fileDtoList = new ArrayList<>();
         List<CommentDto> commentDtoList = new ArrayList<>();
+        NoticePostDto postDto = null;
 
         for(AttachedFile attachedFile : attachedFileList){
             fileDtoList.add(new AttachedFileDto(attachedFile.getId(), attachedFile.getOriginalFileName(),
@@ -130,31 +131,29 @@ public class UnifiedPostService {
         }
 
         if(loginMember.getId() == post.getMember().getId()){
-            postDto = UnifiedPostDto.builder()
+            postDto = NoticePostDto.builder()
                     .id(post.getId())
                     .title(post.getTitle())
                     .bodyContent(post.getBodyContent())
                     .viewCount(post.getViewCount())
                     .likeCount(post.getLikeCount())
-                    .unifiedPostType(post.getUnifiedPostType())
-                    .userName(post.getMember().getName())
+                    .username(post.getMember().getName())
                     .createdTime(post.getCreatedTime())
                     .modifiedTime(post.getModifiedTime())
                     .isMemberWritten(true)
                     .build();
         }
         else{
-            postDto = UnifiedPostDto.builder()
+            postDto = NoticePostDto.builder()
                     .id(post.getId())
                     .title(post.getTitle())
                     .bodyContent(post.getBodyContent())
                     .viewCount(post.getViewCount())
                     .likeCount(post.getLikeCount())
-                    .unifiedPostType(post.getUnifiedPostType())
-                    .userName(post.getMember().getName())
+                    .username(post.getMember().getName())
                     .createdTime(post.getCreatedTime())
                     .modifiedTime(post.getModifiedTime())
-                    .isMemberWritten(true)
+                    .isMemberWritten(false)
                     .build();
         }
 
@@ -162,21 +161,22 @@ public class UnifiedPostService {
 
         postService.addViewCount(post, loginMember.getId());
 
-        return new UnifiedPostResponse(postDto, fileDtoList, commentDtoList, isMemberLiked);
+        return ApiResult.success(new NoticePostResponse(postDto, fileDtoList, commentDtoList, isMemberLiked));
     }
 
     /*
-    통합 게시물 수정
+    공지사항 게시물 수정
      */
     @Transactional
-    public void modifyPost(UnifiedPostModifyRequest request, List<Long> fileIdList, List<MultipartFile> files){
+    public void modifyPost(NoticePostModifyRequest modifyRequest, List<Long> fileIdList, List<MultipartFile> files){
 
-        UnifiedPost post = unifiedPostRepository.findById(request.getId())
+        NoticePost post = noticePostRepository.findById(modifyRequest.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
         attachedFileService.modifyFiles(post, fileIdList, files);
 
         // 변경 감지 -> 자동 update
-        post.modifyPost(request.getTitle(), request.getBodyContent(), request.getUnifiedPostType());
+        post.modifyPost(modifyRequest.getTitle(), modifyRequest.getBodyContent());
     }
+
 }

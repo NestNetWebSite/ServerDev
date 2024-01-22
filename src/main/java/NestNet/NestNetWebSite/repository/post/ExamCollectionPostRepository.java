@@ -32,7 +32,7 @@ public interface ExamCollectionPostRepository extends JpaRepository<ExamCollecti
     List<ExamCollectionPost> findAll();
 
     // 족보 게시물 개수 제한에 따른 리스트 조회
-    @Query("select p from ExamCollectionPost p order by p.id desc")
+    @Query("select p from ExamCollectionPost p")
     Page<ExamCollectionPost> findAll(Pageable pageable);
 
 }

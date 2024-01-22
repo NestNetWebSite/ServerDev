@@ -99,12 +99,12 @@ public class IntroductionPostService {
     자기 소개 게시판 게시물 단건 조회
      */
     @Transactional
-    public ApiResult<?> findPostById(Long id, String memberLoginId){
+    public ApiResult<?> findPostById(Long postId, String memberLoginId){
 
         Member loginMember = memberRepository.findByLoginId(memberLoginId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
 
-        IntroductionPost post = introductionPostRepository.findById(id)
+        IntroductionPost post = introductionPostRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
 
         List<AttachedFile> attachedFileList = post.getAttachedFileList();
