@@ -3,6 +3,7 @@ package NestNet.NestNetWebSite.config.cookie;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -28,12 +29,16 @@ public class CookieManager {
             expTime = refreshTokenExpTime / 1000;
         }
 
-        Cookie cookie = new Cookie(name, value);
-        cookie.setMaxAge(expTime);
-        cookie.setHttpOnly(true);
-//        cookie.setDomain();
-        cookie.setPath("/");
+        ResponseCookie cookie = ResponseCookie.from(name, value)
+                .path("/")
+//                .domain("192.168.219.114")
+                .maxAge(expTime)
+                .httpOnly(false)
+                .secure(false)
+//                .sameSite("None")
+                .build();
 
-        response.addCookie(cookie);
+        response.addHeader("Set-Cookie", cookie.toString());
+
     }
 }

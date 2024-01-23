@@ -2,6 +2,10 @@
 server:
   address: 0.0.0.0    # 모든 접속 허용
   port: 8080
+  servlet:
+    session:
+      cookie:
+        same-site: none
 #  address: localhost
 
 spring:
@@ -41,10 +45,10 @@ springdoc:
 jwt:
   header: Authorization
   secret : ${secret-key}
-#  access-exp-time: 7200000    # 2시간 7200000
-#  refresh-exp-time: 1209600000    # 14일
-  access-exp-time: 10000    # 2시간 7200000
+  access-exp-time: 7200000    # 2시간 7200000
   refresh-exp-time: 1209600000    # 14일
+#  access-exp-time: 10000    # 2시간 7200000
+#  refresh-exp-time: 1209600000    # 14일
 
 mail-secret-string : ${mail-secret-string}
 

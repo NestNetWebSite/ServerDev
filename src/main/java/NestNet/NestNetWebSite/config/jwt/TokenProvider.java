@@ -176,9 +176,9 @@ public class TokenProvider implements InitializingBean {
         }
 
         //"Bearer " 부분 슬라이싱. 바로 뒤부터 토큰임
-        if(accessToken != null && accessToken.startsWith("Bearer ")){
-            accessToken = accessToken.substring(7);
-        }
+//        if(accessToken != null && accessToken.startsWith("Bearer ")){
+//            accessToken = accessToken.substring(7);
+//        }
 
         return accessToken;
     }
