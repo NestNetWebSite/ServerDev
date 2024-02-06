@@ -16,6 +16,7 @@ public class PhotoPostDto {
     private String bodyContent;
     private Long viewCount;
     private int likeCount;
+    private String memberLoginId;
     private String username;
     private LocalDateTime createdTime;
     private LocalDateTime modifiedTime;

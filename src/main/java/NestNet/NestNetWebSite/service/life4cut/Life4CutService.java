@@ -1,16 +1,14 @@
 package NestNet.NestNetWebSite.service.life4cut;
 
 import NestNet.NestNetWebSite.api.ApiResult;
-import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.life4cut.Life4Cut;
-import NestNet.NestNetWebSite.dto.response.Life4CutResponse;
+import NestNet.NestNetWebSite.dto.response.life4cut.Life4CutDto;
+import NestNet.NestNetWebSite.dto.response.life4cut.Life4CutResponse;
 import NestNet.NestNetWebSite.repository.life4cut.Life4CutRepository;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,19 +47,22 @@ public class Life4CutService {
     /*
     인생네컷 조회 (최신순)
      */
-    public ApiResult<?> findFileByPaging(int page, int size){
+    public ApiResult<?> findFileByPaging(int size){
 
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        PageRequest pageRequest = PageRequest.of(0, size / 2, Sort.by(Sort.Direction.DESC, "id"));
+        List<Life4Cut> recentLife4CutList = life4CutRepository.findAll(pageRequest).getContent();
+        List<Life4Cut> randomLife4CutList = life4CutRepository.findByRandom(size / 2);
 
-        Page<Life4Cut> life4CutPage = life4CutRepository.findAll(pageRequest);
-        List<Life4Cut> life4CutList = life4CutPage.getContent();
-        List<Life4CutResponse> responseList = new ArrayList<>();
 
-        for(Life4Cut life4Cut : life4CutList){
-            responseList.add(new Life4CutResponse(life4Cut.getSaveFilePath(), life4Cut.getSaveFileName()));
+        List<Life4CutDto> dtoList = new ArrayList<>();
+        for(Life4Cut life4Cut : recentLife4CutList){
+            dtoList.add(new Life4CutDto(life4Cut.getSaveFilePath(), life4Cut.getSaveFileName()));
+        }
+        for(Life4Cut life4Cut : randomLife4CutList){
+            dtoList.add(new Life4CutDto(life4Cut.getSaveFilePath(), life4Cut.getSaveFileName()));
         }
 
-        return ApiResult.success(responseList);
+        return ApiResult.success(new Life4CutResponse(dtoList));
     }
 
     //==============================물리적인 파일 컨트롤==============================//

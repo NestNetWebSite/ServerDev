@@ -3,6 +3,7 @@ package NestNet.NestNetWebSite.domain.life4cut;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -24,7 +25,8 @@ public class Life4Cut {
     private String saveFileName;
 
     @Transient      //영속성 컨텍스트에 관리되지 않음
-    private static String basePath = "C:" + File.separator + "nestnetFile" + File.separator;
+    @Value("#{environment['filePath']}")
+    private String filePath;
 
     /*
     생성자
@@ -49,7 +51,7 @@ public class Life4Cut {
 
         String path = "LIFE4CUT";
 
-        File folder = new File(basePath + path);               //해당 경로에 폴더 생성
+        File folder = new File(filePath + path);               //해당 경로에 폴더 생성
 
         if(!folder.exists()){       //해당 폴더가 존재하지 않을 경우 생성
             try {

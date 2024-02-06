@@ -237,7 +237,7 @@ public class TokenProvider implements InitializingBean {
 
         String newAccessToken = createAccessToken(authentication);
 
-        cookieManager.setCookie("Authorization", newAccessToken, response);
+        cookieManager.setCookie("Authorization", newAccessToken, false, response);
 
         return newAccessToken;
     }
@@ -246,6 +246,8 @@ public class TokenProvider implements InitializingBean {
     access 토큰 폐기 (블랙리스트 등록)
      */
     public void invalidateAccessToken(HttpServletRequest request){
+
+        System.out.println("여기는");
 
         String accessToken = resolveToken(request);
 
@@ -259,6 +261,8 @@ public class TokenProvider implements InitializingBean {
 
         //레디스에 블랙리스트 등록
         redisUtil.setData(accessToken, "logout", remainTime);
+
+        System.out.println("세팅되는 엑세스 토큰 : " + accessToken);
     }
 
     /*
@@ -267,6 +271,8 @@ public class TokenProvider implements InitializingBean {
     public void invalidateRefreshToken(HttpServletRequest request){
 
         String refreshToken = getRefreshToken(request);
+
+        System.out.println("삭제되는 리프레시 토큰 : " + refreshToken);
 
         if(refreshToken != null){
             redisUtil.deleteData(refreshToken);

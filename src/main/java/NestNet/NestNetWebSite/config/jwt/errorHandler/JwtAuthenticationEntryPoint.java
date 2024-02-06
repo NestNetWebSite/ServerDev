@@ -1,8 +1,5 @@
 package NestNet.NestNetWebSite.config.jwt.errorHandler;
 
-import NestNet.NestNetWebSite.exception.CustomException;
-import NestNet.NestNetWebSite.exception.ErrorCode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

@@ -43,6 +43,11 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {       //ht
         if(!StringUtils.hasText(accessToken)){
             log.info("CustomAuthorizationFilter.class / doFilterInternal : 엑세스 토큰 없음");
 
+            if(servletPath.equals("/attendance/member-attended")) {
+                System.out.println("여기 통과");
+                filterChain.doFilter(request, response);        //다음 필터 실행
+            }
+
             String refreshToken = tokenProvider.getRefreshToken(request);
 
             if(refreshToken != null){
@@ -54,13 +59,13 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {       //ht
                 }
                 else{
                     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                    response.setStatus(HttpStatus.FORBIDDEN.value());
+                    response.setStatus(HttpStatus.UNAUTHORIZED.value());
                     return;
                 }
             }
             else{
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                response.setStatus(HttpStatus.FORBIDDEN.value());
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
                 return;
             }
         }
@@ -68,6 +73,8 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {       //ht
         // 블랙리스트에 있으면 로그아웃되었거나, 토큰이 만료된 상태인 것임. 401에러 -> 다시 로그인 해야함.
         if(!nowCreated && redisUtil.hasKey(accessToken)){
             log.info("CustomAuthorizationFilter.class / doFilterInternal : 블랙리스트에 등록된 엑세스 토큰");
+
+            if(servletPath.equals("/attendance/member-attended")) filterChain.doFilter(request, response);        //다음 필터 실행
 
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
@@ -86,6 +93,8 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {       //ht
         }
         else{
             log.info("CustomAuthorizationFilter.class / doFilterInternal : JWT access 토큰, refresh 토큰 모두 유효하지 않음");
+
+            if(servletPath.equals("/attendance/member-attended")) filterChain.doFilter(request, response);        //다음 필터 실행
 
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setStatus(HttpStatus.UNAUTHORIZED.value());

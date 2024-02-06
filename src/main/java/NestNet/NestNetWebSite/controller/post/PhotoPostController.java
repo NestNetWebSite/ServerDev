@@ -36,10 +36,7 @@ public class PhotoPostController {
                                  @RequestPart(value = "file", required = false) List<MultipartFile> files,
                                  @AuthenticationPrincipal UserDetails userDetails){
 
-        // 허원일 테스트용
-        return photoPostService.savePost(photoPostRequest, files, "admin");
-
-//        return photoPostService.savePost(photoPostRequest, files, userDetails.getUsername());
+        return photoPostService.savePost(photoPostRequest, files, userDetails.getUsername());
     }
 
     /*
@@ -53,9 +50,8 @@ public class PhotoPostController {
 
         int size = 12;
 
-        return photoPostService.findThumbNail(page, size);
+        return photoPostService.findThumbNail(page - 1, size);
     }
-
 
     /*
     사진 게시물 단건 조회
@@ -66,10 +62,7 @@ public class PhotoPostController {
     })
     public ApiResult<?> showPost(@PathVariable("post_id") Long postId, @AuthenticationPrincipal UserDetails userDetails){
 
-        // 허원일 테스트용
-        PhotoPostResponse result = photoPostService.findPostById(postId, "admin");
-
-//        PhotoPostResponse result = photoPostService.findPostById(postId, userDetails.getUsername());
+        PhotoPostResponse result = photoPostService.findPostById(postId, userDetails.getUsername());
 
         return ApiResult.success(result);
     }
@@ -82,7 +75,6 @@ public class PhotoPostController {
     public ApiResult<?> modifyPost(@RequestPart("data") PhotoPostModifyRequest photoPostModifyRequest,
                                    @RequestPart(value = "file-id", required = false) List<Long> fileIdList,
                                    @RequestPart(value = "file", required = false) List<MultipartFile> files){
-
 
         photoPostService.modifyPost(photoPostModifyRequest, fileIdList, files);
 

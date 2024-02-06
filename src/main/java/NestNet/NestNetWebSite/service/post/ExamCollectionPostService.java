@@ -22,6 +22,7 @@ import NestNet.NestNetWebSite.service.attachedfile.AttachedFileService;
 import NestNet.NestNetWebSite.service.comment.CommentService;
 import NestNet.NestNetWebSite.service.like.PostLikeService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -36,6 +37,7 @@ import java.util.List;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Slf4j
 public class ExamCollectionPostService {
 
     private final ExamCollectionPostRepository examCollectionPostRepository;
@@ -59,7 +61,14 @@ public class ExamCollectionPostService {
 
         examCollectionPostRepository.save(post);
 
+        log.info("여기는 올것이고");
+
+        if(files == null) log.info("널이네...");
+
         if(!ObjectUtils.isEmpty(files)){
+
+            log.info("일단 파일이 있는지? ");
+
             List<AttachedFile> savedFileList = attachedFileService.save(post, files);
 
             // 양방향 연관관계 주입
@@ -67,6 +76,8 @@ public class ExamCollectionPostService {
                 post.addAttachedFile(attachedFile);
             }
         }
+
+        postService.addViewCount(post, member.getId());
 
         return ApiResult.success("게시물 저장 성공");
     }
@@ -128,12 +139,12 @@ public class ExamCollectionPostService {
 
         for(Comment comment : commentList){
             if(loginMember.getId() == comment.getMember().getId()){
-                commentDtoList.add(new CommentDto(comment.getId(), comment.getMember().getName(), comment.getContent(),
-                        comment.getCreatedTime(), comment.getModifiedTime(), true));
+                commentDtoList.add(new CommentDto(comment.getId(), comment.getMember().getLoginId(), comment.getMember().getName(), comment.getMember().getMemberAuthority(),
+                        comment.getContent(), comment.getCreatedTime(), comment.getModifiedTime(), true));
             }
             else{
-                commentDtoList.add(new CommentDto(comment.getId(), comment.getMember().getName(), comment.getContent(),
-                        comment.getCreatedTime(), comment.getModifiedTime(), false));
+                commentDtoList.add(new CommentDto(comment.getId(), comment.getMember().getLoginId(), comment.getMember().getName(), comment.getMember().getMemberAuthority(),
+                        comment.getContent(), comment.getCreatedTime(), comment.getModifiedTime(), false));
             }
         }
 
@@ -149,7 +160,8 @@ public class ExamCollectionPostService {
                     .year(post.getYear())
                     .semester(post.getSemester())
                     .examType(post.getExamType())
-                    .userName(post.getMember().getName())
+                    .memberLoginId(post.getMember().getLoginId())
+                    .username(post.getMember().getName())
                     .createdTime(post.getCreatedTime())
                     .modifiedTime(post.getModifiedTime())
                     .isMemberWritten(true)
@@ -167,7 +179,8 @@ public class ExamCollectionPostService {
                     .year(post.getYear())
                     .semester(post.getSemester())
                     .examType(post.getExamType())
-                    .userName(post.getMember().getName())
+                    .memberLoginId(post.getMember().getLoginId())
+                    .username(post.getMember().getName())
                     .createdTime(post.getCreatedTime())
                     .modifiedTime(post.getModifiedTime())
                     .isMemberWritten(false)

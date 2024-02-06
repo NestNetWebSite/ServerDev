@@ -18,14 +18,14 @@ public class CookieManager {
     /*
     response에 쿠키를 만들어 Add
      */
-    public void setCookie(String name, String value, HttpServletResponse response){
+    public void setCookie(String name, String value, boolean isLogout, HttpServletResponse response){
 
         int expTime = 0;
 
-        if(name.equals("Authorization")){
+        if(!isLogout && name.equals("Authorization")){
             expTime = accessTokenExpTime / 1000;
         }
-        else{
+        else if(!isLogout && name.equals("refresh-token")){
             expTime = refreshTokenExpTime / 1000;
         }
 

@@ -1,6 +1,8 @@
 package NestNet.NestNetWebSite.service.member;
 
 import NestNet.NestNetWebSite.api.ApiResult;
+import NestNet.NestNetWebSite.config.cookie.CookieManager;
+import NestNet.NestNetWebSite.config.jwt.TokenProvider;
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.dto.response.MemberIdDto;
 import NestNet.NestNetWebSite.dto.request.MemberModifyInfoRequest;
@@ -9,6 +11,7 @@ import NestNet.NestNetWebSite.exception.CustomException;
 import NestNet.NestNetWebSite.exception.ErrorCode;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import NestNet.NestNetWebSite.service.auth.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,7 +26,7 @@ import java.util.*;
 @Slf4j
 public class MemberService {
 
-    private final AuthService authService;
+    private final TokenProvider tokenProvider;
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -102,16 +105,18 @@ public class MemberService {
     회원 탈퇴 -> 모든 정보 초기화 + 아이디, 비밀번호 랜덤 문자열(10자리)로 변경 + 이름 '알수없음'으로 변경
      */
     @Transactional
-    public ApiResult<?> withDrawMember(String loginId){
+    public ApiResult<?> withDrawMember(String loginId, HttpServletRequest request){
 
         Member member = memberRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
 
-        String memberName = member.getName();
-
         member.withdraw();
 
-        return ApiResult.success(memberName + "(" + loginId + ") 님 탈퇴 처리 되었습니다.");
+        tokenProvider.invalidateAccessToken(request);
+
+        tokenProvider.invalidateRefreshToken(request);
+
+        return ApiResult.success("탈퇴 처리 되었습니다.");
     }
 
 }

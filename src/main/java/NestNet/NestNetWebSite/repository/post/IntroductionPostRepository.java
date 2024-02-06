@@ -14,6 +14,6 @@ public interface IntroductionPostRepository extends JpaRepository<IntroductionPo
     Optional<IntroductionPost> findById(Long id);
 
     // 자기소개 게시물 페이징 조회
-    @Query("select distinct ip from IntroductionPost ip join fetch ip.attachedFileList")
+    @Query("select distinct ip from IntroductionPost ip left join fetch ip.attachedFileList")
     Page<IntroductionPost> findPostList(Pageable pageable);
 }

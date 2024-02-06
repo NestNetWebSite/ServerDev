@@ -7,6 +7,8 @@ import NestNet.NestNetWebSite.dto.request.EmailAuthRequest;
 import NestNet.NestNetWebSite.dto.request.LoginRequest;
 import NestNet.NestNetWebSite.dto.request.SignUpRequest;
 import NestNet.NestNetWebSite.dto.response.TokenDto;
+import NestNet.NestNetWebSite.exception.CustomException;
+import NestNet.NestNetWebSite.exception.ErrorCode;
 import NestNet.NestNetWebSite.service.auth.AuthService;
 import NestNet.NestNetWebSite.service.mail.MailService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,7 +18,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseCookie;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,8 +28,6 @@ public class AuthController {
 
     private final AuthService authService;
     private final MailService mailService;
-
-    private final CookieManager cookieManager;
 
     /*
     회원 가입 시 인증 이메일 전송 Post 요청
@@ -68,12 +67,7 @@ public class AuthController {
             "(Authorization : 엑세스 토큰 / refresh-token : 리프레시 토큰 / refresh-token-exp-time : 리프레시 토큰 만료시간) 삽입")
     public ApiResult<?> login(@Valid @RequestBody LoginRequest loginRequest, HttpServletResponse response){
 
-        TokenDto tokenDto = authService.login(loginRequest);
-
-        cookieManager.setCookie("Authorization", tokenDto.getAccessToken(), response);
-        cookieManager.setCookie("refresh-token", tokenDto.getRefreshToken(), response);
-
-        return ApiResult.success("로그인 되었습니다.");
+        return authService.login(loginRequest, response);
     }
 
     /*
@@ -81,19 +75,19 @@ public class AuthController {
      */
     @GetMapping("/auth/logout")
     @Operation(summary = "로그아웃", description = "로그아웃이 정상적으로 작동하지 않은 경우 500 에러를 반환한다.")
-    public ApiResult<?> logout(HttpServletRequest request){
+    public ApiResult<?> logout(HttpServletRequest request, HttpServletResponse response){
 
-        return authService.logout(request);
+        return authService.logout(request, response);
     }
 
     @RequestMapping("/forbidden")
     public String forbidden(){
-        return "Forbidden";
+        throw new CustomException(ErrorCode.MEMBER_NO_PERMISSION);
     }
 
     @RequestMapping("/unauthorized")
     public String unauthorized(){
-        return "Unauthorized";
+        throw new CustomException(ErrorCode.UNAUTHORIZED);
     }
 
 }

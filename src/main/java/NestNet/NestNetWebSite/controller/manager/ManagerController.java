@@ -1,7 +1,6 @@
 package NestNet.NestNetWebSite.controller.manager;
 
 import NestNet.NestNetWebSite.api.ApiResult;
-import NestNet.NestNetWebSite.domain.member.MemberAuthority;
 import NestNet.NestNetWebSite.dto.request.MemberChangeAuthorityRequest;
 import NestNet.NestNetWebSite.dto.request.MemberSignUpManagementRequest;
 import NestNet.NestNetWebSite.dto.response.manager.MemberInfoResponse;

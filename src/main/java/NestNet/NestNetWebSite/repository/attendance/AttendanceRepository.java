@@ -2,6 +2,8 @@ package NestNet.NestNetWebSite.repository.attendance;
 
 import NestNet.NestNetWebSite.domain.attendance.Attendance;
 import NestNet.NestNetWebSite.domain.member.Member;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,11 +19,21 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     Optional<Attendance> findByMemberAndDay(@Param("member") Member member, @Param("startOfDay") LocalDateTime startOfDay, @Param("endOfDay") LocalDateTime endOfDay);
 
     // 주간 출석 통계 조회 (월~일)
-    @Query("select a.member, count(a) from Attendance a where a.time  >=:startOfWeek and a.time <=:endOfWeek group by a.member")
+    @Query("select a.member, count(a) from Attendance a " +
+            "where a.time  >=:startOfWeek and a.time <=:endOfWeek " +
+            "group by a.member")
     List<Object[]> findWeeklyCount(@Param("startOfWeek") LocalDateTime startOfWeek, @Param("endOfWeek") LocalDateTime endOfWeek);
 
     // 월간 출석 통계 조회
-    @Query("select a.member, count(a) from Attendance a where a.time  >=:startDayOfMonth and a.time <=:endDayOfMonth group by a.member")
+    @Query("select a.member, count(a) from Attendance a " +
+            "where a.time  >=:startDayOfMonth and a.time <=:endDayOfMonth " +
+            "group by a.member")
     List<Object[]> findMonthlyCount(@Param("startDayOfMonth") LocalDateTime startOfWeek, @Param("endDayOfMonth") LocalDateTime endOfWeek);
+
+    // 당일 회원의 출석 여부 조회
+    @Query("select a from Attendance a where a.member =:member and " +
+            "FUNCTION('DATE_FORMAT', a.time, '%Y-%m-%d') = FUNCTION('DATE_FORMAT', current_date, '%Y-%m-%d') ")
+    Optional<Attendance> findByMember(@Param("member") Member member);
+
 
 }

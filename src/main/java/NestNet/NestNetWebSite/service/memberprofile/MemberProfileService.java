@@ -36,11 +36,11 @@ public class MemberProfileService {
         MemberProfileMemberInfoResponse memberInfoDto;
 
         if(!isOtherMember){
-            memberInfoDto = new MemberProfileMemberInfoResponse(member.getLoginId(), member.getName(),
+            memberInfoDto = new MemberProfileMemberInfoResponse(member.getId(), member.getLoginId(), member.getName(),
                     member.getEmailAddress(), member.getStudentId(), member.getMemberAuthority(), member.getGrade(), member.getGraduateYear(), true);
         }
         else{       //타 회원 정보이면
-            memberInfoDto = new MemberProfileMemberInfoResponse(member.getLoginId(), member.getName(),
+            memberInfoDto = new MemberProfileMemberInfoResponse(member.getId(), member.getLoginId(), member.getName(),
                     member.getEmailAddress(), member.getStudentId(), member.getMemberAuthority(), member.getGrade(), member.getGraduateYear(), false);
         }
 
@@ -52,7 +52,7 @@ public class MemberProfileService {
      */
     public ApiResult<?> findAllPostById(Long memberId, String loginId){
 
-        Member member = memberRepository.findByLoginId(loginId)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
 
 //        if(memberId != member.getId()) throw new CustomException(ErrorCode.MEMBER_NO_PERMISSION);

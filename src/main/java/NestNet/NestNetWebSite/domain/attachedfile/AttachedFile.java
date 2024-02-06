@@ -4,6 +4,7 @@ import NestNet.NestNetWebSite.domain.post.Post;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -31,7 +32,8 @@ public class AttachedFile {
     private String saveFilePath;                                // 파일 경로 (서버)
 
     @Transient      //영속성 컨텍스트에 관리되지 않음
-    private static String basePath = "C:" + File.separator + "nestnetFile" + File.separator;
+    @Value("#{environment['filePath']}")
+    private String filePath;
 
     /*
     생성자
@@ -63,7 +65,7 @@ public class AttachedFile {
      */
     public void createSavePath(){
 
-        File depth1Folder = new File(basePath + this.post.getPostCategory().toString());
+        File depth1Folder = new File(filePath + this.post.getPostCategory().toString());
 
         if(!depth1Folder.exists()){
             try {
@@ -87,7 +89,7 @@ public class AttachedFile {
 
         String path = folderNameBuilder.toString();    //파일 저장 경로 ( ex) C:/nestnetFile/EXAM/)
 
-        File depth2Folder = new File(basePath + path);               //해당 경로에 폴더 생성
+        File depth2Folder = new File(filePath + path);               //해당 경로에 폴더 생성
 
         if(!depth2Folder.exists()){       //해당 폴더가 존재하지 않을 경우 생성
             try {

@@ -2,6 +2,7 @@ package NestNet.NestNetWebSite.service.auth;
 
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.config.auth.Authenticator;
+import NestNet.NestNetWebSite.config.cookie.CookieManager;
 import NestNet.NestNetWebSite.config.jwt.TokenProvider;
 import NestNet.NestNetWebSite.config.redis.RedisUtil;
 import NestNet.NestNetWebSite.domain.manager.MemberSignUpManagement;
@@ -15,6 +16,7 @@ import NestNet.NestNetWebSite.exception.ErrorCode;
 import NestNet.NestNetWebSite.repository.manager.MemberSignUpManagementRepository;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,6 +37,7 @@ public class AuthService {
     private final MemberSignUpManagementRepository memberSignUpManagementRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
+    private final CookieManager cookieManager;
     private final Authenticator authenticator;
     private final RedisUtil redisUtil;
 
@@ -86,9 +89,7 @@ public class AuthService {
     로그인
      */
     @Transactional
-    public TokenDto login(LoginRequest loginRequest){
-
-        TokenDto tokenDto;
+    public ApiResult<?> login(LoginRequest loginRequest, HttpServletResponse response){
 
         try{
             Authentication authentication = authenticator.createAuthenticationByIdPassword(loginRequest.getLoginId(), loginRequest.getPassword());
@@ -99,24 +100,28 @@ public class AuthService {
             //레디스에 리프레시 토큰 저장
             redisUtil.setData(refreshToken, "refresh-token", refreshTokenExpTime);
 
-            tokenDto = new TokenDto(accessToken, refreshToken);
+            cookieManager.setCookie("Authorization", accessToken, false, response);
+            cookieManager.setCookie("refresh-token", refreshToken, false, response);
 
         } catch (Exception e){
             throw new CustomException(ErrorCode.ID_PASSWORD_NOT_MATCH);
         }
 
-        return tokenDto;
+        return ApiResult.success("로그인 되었습니다.");
     }
 
     /*
     로그아웃
      */
     @Transactional
-    public ApiResult<?> logout(HttpServletRequest request){
+    public ApiResult<?> logout(HttpServletRequest request, HttpServletResponse response){
 
         tokenProvider.invalidateAccessToken(request);
 
         tokenProvider.invalidateRefreshToken(request);
+
+        cookieManager.setCookie("Authorization", null, true, response);
+        cookieManager.setCookie("refresh-token", null, true, response);
 
         return ApiResult.success("로그아웃 되었습니다");
     }

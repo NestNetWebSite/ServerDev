@@ -3,8 +3,13 @@ package NestNet.NestNetWebSite.controller.post;
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.dto.request.NoticePostModifyRequest;
 import NestNet.NestNetWebSite.dto.request.NoticePostRequest;
+import NestNet.NestNetWebSite.dto.response.noticepost.NoticePostListResponse;
+import NestNet.NestNetWebSite.dto.response.noticepost.NoticePostResponse;
 import NestNet.NestNetWebSite.service.post.NoticePostService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -37,7 +42,9 @@ public class NoticePostController {
     공지 사항 게시물 목록 조회
      */
     @GetMapping("/notice-post")
-    @Operation(summary = "공지 사항 게시물 목록 조회", description = "공지 사항 게시물 목록을 조회한다.")
+    @Operation(summary = "공지 사항 게시물 목록 조회", description = "공지 사항 게시물 목록을 조회한다.", responses = {
+            @ApiResponse(responseCode = "200", description = "", content = @Content(schema = @Schema(implementation = NoticePostListResponse.class)))
+    })
     public ApiResult<?> showPostList(@RequestParam("page") int page, @RequestParam("size") int size){
 
         return noticePostService.findPostListByPaging(page, size);
@@ -47,7 +54,9 @@ public class NoticePostController {
     공지 사항 게시물 단건 조회
      */
     @GetMapping("/notice-post/{post_id}")
-    @Operation(summary = "공지 사항 게시물 단건 조회", description = "공지 사항 게시물을 조회한다.")
+    @Operation(summary = "공지 사항 게시물 단건 조회", description = "공지 사항 게시물을 조회한다.", responses = {
+            @ApiResponse(responseCode = "200", description = "", content = @Content(schema = @Schema(implementation = NoticePostResponse.class)))
+    })
     public ApiResult<?>  showPost(@PathVariable("post_id") Long postId, @AuthenticationPrincipal UserDetails userDetails){
 
         return noticePostService.findPostById(postId, userDetails.getUsername());

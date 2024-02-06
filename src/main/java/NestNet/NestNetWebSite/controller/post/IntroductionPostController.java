@@ -1,16 +1,19 @@
 package NestNet.NestNetWebSite.controller.post;
 
 import NestNet.NestNetWebSite.api.ApiResult;
-import NestNet.NestNetWebSite.dto.request.ExamCollectionPostModifyRequest;
 import NestNet.NestNetWebSite.dto.request.IntroductionPostModifyRequest;
 import NestNet.NestNetWebSite.dto.request.IntroductionPostRequest;
+import NestNet.NestNetWebSite.dto.response.introductionpost.IntroductionPostListResponse;
+import NestNet.NestNetWebSite.dto.response.introductionpost.IntroductionPostResponse;
 import NestNet.NestNetWebSite.service.post.IntroductionPostService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,7 +44,9 @@ public class IntroductionPostController {
     자기 소개 게시물 목록 조회
      */
     @GetMapping("/introduction-post")
-    @Operation(summary = "자기 소개 게시물 목록 조회", description = "자기 소개 게시물 목록을 조회한다.")
+    @Operation(summary = "자기 소개 게시물 목록 조회", description = "자기 소개 게시물 목록을 조회한다.", responses = {
+            @ApiResponse(responseCode = "200", description = "", content = @Content(schema = @Schema(implementation = IntroductionPostListResponse.class)))
+    })
     public ApiResult<?> showPostList(@RequestParam("page") int page, @RequestParam("size") int size){
 
         return introductionPostService.findPostListByPaging(page, size);
@@ -51,7 +56,9 @@ public class IntroductionPostController {
     자기 소개 게시물 단건 조회
      */
     @GetMapping("/introduction-post/{post_id}")
-    @Operation(summary = "자기 소개 게시물 단건 조회", description = "자기 소개 게시물을 조회한다.")
+    @Operation(summary = "자기 소개 게시물 단건 조회", description = "자기 소개 게시물을 조회한다.", responses = {
+            @ApiResponse(responseCode = "200", description = "", content = @Content(schema = @Schema(implementation = IntroductionPostResponse.class)))
+    })
     public ApiResult<?> showPost(@PathVariable("post_id") Long postId, @AuthenticationPrincipal UserDetails userDetails){
 
         return introductionPostService.findPostById(postId, userDetails.getUsername());

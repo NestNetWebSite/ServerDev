@@ -14,7 +14,7 @@ public interface PhotoPostRepository extends JpaRepository<PhotoPost, Long> {
     Optional<PhotoPost> findById(Long id);
 
     // 사진 게시판 리스트 조회(페이징)
-    @Query("select pp from PhotoPost pp")
+    @Query("select distinct pp from PhotoPost pp join fetch pp.attachedFileList")
     Page<PhotoPost> findAllThumbNail(Pageable pageable);
 
 }

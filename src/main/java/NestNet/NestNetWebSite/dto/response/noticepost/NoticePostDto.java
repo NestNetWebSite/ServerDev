@@ -18,6 +18,7 @@ public class NoticePostDto {
     private Long viewCount;
     private int likeCount;
     private UnifiedPostType unifiedPostType;
+    private String memberLoginId;
     private String username;
     private LocalDateTime createdTime;
     private LocalDateTime modifiedTime;

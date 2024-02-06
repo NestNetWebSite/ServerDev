@@ -2,6 +2,8 @@ package NestNet.NestNetWebSite.repository.post;
 
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.post.Post;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -21,8 +23,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("select p from Post p where p.member =:member")
     List<Post> findAllByMember (@Param("member") Member member);
 
-    // 게시판 카테고리별 게시물 총 갯수 조회
-//    long countAllByPostCategory(PostCategory postCategory);
+    // 최근 게시물 목록 조회
+    Page<Post> findAll(Pageable pageable);
 
     // 게시물 삭제
     @Modifying

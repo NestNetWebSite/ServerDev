@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -47,8 +48,8 @@ public class MemberController {
         // 새로운 인증 정보 발급
         TokenDto tokenDto = authService.setAuthenticationSecurityContext(dto.getLoginId(), request);
 
-        cookieManager.setCookie("Authorization", tokenDto.getAccessToken(), response);
-        cookieManager.setCookie("refresh-token", tokenDto.getRefreshToken(), response);
+        cookieManager.setCookie("Authorization", tokenDto.getAccessToken(), false, response);
+        cookieManager.setCookie("refresh-token", tokenDto.getRefreshToken(), false, response);
 
         return ApiResult.success("회원 정보가 수정되었습니다.");
     }
@@ -112,9 +113,9 @@ public class MemberController {
      */
     @GetMapping("/member/withdraw")
     @Operation(summary = "회원 탈퇴", description = "로그인한 회원 본인이 직접 탈퇴한다.")
-    public ApiResult<?> withdrawMember(@AuthenticationPrincipal UserDetails userDetails){
+    public ApiResult<?> withdrawMember(@AuthenticationPrincipal UserDetails userDetails, HttpServletRequest request){
 
-        return memberService.withDrawMember(userDetails.getUsername());
+        return memberService.withDrawMember(userDetails.getUsername(), request);
     }
 
 }

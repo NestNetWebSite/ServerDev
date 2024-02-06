@@ -1,14 +1,21 @@
 # 실제 운영에서의 설정
 spring:
   config:
+    name: application-prod
     activate:
       on-profile: prod
+    location: classpath:/application-prod.yml
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/nestnet?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    url: ${spring-datasource-url}
     username: root
     password: ${mysql-pw}
+
+  data:
+    redis:
+      host: ${redis-host}
+      port: 6379
 
   jpa:
     hibernate:
@@ -20,5 +27,5 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect        # mysql 방언
     open-in-view: false
 
-
-
+filePath: C:\nestnetFile\
+#filePath: home/new_nnetserver/nestnet_file

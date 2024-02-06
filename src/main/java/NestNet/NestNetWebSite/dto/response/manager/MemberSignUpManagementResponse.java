@@ -10,7 +10,6 @@ import java.util.List;
 
 @Getter
 @AllArgsConstructor
-@Builder
 public class MemberSignUpManagementResponse {
 
     private List<MemberSignUpManagementDto> dtoList = new ArrayList<>();

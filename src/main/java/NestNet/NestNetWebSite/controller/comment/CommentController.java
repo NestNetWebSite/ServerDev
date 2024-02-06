@@ -24,10 +24,7 @@ public class CommentController {
     public void writeComment(@PathVariable("post_id") Long postId, @RequestBody CommentRequest commentRequest,
                                   @AuthenticationPrincipal UserDetails userDetails){
 
-        // 허원일용
-        commentService.saveComment(commentRequest, postId, "admin");
-
-//        commentService.saveComment(commentRequest, postId, userDetails.getUsername());
+        commentService.saveComment(commentRequest, postId, userDetails.getUsername());
     }
 
     /*

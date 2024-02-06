@@ -1,23 +1,13 @@
 # 기본 설정
 server:
-  address: 0.0.0.0    # 모든 접속 허용
+  address: 0.0.0.0              # 모든 접속 허용
   port: 8080
   servlet:
     session:
       cookie:
         same-site: none
-#  address: localhost
 
 spring:
-  profiles:
-    default: dev
-    active: dev           # 메인으로 사용할 설정
-
-  data:
-    redis:
-      host: localhost
-      port: 6379
-
   servlet:
     multipart:
       enabled: true
@@ -33,26 +23,38 @@ spring:
       mail.smtp.auth: true        # SMTP 서버와의 인증
       mail.smtp.ssl.enable: true  # SSL 보안연결(필수)
 
-springdoc:
-  api-docs:
-    enabled: true
-  swagger-ui:
-    enabled: true
-    tagsSorter: alpha
-    operations-sorter: alpha
-    display-request-duration: true
-
 jwt:
   header: Authorization
   secret : ${secret-key}
   access-exp-time: 7200000    # 2시간 7200000
   refresh-exp-time: 1209600000    # 14일
-#  access-exp-time: 10000    # 2시간 7200000
-#  refresh-exp-time: 1209600000    # 14일
 
 mail-secret-string : ${mail-secret-string}
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    display-request-duration: true
 
 logging:
   level:
     org.hibernate.SQL: debug    # 하이버네이트가 생성하는 sql 로그로 출력
     org.hibernate.orm.jdbc.bind: debug    # 쿼리 파라미터 로그 남김
+
+---
+spring:
+  profiles:
+    active: dev
+
+---
+spring:
+  profiles:
+    active: prod
+
+---
+spring:
+  profiles:
+    active: local
+    default: local

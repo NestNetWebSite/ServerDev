@@ -18,7 +18,8 @@ public class UnifiedPostDto {
     private Long viewCount;
     private int likeCount;
     private UnifiedPostType unifiedPostType;
-    private String userName;
+    private String memberLoginId;
+    private String username;
     private LocalDateTime createdTime;
     private LocalDateTime modifiedTime;
     boolean isMemberWritten;

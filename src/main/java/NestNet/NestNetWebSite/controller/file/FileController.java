@@ -12,7 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -25,11 +25,11 @@ public class FileController {
     /*
     파일 다운로드
      */
-    @GetMapping("/file/{postId}/{fileName}")
+    @GetMapping("/file")
     @Operation(summary = "파일 다운로드", description = "파일 다운로드 요청에 응답하여 인코딩된 파일을 전송한다.", responses = {
                     @ApiResponse(responseCode = "200", description = "파일 다운로드 성공", content = @Content(schema = @Schema(implementation = InputStreamResource.class)))
             })
-    public ResponseEntity<InputStreamResource> showFile(@PathVariable(value = "postId") Long postId, @PathVariable(value = "fileName") String fileName){
+    public ResponseEntity<InputStreamResource> showFile(@RequestParam(value = "postId") Long postId, @RequestParam(value = "fileName") String fileName){
 
         InputStreamResource inputStreamResource = attachedFileService.findFile(postId, fileName);
 

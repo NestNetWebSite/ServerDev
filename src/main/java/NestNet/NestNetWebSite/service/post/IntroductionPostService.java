@@ -66,6 +66,8 @@ public class IntroductionPostService {
             }
         }
 
+        postService.addViewCount(post, member.getId());
+
         return ApiResult.success("게시물 저장 성공");
     }
 
@@ -82,11 +84,22 @@ public class IntroductionPostService {
 
         List<IntroductionPostListDto> dtoList = new ArrayList<>();
         for(IntroductionPost post : introductionPostList){
-            for(AttachedFile attachedFile : post.getAttachedFileList()){
+
+            // 게시물에 첨부파일이 있는 경우
+            if(!ObjectUtils.isEmpty(post.getAttachedFileList())){
+                for(AttachedFile attachedFile : post.getAttachedFileList()){
+                    dtoList.add(new IntroductionPostListDto(
+                            post.getId(), post.getTitle(), post.getViewCount(), post.getLikeCount(), post.getCreatedTime(),
+                            attachedFile.getSaveFilePath(), attachedFile.getSaveFileName()));
+                }
+            }
+            // 게시물에 첨부 파일이 없는 경우
+            else{
                 dtoList.add(new IntroductionPostListDto(
                         post.getId(), post.getTitle(), post.getViewCount(), post.getLikeCount(), post.getCreatedTime(),
-                        attachedFile.getSaveFilePath(), attachedFile.getSaveFileName()));
+                        null, null));
             }
+
         }
 
         IntroductionPostListResponse result = new IntroductionPostListResponse(postPage.getTotalElements(), dtoList);
@@ -122,12 +135,12 @@ public class IntroductionPostService {
 
         for(Comment comment : commentList){
             if(loginMember.getId() == comment.getMember().getId()){
-                commentDtoList.add(new CommentDto(comment.getId(), comment.getMember().getName(), comment.getContent(),
-                        comment.getCreatedTime(), comment.getModifiedTime(), true));
+                commentDtoList.add(new CommentDto(comment.getId(), comment.getMember().getLoginId(), comment.getMember().getName(), comment.getMember().getMemberAuthority(),
+                        comment.getContent(), comment.getCreatedTime(), comment.getModifiedTime(), true));
             }
             else{
-                commentDtoList.add(new CommentDto(comment.getId(), comment.getMember().getName(), comment.getContent(),
-                        comment.getCreatedTime(), comment.getModifiedTime(), false));
+                commentDtoList.add(new CommentDto(comment.getId(), comment.getMember().getLoginId(), comment.getMember().getName(), comment.getMember().getMemberAuthority(),
+                        comment.getContent(), comment.getCreatedTime(), comment.getModifiedTime(), false));
             }
         }
 
@@ -138,6 +151,7 @@ public class IntroductionPostService {
                     .bodyContent(post.getBodyContent())
                     .viewCount(post.getViewCount())
                     .likeCount(post.getLikeCount())
+                    .memberLoginId(post.getMember().getLoginId())
                     .username(post.getMember().getName())
                     .createdTime(post.getCreatedTime())
                     .modifiedTime(post.getModifiedTime())
@@ -151,6 +165,7 @@ public class IntroductionPostService {
                     .bodyContent(post.getBodyContent())
                     .viewCount(post.getViewCount())
                     .likeCount(post.getLikeCount())
+                    .memberLoginId(post.getMember().getLoginId())
                     .username(post.getMember().getName())
                     .createdTime(post.getCreatedTime())
                     .modifiedTime(post.getModifiedTime())

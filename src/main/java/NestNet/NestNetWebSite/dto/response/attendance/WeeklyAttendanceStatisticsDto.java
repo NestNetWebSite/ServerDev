@@ -5,8 +5,9 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class AttendanceStatisticsDto {
+public class WeeklyAttendanceStatisticsDto {
 
     private String memberName;
+    private String type;
     private Long point;
 }

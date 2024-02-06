@@ -4,6 +4,7 @@ import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.attachedfile.AttachedFile;
 import NestNet.NestNetWebSite.domain.comment.Comment;
 import NestNet.NestNetWebSite.domain.member.Member;
+import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.domain.post.photo.PhotoPost;
 import NestNet.NestNetWebSite.dto.request.PhotoPostModifyRequest;
 import NestNet.NestNetWebSite.dto.request.PhotoPostRequest;
@@ -18,6 +19,7 @@ import NestNet.NestNetWebSite.exception.CustomException;
 import NestNet.NestNetWebSite.exception.ErrorCode;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
 import NestNet.NestNetWebSite.repository.post.PhotoPostRepository;
+import NestNet.NestNetWebSite.repository.post.PostRepository;
 import NestNet.NestNetWebSite.service.attachedfile.AttachedFileService;
 import NestNet.NestNetWebSite.service.comment.CommentService;
 import NestNet.NestNetWebSite.service.like.PostLikeService;
@@ -45,6 +47,8 @@ public class PhotoPostService {
     private final PostLikeService postLikeService;
     private final PostService postService;
 
+    private final PostRepository postRepository;
+
     /*
     사진 게시판에 게시물 저장
      */
@@ -67,6 +71,8 @@ public class PhotoPostService {
             }
         }
 
+        postService.addViewCount(post, member.getId());
+
         return ApiResult.success("게시물 저장 성공");
     }
 
@@ -82,13 +88,13 @@ public class PhotoPostService {
         List<PhotoPost> photoPostList = photoPostPage.getContent();
 
         List<ThumbNailDto> dtoList = new ArrayList<>();
-        for(PhotoPost post : photoPostList){
+        for(Post post : photoPostList){
 
-            AttachedFile attachedFile = attachedFileService.findThumbNailFileByPost(post);
+//            AttachedFile attachedFile = attachedFileService.findThumbNailFileByPost(post);
 
             dtoList.add(new ThumbNailDto(
                     post.getId(), post.getTitle(), post.getViewCount(), post.getLikeCount(),
-                    attachedFile.getSaveFilePath(), attachedFile.getSaveFileName()));
+                    post.getAttachedFileList().get(0).getSaveFilePath(), post.getAttachedFileList().get(0).getSaveFileName()));
         }
 
         return ApiResult.success(new ThumbNailResponse(dtoList));
@@ -121,12 +127,12 @@ public class PhotoPostService {
 
         for(Comment comment : commentList){
             if(loginMember.getId() == comment.getMember().getId()){
-                commentDtoList.add(new CommentDto(comment.getId(), comment.getMember().getName(), comment.getContent(),
-                        comment.getCreatedTime(), comment.getModifiedTime(), true));
+                commentDtoList.add(new CommentDto(comment.getId(), comment.getMember().getLoginId(), comment.getMember().getName(), comment.getMember().getMemberAuthority(),
+                        comment.getContent(), comment.getCreatedTime(), comment.getModifiedTime(), true));
             }
             else{
-                commentDtoList.add(new CommentDto(comment.getId(), comment.getMember().getName(), comment.getContent(),
-                        comment.getCreatedTime(), comment.getModifiedTime(), false));
+                commentDtoList.add(new CommentDto(comment.getId(), comment.getMember().getLoginId(), comment.getMember().getName(), comment.getMember().getMemberAuthority(),
+                        comment.getContent(), comment.getCreatedTime(), comment.getModifiedTime(), false));
             }
         }
 
@@ -137,6 +143,7 @@ public class PhotoPostService {
                     .bodyContent(post.getBodyContent())
                     .viewCount(post.getViewCount())
                     .likeCount(post.getLikeCount())
+                    .memberLoginId(post.getMember().getLoginId())
                     .username(post.getMember().getName())
                     .createdTime(post.getCreatedTime())
                     .modifiedTime(post.getModifiedTime())
@@ -150,6 +157,7 @@ public class PhotoPostService {
                     .bodyContent(post.getBodyContent())
                     .viewCount(post.getViewCount())
                     .likeCount(post.getLikeCount())
+                    .memberLoginId(post.getMember().getLoginId())
                     .username(post.getMember().getName())
                     .createdTime(post.getCreatedTime())
                     .modifiedTime(post.getModifiedTime())

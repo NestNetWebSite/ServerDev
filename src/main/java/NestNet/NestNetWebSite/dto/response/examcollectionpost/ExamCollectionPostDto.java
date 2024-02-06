@@ -22,7 +22,8 @@ public class ExamCollectionPostDto {
     private int year;
     private int semester;
     private ExamType examType;
-    private String userName;
+    private String memberLoginId;
+    private String username;
     private LocalDateTime createdTime;
     private LocalDateTime modifiedTime;
     boolean isMemberWritten;

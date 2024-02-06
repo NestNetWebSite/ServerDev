@@ -69,6 +69,8 @@ public class NoticePostService {
             }
         }
 
+        postService.addViewCount(post, member.getId());
+
         return ApiResult.success("게시물 저장 성공");
     }
 
@@ -121,12 +123,12 @@ public class NoticePostService {
 
         for(Comment comment : commentList){
             if(loginMember.getId() == comment.getMember().getId()){
-                commentDtoList.add(new CommentDto(comment.getId(), comment.getMember().getName(), comment.getContent(),
-                        comment.getCreatedTime(), comment.getModifiedTime(), true));
+                commentDtoList.add(new CommentDto(comment.getId(), comment.getMember().getLoginId(), comment.getMember().getName(), comment.getMember().getMemberAuthority(),
+                        comment.getContent(), comment.getCreatedTime(), comment.getModifiedTime(), true));
             }
             else{
-                commentDtoList.add(new CommentDto(comment.getId(), comment.getMember().getName(), comment.getContent(),
-                        comment.getCreatedTime(), comment.getModifiedTime(), false));
+                commentDtoList.add(new CommentDto(comment.getId(), comment.getMember().getLoginId(), comment.getMember().getName(), comment.getMember().getMemberAuthority(),
+                        comment.getContent(), comment.getCreatedTime(), comment.getModifiedTime(), false));
             }
         }
 
@@ -137,6 +139,7 @@ public class NoticePostService {
                     .bodyContent(post.getBodyContent())
                     .viewCount(post.getViewCount())
                     .likeCount(post.getLikeCount())
+                    .memberLoginId(post.getMember().getLoginId())
                     .username(post.getMember().getName())
                     .createdTime(post.getCreatedTime())
                     .modifiedTime(post.getModifiedTime())
@@ -150,6 +153,7 @@ public class NoticePostService {
                     .bodyContent(post.getBodyContent())
                     .viewCount(post.getViewCount())
                     .likeCount(post.getLikeCount())
+                    .memberLoginId(post.getMember().getLoginId())
                     .username(post.getMember().getName())
                     .createdTime(post.getCreatedTime())
                     .modifiedTime(post.getModifiedTime())

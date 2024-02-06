@@ -17,5 +17,4 @@ public class IntroductionPostListDto {
 
     private String saveFilePath;        // 사진 경로
     private String saveFileName;        // 사진 이름
-
 }

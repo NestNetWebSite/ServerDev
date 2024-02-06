@@ -1,7 +1,7 @@
 package NestNet.NestNetWebSite.controller.life4cut;
 
 import NestNet.NestNetWebSite.api.ApiResult;
-import NestNet.NestNetWebSite.dto.response.Life4CutResponse;
+import NestNet.NestNetWebSite.dto.response.life4cut.Life4CutResponse;
 import NestNet.NestNetWebSite.service.life4cut.Life4CutService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -32,12 +32,12 @@ public class Life4CutController {
     /*
     인생네컷 조회 (내림차순)
      */
-    @GetMapping("/life4cut/{page}/{size}")
+    @GetMapping("/life4cut")
     @Operation(summary = "인생네컷 다건 조회", description = "size(갯수)만큼 인생네컷을 랜덤으로 조회하여 반환한다.", responses = {
             @ApiResponse(responseCode = "200", description = "게시글 조회 성공", content = @Content(schema = @Schema(implementation = Life4CutResponse.class)))
     })
-    public ApiResult<?> showLife4Cut(@PathVariable("page") int page, @PathVariable("size") int size){
+    public ApiResult<?> showLife4Cut(@RequestParam("size") int size){
 
-        return life4CutService.findFileByPaging(page, size);
+        return life4CutService.findFileByPaging(size);
     }
 }

@@ -1,5 +1,6 @@
 package NestNet.NestNetWebSite.config.web;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -17,6 +18,9 @@ import java.io.File;
 @Configuration
 @EnableWebMvc
 public class WebConfig implements WebMvcConfigurer {
+
+    @Value("#{environment['filePath']}")
+    private String filePath;
 
     /*
     multipart 데이터 파싱 및 처리
@@ -40,11 +44,7 @@ public class WebConfig implements WebMvcConfigurer {
         CorsConfiguration configuration = new CorsConfiguration();      //CORS 관련 설정 정의할 객체
 
         configuration.setAllowCredentials(true);         //자격 증명 허용 여부 설정. Authorization을 이용해 인증 서비스를 할 때 true로 세팅
-//        configuration.addAllowedOrigin("http://**");
         configuration.addAllowedOriginPattern("http://**");
-//        configuration.addAllowedOriginPattern("http://192.168.219.164:3000");      //모든 ip에 대해 응답을 허용
-//        configuration.addAllowedOriginPattern("http://192.168.219.114:3000");      //모든 ip에 대해 응답을 허용
-//        configuration.addAllowedOriginPattern("http://192.168.219.143:3000");      //모든 ip에 대해 응답을 허용
         configuration.addAllowedHeader("*");             //모든 header에 대해 응답을 허용
         configuration.addAllowedMethod("*");             //모든 매서드(get, post, put, delete..)에 대해 응답을 허용
 
@@ -56,17 +56,16 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-//                .allowedOrigins("*")
                 .allowedOrigins("http://**")
-//                .allowedOrigins("http://192.168.219.164:3000", "http://192.168.219.114:3000", "http://192.168.219.143:3000")
                 .allowCredentials(true)
                 .allowedMethods("OPTIONS", "GET", "POST", "PUT", "DELETE");
     }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+
         registry.addResourceHandler("/image/**")
-                .addResourceLocations("file:///C:" + File.separator + "nestnetFile" + File.separator);
+                .addResourceLocations("file:///" + filePath);
     }
 
 

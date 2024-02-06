@@ -1,9 +1,12 @@
 package NestNet.NestNetWebSite.service.post;
 
+import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.config.redis.RedisUtil;
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.domain.post.Post;
 import NestNet.NestNetWebSite.domain.post.PostCategory;
+import NestNet.NestNetWebSite.dto.response.RecentPostListDto;
+import NestNet.NestNetWebSite.dto.response.RecentPostListResponse;
 import NestNet.NestNetWebSite.exception.CustomException;
 import NestNet.NestNetWebSite.exception.ErrorCode;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
@@ -12,9 +15,13 @@ import NestNet.NestNetWebSite.service.attachedfile.AttachedFileService;
 import NestNet.NestNetWebSite.service.comment.CommentService;
 import NestNet.NestNetWebSite.service.like.PostLikeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -35,9 +42,31 @@ public class PostService {
 
         //24시간 내에 다시 조회해도 조회수 올라가지 않음 (조회하지 않았으면 레디스에 없음 -> 조회수 + 1)
         if(!redisUtil.hasKey(viewRecordKey)){
+
+            System.out.println(viewRecordKey);
+
             post.addViewCount();        //변경 감지에 의해 update
             redisUtil.setData(viewRecordKey, "v", 24, TimeUnit.HOURS);      //24시간 유지 -> 자동 삭제
         }
+    }
+
+    /*
+    최근 게시물 목록 조회
+     */
+    public ApiResult<?> findRecentPost(){
+
+        int size = 5;
+
+        PageRequest pageRequest = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "id"));
+
+        List<Post> postList = postRepository.findAll(pageRequest).getContent();
+
+        List<RecentPostListDto> dtoList = new ArrayList<>();
+        for(Post post : postList){
+            dtoList.add(new RecentPostListDto(post.getId(), post.getPostCategory(), post.getTitle(), post.getCreatedTime()));
+        }
+
+        return ApiResult.success(new RecentPostListResponse(dtoList));
     }
 
     /*
@@ -50,15 +79,7 @@ public class PostService {
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
 
-//        commentService.deleteAllComments(post);
-//        postLikeService.deleteLike(post);
-//
-//        if(post.getPostCategory().equals(PostCategory.PHOTO)){
-//            photoFileService.deleteFiles(post);
-//        }
-//        else{
-//            attachedFileService.deleteFiles(post);
-//        }
+        postLikeService.deleteLike(post);
 
         postRepository.delete(post);
     }
@@ -67,7 +88,7 @@ public class PostService {
     좋아요
      */
     @Transactional
-    public void like(Long id, String memberLoginId){
+    public ApiResult<?> like(Long id, String memberLoginId){
 
         Member member = memberRepository.findByLoginId(memberLoginId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
@@ -80,13 +101,15 @@ public class PostService {
 
             post.like();
         }
+
+        return ApiResult.success(post.getLikeCount());
     }
 
     /*
     좋아요 취소
      */
     @Transactional
-    public void cancelLike(Long id, String memberLoginId){
+    public ApiResult<?> cancelLike(Long id, String memberLoginId){
 
         Member member = memberRepository.findByLoginId(memberLoginId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
@@ -99,6 +122,8 @@ public class PostService {
 
             post.cancelLike();
         }
+
+        return ApiResult.success(post.getLikeCount());
     }
 
 }

@@ -1,15 +1,19 @@
 package NestNet.NestNetWebSite.controller.attendance;
 
 import NestNet.NestNetWebSite.api.ApiResult;
+import NestNet.NestNetWebSite.dto.response.attendance.AttendanceStatisticsResponse;
 import NestNet.NestNetWebSite.service.attendance.AttendanceService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -23,30 +27,36 @@ public class AttendanceController {
     /*
     출석
      */
-    @GetMapping("/attendance")
+    @PostMapping("/attendance")
     @Operation(summary = "출석", description = "로그인한 사용자가 출석 버튼을 눌렀을 때 동작한다.")
-    public ApiResult<?> memberAttendance(@AuthenticationPrincipal UserDetails userDetails, HttpServletResponse response){
+    public ApiResult<?> memberAttendance(@AuthenticationPrincipal UserDetails userDetails){
 
-        return attendanceService.saveAttendance(userDetails.getUsername(), response);
+        return attendanceService.saveAttendance(userDetails.getUsername());
     }
 
     /*
-    주간 출석 통계 조회
+    주간 / 월간 출석 통계 조회
      */
-    @GetMapping("attendance/weekly")
-    @Operation(summary = "주간 출석 조회", description = "")
-    public ApiResult<?> findWeeklyAttendance(){
+    @GetMapping("/attendance/statistics")
+    @Operation(summary = "주간 / 월간 출석 통계 조회", description = "", responses =
+            @ApiResponse(responseCode = "200", description = "", content = @Content(schema = @Schema(implementation = AttendanceStatisticsResponse.class)))
+    )
+    public ApiResult<?> findAttendanceStatistics(){
 
-        return attendanceService.findWeeklyAttendanceStatistics();
+        return attendanceService.findAttendanceStatistics();
     }
 
     /*
-    월간 출석 통계 조회
+    로그인한 회원의 출석 정보 조회
      */
-    @GetMapping("attendance/monthly")
-    @Operation(summary = "월간 출석 조회", description = "")
-    public ApiResult<?> findMonthlyAttendance(){
-
-        return attendanceService.findMonthlyAttendanceStatistics();
-    }
+//    @GetMapping("/attendance/member-attended")
+//    @Operation(summary = "회원 출석 여부 조회", description = "", responses =
+//    @ApiResponse(responseCode = "200", description = "", content = @Content(schema = @Schema(implementation = Boolean.class)))
+//    )
+//    public ApiResult<?> findAttendance(@AuthenticationPrincipal UserDetails userDetails){
+//
+//        if(userDetails == null) return ApiResult.success(false);
+//
+//        return attendanceService.findAttendance(userDetails.getUsername());
+//    }
 }

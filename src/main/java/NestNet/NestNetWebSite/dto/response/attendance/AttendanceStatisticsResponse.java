@@ -10,5 +10,6 @@ import java.util.List;
 @AllArgsConstructor
 public class AttendanceStatisticsResponse {
 
-    private List<AttendanceStatisticsDto> dtoList = new ArrayList<>();
+    private List<WeeklyAttendanceStatisticsDto> weeklyStatisticsDtoList = new ArrayList<>();
+    private List<MonthlyAttendanceStatisticsDto> monthlyStatisticsDtoList = new ArrayList<>();
 }

@@ -9,7 +9,6 @@ import java.util.List;
 
 @Getter
 @AllArgsConstructor
-@Builder
 public class ThumbNailResponse {
 
     private List<ThumbNailDto> dtoList = new ArrayList<>();

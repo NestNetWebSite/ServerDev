@@ -7,8 +7,11 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Life4CutResponse {
+public class ExecutiveInfoDto {
 
-    private String saveFilePath;
-    private String saveFileName;
+    private Long id;
+    private int year;
+    private String name;
+    private String studentId;
+    private String role;
 }
