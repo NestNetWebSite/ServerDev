@@ -1,19 +1,6 @@
 # BUILD (이미지를 만드는 과정)
 
 # Base Image
-FROM openjdk:17-alpine AS builder
-
-# 작업 디렉토리 설정
-WORKDIR /app
-
-# 프로젝트 파일 복사
-COPY . .
-
-# Gradle 빌드 실행 (테스트 제외)
-RUN ./gradlew build -x test
-
-
-# Base Image
 FROM openjdk:17-alpine
 
 # 운영 환경 컨테이너
