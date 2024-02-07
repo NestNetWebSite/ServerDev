@@ -90,8 +90,6 @@ public class PhotoPostService {
         List<ThumbNailDto> dtoList = new ArrayList<>();
         for(Post post : photoPostList){
 
-//            AttachedFile attachedFile = attachedFileService.findThumbNailFileByPost(post);
-
             dtoList.add(new ThumbNailDto(
                     post.getId(), post.getTitle(), post.getViewCount(), post.getLikeCount(),
                     post.getAttachedFileList().get(0).getSaveFilePath(), post.getAttachedFileList().get(0).getSaveFileName()));

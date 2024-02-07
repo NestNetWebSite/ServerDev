@@ -14,4 +14,5 @@ public class ExecutiveInfoDto {
     private String name;
     private String studentId;
     private String role;
+    private int priority;
 }

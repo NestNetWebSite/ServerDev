@@ -28,9 +28,9 @@ public class ExecutiveInfoController {
      */
     @PostMapping("/executive-info/save")
     @Operation(summary = "임원 정보 다건 저장", description = "임원 정보를 저장한다. 이때, 여러건을 한번에 저장할 수 있다.")
-    public void saveInfo(@RequestBody List<ExecutiveInfoRequest> executiveInfoRequestList){
+    public ApiResult<?> saveInfo(@RequestBody List<ExecutiveInfoRequest> executiveInfoRequestList){
 
-        executiveInfoService.saveExecutiveInfo(executiveInfoRequestList);
+        return executiveInfoService.saveExecutiveInfo(executiveInfoRequestList);
     }
 
     /*

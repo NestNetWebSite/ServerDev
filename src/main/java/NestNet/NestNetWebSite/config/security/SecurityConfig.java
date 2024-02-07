@@ -82,14 +82,13 @@ public class SecurityConfig {
                 .ignoring()
                 .requestMatchers("/swagger-ui/index.html", "/swagger-ui/**", "/v3/api-docs/**")
                 .requestMatchers("/auth/signup", "/auth/login", "/auth/mail-auth", "/auth/mail-auth-answer")
-                .requestMatchers("/member/find-id", "/member/get-temp-pw", "/member/find")
+                .requestMatchers("/member/find-id", "/member/get-temp-pw")
                 .requestMatchers("/attendance/statistics")
-                .requestMatchers("/life4cut/**")
+                .requestMatchers("/life4cut")
                 .requestMatchers("/post/recent-posts")
-                .requestMatchers("/manager/**")
+                .requestMatchers("/executive-info/prev", "/executive-info/current")
                 .requestMatchers("/file/**")
                 .requestMatchers("/forbidden", "/unauthorized")
-                .requestMatchers("/photo-post/**")
                 .requestMatchers("/image/**");
     }
 
@@ -117,29 +116,41 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()        //html, css같은 정적 리소스에 대해 접근 허용
-                        .requestMatchers(HttpMethod.GET, "/image/**").permitAll()
-                        .requestMatchers("/auth/signup", "auth/login").permitAll()                      //로그인, 회원가입 접근 허용
-                        // 관리자 패이지는 관리자만 접근 가능
-                        .requestMatchers("/manager/**").hasAnyAuthority("MANAGER", "ADMIN")                  //manager하위 리소스는 MANAGER 권한으로 허용
+                        // 출석은 모든 권한 접근 가능 (승인대기, 탈퇴 제외)
+                        .requestMatchers("/attendance").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER")
+                        // 댓글 관련은 모든 권한 접근 가능 (승인대기, 탈퇴 제외)
+                        .requestMatchers("/comment/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER")
+                        // 임원 정보 저장/수정/삭제는 회장, 부회장, 관리자만 접근 가능
+                        .requestMatchers("/executive-info/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER")
+                        // 파일 저장은 모든 권한 접근 가능 (승인대기, 탈퇴 제외)
+                        .requestMatchers("/file").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER")
+                        // 인생네컷 저장은 회장, 부회장, 관리자만 접근 가능
+                        .requestMatchers("/life4cut/save").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER")
+                        // 관리자 페이지는 관리자만 접근 가능
+                        .requestMatchers("/manager/**").hasAnyAuthority("ADMIN", "MANAGER")
+                        // 회원 정보 수정/비번 인증/비번 변경/탈퇴는 모든 권한 접근 가능 (승인대기, 탈퇴 제외)
+                        .requestMatchers("/member/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER")
+                        // 회원 프로필 관련은 모든 회원 접근 가능 (승인대기, 탈퇴 제외)
+                        .requestMatchers("/member-profile/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER")
+                        // 족보 게시판은 모든 회원 접근 가능 (승인대기, 탈퇴 제외)
+                        .requestMatchers("/exam-collection-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER")
+                        // 자기 소개 게시판은 모든 회원 접근 가능 (승인대기, 탈퇴 제외)
+                        .requestMatchers("/introduction-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER")
+                        // 공지 사항 게시판 작성은 회장, 부회장, 관리자만 접근 가능
+                        .requestMatchers("/notice-post/post").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER")
+                        // 공지 사항 게시판 수정은 회장, 부회장, 관리자만 접근 가능
+                        .requestMatchers("/notice-post/modify").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER")
+                        // 사진 게시판 작성은 회장, 부회장, 관리자만 접근 가능
+                        .requestMatchers("/photo-post/post").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER")
+                        // 사진 게시판 수정은 회장, 부회장, 관리자만 접근 가능
+                        .requestMatchers("/photo-post/modify").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER")
+                        // 사진 게시판 목록 조회는 모든 회원 접근 가능 (승인대기, 탈퇴 제외)
+                        .requestMatchers("/photo-post").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER")
                         // 게시판 통합 기능은 모든 회원 접근 가능
-                        .requestMatchers("/post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER",  "WITHDRAWN_MEMBER")
+                        .requestMatchers("/post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER")
                         // 통합 게시판은 모든 회원 접근 가능
-                        .requestMatchers("/unified-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER", "WITHDRAWN_MEMBER")
-                        // 족보 게시판은 졸업생을 제외한 모든 회원 접근 가능
-                        .requestMatchers("/exam-collection-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "WITHDRAWN_MEMBER")
-                        // 사진 게시판 리스트 조회는 권한 필요없음 / 사진 게시판 작성은 회장, 부회장, 관리자 접근 가능 / 그 외 조회는 모든 회원 접근 가능
-                        .requestMatchers("/photo-post/post").hasAnyAuthority("PRESIDENT", "VICE_PRESIDENT", "MANAGER", "ADMIN")
-                        .requestMatchers("/photo-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER", "WITHDRAWN_MEMBER")
-                        // 인생네컷
-                        .requestMatchers("/life4cut/save").hasAnyAuthority("PRESIDENT", "VICE_PRESIDENT", "MANAGER")
-//                        .requestMatchers("/life4cut/**").permitAll()
-                        // 멤버 프로필
-                        .requestMatchers("/member-profile/member-info/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER", "WITHDRAWN_MEMBER")
-                        .requestMatchers("/member/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER", "WITHDRAWN_MEMBER")
-                        // 자기소개 게시판
-                        .requestMatchers("/introduction-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER", "WITHDRAWN_MEMBER")
+                        .requestMatchers("/unified-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER")
                         .anyRequest().authenticated()       //나머지 요청은 모두 권한 필요함.
-
                 )
 
                 // 헤더 관련 설정

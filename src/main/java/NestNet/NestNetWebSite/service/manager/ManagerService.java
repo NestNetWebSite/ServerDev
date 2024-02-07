@@ -77,12 +77,12 @@ public class ManagerService {
         Member member = memberRepository.findByLoginId(dto.getLoginId())
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
 
-        memberRepository.delete(member);
-
         MemberSignUpManagement memberSignUpManagement = memberSignUpManagementRepository.findByMember(member)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_SIGNUP_REQUEST_NOT_FOUND));
 
         memberSignUpManagementRepository.delete(memberSignUpManagement);
+
+//        memberRepository.delete(member);
 
         return ApiResult.success(member.getLoginId() + " 님의 회원가입 요청 거절이 완료되었습니다.");
     }

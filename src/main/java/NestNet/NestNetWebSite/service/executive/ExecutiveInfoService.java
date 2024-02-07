@@ -14,28 +14,45 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ExecutiveInfoService {
 
-    public ExecutiveInfoRepository executiveInfoRepository;
+    private final ExecutiveInfoRepository executiveInfoRepository;
 
     /*
     임원 정보 저장
      */
     @Transactional
-    public void saveExecutiveInfo(List<ExecutiveInfoRequest> executiveInfoRequestList){
+    public ApiResult<?> saveExecutiveInfo(List<ExecutiveInfoRequest> executiveInfoRequestList){
 
         List<ExecutiveInfo> executiveInfoList = new ArrayList<>();
 
+        Map<String, Integer> priorityMap = new HashMap<>();
+        priorityMap.put("회장", 1);
+        priorityMap.put("부회장", 2);
+        priorityMap.put("총무", 3);
+        priorityMap.put("서버", 4);
+        priorityMap.put("기획", 5);
+        priorityMap.put("홍보", 6);
+        priorityMap.put("학술", 7);
+        priorityMap.put("복지", 8);
+
         for(ExecutiveInfoRequest executiveInfoRequest : executiveInfoRequestList){
-            executiveInfoList.add(executiveInfoRequest.toEntity());
+            ExecutiveInfo executiveInfo = executiveInfoRequest.toEntity();
+
+            executiveInfo.setPriority(priorityMap.get(executiveInfo.getRole()));        // 직무에 맞는 우선순위 세팅
+            executiveInfoList.add(executiveInfo);
         }
 
         executiveInfoRepository.saveAll(executiveInfoList);
+
+        return ApiResult.success("임원 정보를 저장했습니다");
     }
 
     /*
@@ -49,7 +66,7 @@ public class ExecutiveInfoService {
 
         for(ExecutiveInfo executiveInfo : executiveInfoList){
             dtoList.add(new ExecutiveInfoDto(executiveInfo.getId(), executiveInfo.getYear(),
-                    executiveInfo.getName(), executiveInfo.getStudentId(), executiveInfo.getRole()));
+                    executiveInfo.getName(), executiveInfo.getStudentId(), executiveInfo.getRole(), executiveInfo.getPriority()));
         }
 
         return ApiResult.success(new ExecutiveInfoResponse(dtoList));
@@ -66,7 +83,7 @@ public class ExecutiveInfoService {
 
         for(ExecutiveInfo executiveInfo : executiveInfoList){
             dtoList.add(new ExecutiveInfoDto(executiveInfo.getId(), executiveInfo.getYear(),
-                    executiveInfo.getName(), executiveInfo.getStudentId(), executiveInfo.getRole()));
+                    executiveInfo.getName(), executiveInfo.getStudentId(), executiveInfo.getRole(), executiveInfo.getPriority()));
         }
 
         return ApiResult.success(new ExecutiveInfoResponse(dtoList));
@@ -77,11 +94,21 @@ public class ExecutiveInfoService {
      */
     public ApiResult<?> modifyExecutiveInfo(ExecutiveInfoModifyRequest executiveInfoRequest){
 
+        Map<String, Integer> priorityMap = new HashMap<>();
+        priorityMap.put("회장", 1);
+        priorityMap.put("부회장", 2);
+        priorityMap.put("총무", 3);
+        priorityMap.put("서버", 4);
+        priorityMap.put("기획", 5);
+        priorityMap.put("홍보", 6);
+        priorityMap.put("학술", 7);
+        priorityMap.put("복지", 8);
+
         ExecutiveInfo executiveInfo = executiveInfoRepository.findById(executiveInfoRequest.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.EXECUTIVE_INFO_NOT_FOUND));
 
         executiveInfo.modifyInfo(executiveInfoRequest.getYear(), executiveInfoRequest.getName(),
-                executiveInfoRequest.getStudentId(), executiveInfoRequest.getRole());
+                executiveInfoRequest.getStudentId(), executiveInfoRequest.getRole(), priorityMap.get(executiveInfoRequest.getRole()));
 
         return ApiResult.success("임원 정보가 수정되었습니다.");
     }

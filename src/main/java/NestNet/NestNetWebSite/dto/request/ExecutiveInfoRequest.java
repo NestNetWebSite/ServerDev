@@ -18,6 +18,6 @@ public class ExecutiveInfoRequest {
     //== DTO ---> Entity ==//
     public ExecutiveInfo toEntity(){
 
-        return new ExecutiveInfo(year, name, studentId, role);
+        return new ExecutiveInfo(year, name, studentId, role, 0);
     }
 }
