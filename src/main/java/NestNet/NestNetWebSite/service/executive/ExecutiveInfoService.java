@@ -2,9 +2,12 @@ package NestNet.NestNetWebSite.service.executive;
 
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.executive.ExecutiveInfo;
+import NestNet.NestNetWebSite.dto.request.ExecutiveInfoModifyRequest;
 import NestNet.NestNetWebSite.dto.request.ExecutiveInfoRequest;
 import NestNet.NestNetWebSite.dto.response.ExecutiveInfoDto;
 import NestNet.NestNetWebSite.dto.response.ExecutiveInfoResponse;
+import NestNet.NestNetWebSite.exception.CustomException;
+import NestNet.NestNetWebSite.exception.ErrorCode;
 import NestNet.NestNetWebSite.repository.executive.ExecutiveInfoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -68,5 +71,33 @@ public class ExecutiveInfoService {
 
         return ApiResult.success(new ExecutiveInfoResponse(dtoList));
     }
+
+    /*
+    임원 정보 수정
+     */
+    public ApiResult<?> modifyExecutiveInfo(ExecutiveInfoModifyRequest executiveInfoRequest){
+
+        ExecutiveInfo executiveInfo = executiveInfoRepository.findById(executiveInfoRequest.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.EXECUTIVE_INFO_NOT_FOUND));
+
+        executiveInfo.modifyInfo(executiveInfoRequest.getYear(), executiveInfoRequest.getName(),
+                executiveInfoRequest.getStudentId(), executiveInfoRequest.getRole());
+
+        return ApiResult.success("임원 정보가 수정되었습니다.");
+    }
+
+    /*
+    임원 정보 삭제
+     */
+    public ApiResult<?> deleteExecutiveInfo(Long id){
+
+        ExecutiveInfo executiveInfo = executiveInfoRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.EXECUTIVE_INFO_NOT_FOUND));
+
+        executiveInfoRepository.delete(executiveInfo);
+
+        return ApiResult.success("임원 정보가 삭제되었습니다.");
+    }
+
 
 }

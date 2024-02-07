@@ -27,5 +27,5 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect        # mysql 방언
     open-in-view: false
 
-filePath: C:\nestnetFile\
-#filePath: home/new_nnetserver/nestnet_file
+#filePath: C:\nestnetFile\
+filePath: /home/new_nnetserver/nestnet_file

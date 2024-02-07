@@ -38,9 +38,10 @@ public class ExecutiveInfo {
     /*
     임원 정보 수정
      */
-    public void modifyInfo(int year, String name, String studentId){
+    public void modifyInfo(int year, String name, String studentId, String role){
         this.year = year;
         this.name = name;
         this.studentId = studentId;
+        this.role = role;
     }
 }

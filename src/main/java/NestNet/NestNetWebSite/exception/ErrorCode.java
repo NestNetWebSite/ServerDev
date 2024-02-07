@@ -27,6 +27,7 @@ public enum ErrorCode {
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 댓글이 존재하지 않습니다."),
     THUMBNAIL_FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 사진 게시물의 썸네일 파일이 존재하지 않습니다."),
     MEMBER_SIGNUP_REQUEST_NOT_FOUND(HttpStatus.NOT_FOUND, "회원가입 요청을 찾을 수 없습니다."),
+    EXECUTIVE_INFO_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 임원 정보를 찾을 수 없습니다."),
 
     // 409 CONFLICT
     ALREADY_ATTENDED(HttpStatus.CONFLICT, "이미 출석하셨습니다."),
