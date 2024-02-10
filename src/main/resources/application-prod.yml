@@ -28,4 +28,4 @@ spring:
     open-in-view: false
 
 #filePath: C:\nestnetFile\
-filePath: /home/new_nnetserver/nestnet_file
+filePath: ${file-path}

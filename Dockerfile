@@ -1,4 +1,10 @@
 # BUILD (이미지를 만드는 과정)
+FROM gradle:7.6.1-jdk17-alpine as builder
+
+WORKDIR /app
+COPY . .
+
+RUN ["gradle", "-x", "test" , "build"]
 
 # Base Image
 FROM openjdk:17-alpine
@@ -11,5 +17,7 @@ ARG JAR_FILE=./build/libs/NestNet-WebSite-0.0.1-SNAPSHOT.jar
 
 # 컨테이너 WORKDIR 위치에 jar 파일 복사
 COPY ${JAR_FILE} nestnet_server.jar
+
+EXPOSE 8080
 
 ENTRYPOINT ["java", "-Dspring.profiles.active=${SPRING_PROFILE}", "-jar", "nestnet_server.jar"]
