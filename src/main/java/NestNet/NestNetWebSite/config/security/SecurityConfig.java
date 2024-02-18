@@ -118,6 +118,8 @@ public class SecurityConfig {
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()        //html, css같은 정적 리소스에 대해 접근 허용
                         // 출석은 모든 권한 접근 가능 (승인대기, 탈퇴 제외)
                         .requestMatchers("/attendance").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER")
+                        // 로그아웃은 모든 권한 접근 가능
+                        .requestMatchers("/auth/logout").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER", "WAITING_FOR_APPROVAL")
                         // 댓글 관련은 모든 권한 접근 가능 (승인대기, 탈퇴 제외)
                         .requestMatchers("/comment/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER")
                         // 임원 정보 저장/수정/삭제는 회장, 부회장, 관리자만 접근 가능
@@ -140,6 +142,8 @@ public class SecurityConfig {
                         .requestMatchers("/notice-post/post").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER")
                         // 공지 사항 게시판 수정은 회장, 부회장, 관리자만 접근 가능
                         .requestMatchers("/notice-post/modify").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER")
+                        // 공지 사항 게시판 목록 조회 모든 회원 접근 가능 (승인대기, 탈퇴 제외)
+                        .requestMatchers("/notice-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER")
                         // 사진 게시판 작성은 회장, 부회장, 관리자만 접근 가능
                         .requestMatchers("/photo-post/post").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER")
                         // 사진 게시판 수정은 회장, 부회장, 관리자만 접근 가능
@@ -150,7 +154,7 @@ public class SecurityConfig {
                         .requestMatchers("/post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER")
                         // 통합 게시판은 모든 회원 접근 가능
                         .requestMatchers("/unified-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER")
-                        .anyRequest().authenticated()       //나머지 요청은 모두 권한 필요함.
+//                        .anyRequest().authenticated()       //나머지 요청은 모두 권한 필요함.
                 )
 
                 // 헤더 관련 설정

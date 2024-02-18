@@ -4,8 +4,12 @@ import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.domain.life4cut.Life4Cut;
 import NestNet.NestNetWebSite.dto.response.life4cut.Life4CutDto;
 import NestNet.NestNetWebSite.dto.response.life4cut.Life4CutResponse;
+import NestNet.NestNetWebSite.exception.CustomException;
+import NestNet.NestNetWebSite.exception.ErrorCode;
 import NestNet.NestNetWebSite.repository.life4cut.Life4CutRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -23,11 +27,13 @@ import java.util.List;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Slf4j
 public class Life4CutService {
 
     private final Life4CutRepository life4CutRepository;
 
-    private static String basePath = "C:" + File.separator + "nestnetFile" + File.separator;
+    @Value("#{environment['filePath']}")
+    private String filePath;
 
     /*
     인생네컷 저장
@@ -70,19 +76,19 @@ public class Life4CutService {
     // 실제 파일 저장
     private void saveRealFile(Life4Cut life4Cut, MultipartFile file){
 
-        StringBuilder filePathBuilder = new StringBuilder(basePath)
+        StringBuilder filePathBuilder = new StringBuilder(filePath)
                 .append(life4Cut.getSaveFilePath())
                 .append(File.separator)
                 .append(life4Cut.getSaveFileName());
 
         Path saveFilePath = Paths.get(filePathBuilder.toString());
 
+        log.info("인생네컷 저장 경로 : " + filePathBuilder.toString());
+
         try {
             file.transferTo(saveFilePath);
-        } catch (IOException e){
-
-        } catch (IllegalStateException e){
-
+        } catch (IOException | IllegalStateException e){
+            throw new CustomException(ErrorCode.CANNOT_SAVE_FILE);
         }
 
     }
