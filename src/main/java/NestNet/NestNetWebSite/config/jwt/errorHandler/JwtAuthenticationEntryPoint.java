@@ -4,6 +4,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -24,6 +26,11 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
 //        response.sendError(HttpServletResponse.SC_UNAUTHORIZED);        //401 error
 
-        response.sendRedirect("/unauthorized");
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("UTF-8");
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.getWriter().write("로그인 후 이용해주세요");
+
+//        response.sendRedirect("/unauthorized");
     }
 }

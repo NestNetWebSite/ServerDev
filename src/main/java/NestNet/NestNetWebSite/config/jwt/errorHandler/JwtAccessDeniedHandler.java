@@ -29,7 +29,9 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
 //        response.sendError(HttpServletResponse.SC_FORBIDDEN);           //403 error
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("UTF-8");
         response.setStatus(HttpStatus.FORBIDDEN.value());
+        response.getWriter().write("권한이 없습니다.");
 
 //        response.sendRedirect("/forbidden");
     }

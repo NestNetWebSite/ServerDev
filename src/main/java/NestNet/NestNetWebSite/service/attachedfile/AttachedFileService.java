@@ -6,6 +6,7 @@ import NestNet.NestNetWebSite.exception.CustomException;
 import NestNet.NestNetWebSite.exception.ErrorCode;
 import NestNet.NestNetWebSite.repository.attachedfile.AttachedFileRepository;
 import NestNet.NestNetWebSite.repository.post.PostRepository;
+import jakarta.persistence.Transient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,8 +36,8 @@ public class AttachedFileService {
     private final AttachedFileRepository attachedFileRepository;
     private final PostRepository postRepository;
 
-    @Value("#{environment['filePath']}")
-    private String filePath;
+    @Value("${filePath}")
+    private String baseFilePath;
 
     /*
     첨부파일 저장
@@ -47,13 +48,11 @@ public class AttachedFileService {
         List<AttachedFile> attachedFileList = new ArrayList<>();
 
         for(MultipartFile file : files){
-            AttachedFile attachedFile = new AttachedFile(post, file);
+            AttachedFile attachedFile = new AttachedFile(post, file, baseFilePath);
             attachedFileList.add(attachedFile);
         }
 
         attachedFileRepository.saveAll(attachedFileList);
-
-        log.info("여기까지는 잘 오는지? ");
 
         saveRealFile(attachedFileList, files);
 
@@ -89,7 +88,7 @@ public class AttachedFileService {
 
         InputStreamResource resource = null;
 
-        StringBuilder filePathBuilder = new StringBuilder(filePath)
+        StringBuilder filePathBuilder = new StringBuilder(baseFilePath)
                 .append(file.getSaveFilePath())
                 .append(File.separator)
                 .append(file.getSaveFileName());
@@ -127,10 +126,6 @@ public class AttachedFileService {
             }
         }
 
-        for(AttachedFile file : deleteFileList){
-            System.out.println(file.getId());
-        }
-
         // Delete From DB
         attachedFileRepository.deleteAll(deleteFileList);
 
@@ -140,7 +135,7 @@ public class AttachedFileService {
         List<AttachedFile> newFileList = new ArrayList<>();     // 새로 입력된 파일
         if(fileList != null){
             for(MultipartFile file : fileList){
-                newFileList.add(new AttachedFile(post, file));
+                newFileList.add(new AttachedFile(post, file, baseFilePath));
             }
         }
 
@@ -176,14 +171,12 @@ public class AttachedFileService {
             AttachedFile attachedFile = attachedFiles.get(i);
             MultipartFile file = files.get(i);
 
-            StringBuilder filePathBuilder = new StringBuilder(filePath)
+            StringBuilder filePathBuilder = new StringBuilder(baseFilePath)
                     .append(attachedFile.getSaveFilePath())
                     .append(File.separator)
                     .append(attachedFile.getSaveFileName());
 
             Path saveFilePath = Paths.get(filePathBuilder.toString());
-
-            log.info("여기는 왜 안오는지? : " + filePathBuilder.toString());
 
             try {
                 file.transferTo(saveFilePath);
@@ -197,7 +190,7 @@ public class AttachedFileService {
     private void deleteRealFile(List<AttachedFile> files){
 
         for(AttachedFile file : files){
-            StringBuilder filePathBuilder = new StringBuilder(filePath)
+            StringBuilder filePathBuilder = new StringBuilder(baseFilePath)
                     .append(file.getSaveFilePath())
                     .append(File.separator)
                     .append(file.getSaveFileName());

@@ -1,6 +1,8 @@
 package NestNet.NestNetWebSite.domain.attachedfile;
 
 import NestNet.NestNetWebSite.domain.post.Post;
+import NestNet.NestNetWebSite.exception.CustomException;
+import NestNet.NestNetWebSite.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,17 +33,17 @@ public class AttachedFile {
     private String saveFileName;                                // 실제 저장된 파일 이름
     private String saveFilePath;                                // 파일 경로 (서버)
 
-    @Transient      //영속성 컨텍스트에 관리되지 않음
-    @Value("#{environment['filePath']}")
-    private String filePath;
+//    @Transient      //영속성 컨텍스트에 관리되지 않음
+//    @Value("${filePath}")
+//    private String filePath;
 
     /*
     생성자
      */
-    public AttachedFile(Post post, MultipartFile file){
+    public AttachedFile(Post post, MultipartFile file, String baseFilePath){
         this.post = post;
         createFileName(file);
-        createSavePath();
+        createSavePath(baseFilePath);
     }
 
     //== setter ==//
@@ -54,52 +56,36 @@ public class AttachedFile {
     파일 이름 중복 방지를 위한 파일명 생성
      */
     public void createFileName(MultipartFile file){
-        String fileName = Normalizer.normalize(file.getOriginalFilename(), Normalizer.Form.NFC);    //Mac, Window 한글 처리 다른 이슈 처리
-        this.originalFileName = fileName;
-        this.saveFileName = UUID.randomUUID().toString() + "_" + fileName;
 
+        String fileName = Normalizer.normalize(file.getOriginalFilename(), Normalizer.Form.NFC);    //Mac, Window 한글 처리 다른 이슈 처리
+
+        StringBuilder fileNameBuilder = new StringBuilder();
+        fileNameBuilder.append(UUID.randomUUID().toString()).append("_").append(fileName);
+
+        this.originalFileName = fileName;
+        this.saveFileName = fileNameBuilder.toString();
     }
 
     /*
     파일 저장 경로 생성
      */
-    public void createSavePath(){
+    public void createSavePath(String baseFilePath){
 
-        File depth1Folder = new File(filePath + this.post.getPostCategory().toString());
+        StringBuilder folderBuilder = new StringBuilder();
+        folderBuilder.append(this.post.getPostCategory().toString())
+                .append(File.separator).append(this.post.getCreatedTime().getYear());
 
-        if(!depth1Folder.exists()){
+        File folder = new File(baseFilePath + folderBuilder.toString());
+
+        if(!folder.exists()){
             try {
-                depth1Folder.mkdir();
+                folder.mkdirs();
             }catch (Exception e){
-                e.printStackTrace();
+                throw new CustomException(ErrorCode.CANNOT_SAVE_FILE);
             }
         }
 
-        StringBuilder folderNameBuilder = new StringBuilder();
-        folderNameBuilder.append(this.post.getPostCategory().toString());
-        folderNameBuilder.append(File.separator);
-        folderNameBuilder.append(this.post.getCreatedTime().getYear());
-
-        if(this.post.getCreatedTime().getMonth().getValue() <= 6){      //상반기 작성된 글
-           folderNameBuilder.append("_first_half");
-        }
-        else{
-            folderNameBuilder.append("_second_half");
-        }
-
-        String path = folderNameBuilder.toString();    //파일 저장 경로 ( ex) C:/nestnetFile/EXAM/)
-
-        File depth2Folder = new File(filePath + path);               //해당 경로에 폴더 생성
-
-        if(!depth2Folder.exists()){       //해당 폴더가 존재하지 않을 경우 생성
-            try {
-                depth2Folder.mkdir();
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-        }
-
-        this.saveFilePath = path;
+        this.saveFilePath = folderBuilder.toString();
     }
 
 }
