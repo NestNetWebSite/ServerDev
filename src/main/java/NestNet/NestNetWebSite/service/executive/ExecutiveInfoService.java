@@ -92,6 +92,7 @@ public class ExecutiveInfoService {
     /*
     임원 정보 수정
      */
+    @Transactional
     public ApiResult<?> modifyExecutiveInfo(ExecutiveInfoModifyRequest executiveInfoRequest){
 
         Map<String, Integer> priorityMap = new HashMap<>();
@@ -116,6 +117,7 @@ public class ExecutiveInfoService {
     /*
     임원 정보 삭제
      */
+    @Transactional
     public ApiResult<?> deleteExecutiveInfo(Long id){
 
         ExecutiveInfo executiveInfo = executiveInfoRepository.findById(id)

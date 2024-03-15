@@ -18,6 +18,4 @@ ARG JAR_FILE=./build/libs/NestNet-WebSite-0.0.1-SNAPSHOT.jar
 # 컨테이너 WORKDIR 위치에 jar 파일 복사
 COPY ${JAR_FILE} nestnet_server.jar
 
-#EXPOSE 8080
-
 ENTRYPOINT ["java", "-Dspring.profiles.active=${SPRING_PROFILE}", "-jar", "nestnet_server.jar"]

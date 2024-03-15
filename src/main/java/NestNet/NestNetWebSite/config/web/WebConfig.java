@@ -1,6 +1,8 @@
 package NestNet.NestNetWebSite.config.web;
 
+import NestNet.NestNetWebSite.config.auth.CustomAuthorizationFilter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -31,12 +33,20 @@ public class WebConfig implements WebMvcConfigurer {
     }
 
     /*
-   Cross-Origin Resource Sharing (CORS)
-   보안상의 이유로 브라우저는 다른 도메인의 리소스에 접근하는 교차 출처 HTTP 요청을 제한한다. '동일 출처 정책' (Same Origin Policy, SOP)
-   이를 위해서는 서버의 동의가 필요하며, 교차 출처 요청에 대해 동의하기 위해 Cross-Origin Resource Sharing를 구성해야 한다.
-   이를 위해 커스텀 필터인 corsFilter를 생성하고 추가하는 방법으로 해결할 수 있다.
-   */
+    인증/인가 필터 등록
+     */
+    @Bean
+    public FilterRegistrationBean<CustomAuthorizationFilter> registrationBean(CustomAuthorizationFilter filter){
 
+        FilterRegistrationBean<CustomAuthorizationFilter> registration = new FilterRegistrationBean<>(filter);
+        registration.setEnabled(false);
+
+        return registration;
+    }
+
+    /*
+   cors 필터 등록
+   */
     @Bean
     public CorsFilter corsFilter(){
 

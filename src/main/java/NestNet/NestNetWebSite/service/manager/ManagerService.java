@@ -82,7 +82,7 @@ public class ManagerService {
 
         memberSignUpManagementRepository.delete(memberSignUpManagement);
 
-//        memberRepository.delete(member);
+        memberRepository.delete(member);
 
         return ApiResult.success(member.getLoginId() + " 님의 회원가입 요청 거절이 완료되었습니다.");
     }

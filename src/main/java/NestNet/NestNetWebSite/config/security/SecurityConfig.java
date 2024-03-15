@@ -149,7 +149,7 @@ public class SecurityConfig {
                         // 사진 게시판 수정은 회장, 부회장, 관리자만 접근 가능
                         .requestMatchers("/photo-post/modify").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER")
                         // 사진 게시판 목록 조회는 모든 회원 접근 가능 (승인대기, 탈퇴 제외)
-                        .requestMatchers("/photo-post").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER")
+                        .requestMatchers("/photo-post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER")
                         // 게시판 통합 기능은 모든 회원 접근 가능
                         .requestMatchers("/post/**").hasAnyAuthority("ADMIN", "PRESIDENT", "VICE_PRESIDENT", "MANAGER", "GENERAL_MEMBER", "ON_LEAVE_MEMBER", "GRADUATED_MEMBER")
                         // 통합 게시판은 모든 회원 접근 가능

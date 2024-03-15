@@ -11,8 +11,8 @@ spring:
   servlet:
     multipart:
       enabled: true
-      max-file-size: 10MB
-      max-request-size: 10MB
+      max-file-size: 5MB          # 요청 파일 하나의 사이즈
+      max-request-size: 200MB     # 요청 전체의 사이즈
 
   mail:
     host: smtp.naver.com          # 네이버 SMTP 호스트 주소
@@ -39,6 +39,9 @@ springdoc:
     display-request-duration: true
 
 logging:
+  webhook:
+    slack-url: ${webhook-slack-url}
+
   level:
     org.hibernate.SQL: debug    # 하이버네이트가 생성하는 sql 로그로 출력
     org.hibernate.orm.jdbc.bind: debug    # 쿼리 파라미터 로그 남김
