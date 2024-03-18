@@ -61,13 +61,7 @@ public class ExamCollectionPostService {
 
         examCollectionPostRepository.save(post);
 
-        log.info("여기는 올것이고");
-
-        if(files == null) log.info("널이네...");
-
         if(!ObjectUtils.isEmpty(files)){
-
-            log.info("일단 파일이 있는지? ");
 
             List<AttachedFile> savedFileList = attachedFileService.save(post, files);
 
@@ -138,7 +132,7 @@ public class ExamCollectionPostService {
         }
 
         for(Comment comment : commentList){
-            if(loginMember.getId() == comment.getMember().getId()){
+            if(loginMember.getId().equals(comment.getMember().getId())){
                 commentDtoList.add(new CommentDto(comment.getId(), comment.getMember().getLoginId(), comment.getMember().getName(), comment.getMember().getMemberAuthority(),
                         comment.getContent(), comment.getCreatedTime(), comment.getModifiedTime(), true));
             }
@@ -148,7 +142,7 @@ public class ExamCollectionPostService {
             }
         }
 
-        if(loginMember.getId() == post.getMember().getId()){
+        if(loginMember.getId().equals(post.getMember().getId())){
             postDto = ExamCollectionPostDto.builder()
                     .id(post.getId())
                     .title(post.getTitle())
