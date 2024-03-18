@@ -1,7 +1,6 @@
 package NestNet.NestNetWebSite.service.member;
 
 import NestNet.NestNetWebSite.api.ApiResult;
-import NestNet.NestNetWebSite.config.cookie.CookieManager;
 import NestNet.NestNetWebSite.config.jwt.TokenProvider;
 import NestNet.NestNetWebSite.domain.member.Member;
 import NestNet.NestNetWebSite.dto.response.MemberIdDto;
@@ -10,7 +9,6 @@ import NestNet.NestNetWebSite.dto.response.member.TemporaryInfoDto;
 import NestNet.NestNetWebSite.exception.CustomException;
 import NestNet.NestNetWebSite.exception.ErrorCode;
 import NestNet.NestNetWebSite.repository.member.MemberRepository;
-import NestNet.NestNetWebSite.service.auth.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -56,10 +54,10 @@ public class MemberService {
     }
 
     /*
-    임시 비밀번호 발급
+    임시 비밀번호 발급 + 비밀번호 변경
      */
     @Transactional
-    public TemporaryInfoDto createTemporaryPassword(String loginId){
+    public TemporaryInfoDto createTemporaryPasswordAndChangePassword(String loginId){
 
         Member member = memberRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_LOGIN_ID_NOT_FOUND));
@@ -67,7 +65,7 @@ public class MemberService {
         String tempPassword = UUID.randomUUID().toString().replace("-", "");
         tempPassword = tempPassword.substring(0,15);
 
-        changeMemberPassword(member.getLoginId(), tempPassword);
+        member.changePassword(tempPassword, passwordEncoder);
 ;
         return new TemporaryInfoDto(member.getEmailAddress(), tempPassword);
     }

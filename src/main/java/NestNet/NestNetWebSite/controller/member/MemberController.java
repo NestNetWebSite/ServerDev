@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -81,9 +80,9 @@ public class MemberController {
     })
     public ApiResult<?> getTemporaryPassword(@Valid @RequestBody MemberGetTemporaryPwRequest dto){
 
-        TemporaryInfoDto emailAndPw = memberService.createTemporaryPassword(dto.getLoginId());
+        TemporaryInfoDto temporaryInfoDto = memberService.createTemporaryPasswordAndChangePassword(dto.getLoginId());
 
-        return mailService.sendEmailTemporaryPassword(emailAndPw.getEmail(), emailAndPw.getPassword());
+        return mailService.sendEmailTemporaryPassword(temporaryInfoDto.getEmail(), temporaryInfoDto.getPassword());
     }
 
     /*
