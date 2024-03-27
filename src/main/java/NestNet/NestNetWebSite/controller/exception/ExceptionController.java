@@ -2,7 +2,7 @@ package NestNet.NestNetWebSite.controller.exception;
 
 import NestNet.NestNetWebSite.api.ApiResult;
 import NestNet.NestNetWebSite.exception.CustomException;
-import NestNet.NestNetWebSite.service.SlackService;
+import NestNet.NestNetWebSite.service.slack.SlackService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

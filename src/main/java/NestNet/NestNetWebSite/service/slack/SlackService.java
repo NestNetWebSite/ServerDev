@@ -1,4 +1,4 @@
-package NestNet.NestNetWebSite.service;
+package NestNet.NestNetWebSite.service.slack;
 
 import NestNet.NestNetWebSite.exception.CustomException;
 import com.slack.api.Slack;
